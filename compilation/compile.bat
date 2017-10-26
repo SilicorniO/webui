@@ -1,0 +1,1 @@
+java -jar compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --js ../core/ui_core.js ../core/ui_view.js ../core/ui_logs.js ../core/ui_core_config.js ../core/ui_draw.js ../core/ui_general.js ../core/ui_prepare.js ../core/ui_start.js > ../builds/webui-X.min.js

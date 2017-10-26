@@ -77,7 +77,7 @@ function applyPositions(views){
         }	
 	}
 	
-	return {maxX,maxY};
+	return {maxX: maxX, maxY: maxY};
 	
 }
     

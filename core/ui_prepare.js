@@ -171,7 +171,7 @@ function loadSizes(views, coreConfig){
 
 /**
 * Load the size of the screenView
-* @param screenView View with screen value (body)
+* @param screen View with screen value (body)
 **/
 function loadSizeScreen(screen, ele){
 
