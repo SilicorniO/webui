@@ -1,0 +1,70 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../core/ui_start.js"></script>
+    <script type="text/javascript" src="../core/ui_view.js"></script>
+    <script type="text/javascript" src="../core/ui_core_config.js"></script>
+    <script type="text/javascript" src="../core/ui_prepare.js"></script>
+    <script type="text/javascript" src="../core/ui_core.js"></script>
+    <script type="text/javascript" src="../core/ui_draw.js"></script>
+    <script type="text/javascript" src="../core/ui_general.js"></script>
+    <script type="text/javascript" src="../core/ui_logs.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="s;w:100%;h:100%">
+        <span ui="t:p;l:p">
+            <div ui="p:mb">
+                <div ui="">
+                    <span>Mobile: padding-big-20</span><br />
+                    <span>Tablet: padding-big-50</span><br />
+                    <span>Desktop: padding-big-100</span>
+                <div>
+            </div>
+    </div>
+    
+    <script>
+    configUI({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs',
+        dimens: {
+            ms: 10, 	//margin small
+            mm: 20, 	//margin medium
+            mb: 100 	//margin big
+        },
+        screenModes: [
+            {
+                //mobile
+                suffix: "m",
+                widthEnd: 450,
+                dimens: {
+                    ms: 2, 	//margin small
+                    mm: 5, 	//margin medium
+                    mb: 20 	//margin big
+                }
+            },
+            {
+                //tablet
+                suffix: "t",
+                widthStart: 451,
+                widthEnd: 700,
+                dimens: {
+                    ms: 5, 	//margin small
+                    mm: 10, //margin medium
+                    mb: 50 	//margin big
+                }
+            },
+            {
+                //desktop
+                suffix: "d",
+                widthStart: 701
+            }
+        ]
+    });
+    
+    drawUIAll();
+    </script>
+    
+</body>
+</html>

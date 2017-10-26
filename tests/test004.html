@@ -1,0 +1,33 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../core/ui_start.js"></script>
+    <script type="text/javascript" src="../core/ui_view.js"></script>
+    <script type="text/javascript" src="../core/ui_core_config.js"></script>
+    <script type="text/javascript" src="../core/ui_prepare.js"></script>
+    <script type="text/javascript" src="../core/ui_core.js"></script>
+    <script type="text/javascript" src="../core/ui_draw.js"></script>
+    <script type="text/javascript" src="../core/ui_general.js"></script>
+    <script type="text/javascript" src="../core/ui_logs.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="s;w:100%;h:100%">
+        <div id="content1" ui="t:p;gh:c">Top-Center</div>
+        <div id="content2" ui="l:p;gv:c">Left-Center</div>
+        <div id="content3" ui="r:p;gv:c">Right-Center</div>
+        <div id="content4" ui="b:p;gh:c">Bottom-Center</div>
+    </div>
+    
+    <script>
+    configUI({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs'
+    });
+    
+    drawUIAll();
+    </script>
+    
+</body>
+</html>

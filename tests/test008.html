@@ -1,0 +1,42 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../core/ui_start.js"></script>
+    <script type="text/javascript" src="../core/ui_view.js"></script>
+    <script type="text/javascript" src="../core/ui_core_config.js"></script>
+    <script type="text/javascript" src="../core/ui_prepare.js"></script>
+    <script type="text/javascript" src="../core/ui_core.js"></script>
+    <script type="text/javascript" src="../core/ui_draw.js"></script>
+    <script type="text/javascript" src="../core/ui_general.js"></script>
+    <script type="text/javascript" src="../core/ui_logs.js"></script>
+</head>
+<body style="margin:0">
+    
+        <div id="screen" ui="s;w:100%;h:100%">
+                <div id="content" ui="g:c,c">
+                    <div ui="">Center long long</div>
+                    <div ui="ab:l">Double</div>
+                </div>
+                <div id="content1" ui="ale:content;gv:c">At-Left-Equal</div>
+                <div id="content2" ui="ate:content;gh:c">At-Top-Equal</div>
+                <div id="content3" ui="are:content;gv:c">At-Right-Equal</div>
+                <div id="content4" ui="abe:content;gh:c">At-Bottom-Equal</div>
+            </div>
+    
+    <script>
+    configUI({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs',
+        dimens: {
+            ms: 10, 	//margin small
+            mm: 20, 	//margin medium
+            mb: 100 	//margin big
+        },
+    });
+    
+    drawUIAll();
+    </script>
+    
+</body>
+</html>
