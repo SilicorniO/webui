@@ -3,8 +3,8 @@ Easier way to set the position of the views/tags in a website.
 Built with basic Javascript, it should be working in most of browsers. 
 
 ## Features
- * Set horizontal position of a view: Left, Right or Middle.
- * Set vertical position of a view: Top, Bottom or Middle.
+ * Set horizontal position of a view: Left, Right, Middle, Percentage, ...
+ * Set vertical position of a view: Top, Bottom, Middle, Percentage, ...
  * Define relational position of a view respect another one.
  * Allows to change the position of the views depending of the width of the screen.
  * Allows to change automatically the size of margins and paddings depending of device.
@@ -34,11 +34,11 @@ You can find the latest minified version in the builds folder. If you need to de
           </body>
       </html>
       
-   ``
+   ```
 
 2. Add the first call to use webui in your page.
 
-   ``html
+   ```html
       
       <html>
           <head>
@@ -54,7 +54,7 @@ You can find the latest minified version in the builds folder. If you need to de
           </body>
       </html>
       
-   ``
+   ```
    
 3. Now you can use webui in your page:
 
@@ -127,30 +127,36 @@ Once you have a screen in your page you can start adding more views. The views a
 If you want a tag to convert in a webui-view, you have to add the "ui" attribute. For example:
 
     ```html
-    <div id="container" ui="">
-    </div>
+        
+        <div id="container" ui="">
+        </div>
+        
     ```
     
 You can add containers inside containers as views. Remember adding the attribute "ui" to all tags you want to be processed. If a tag hasn't got it, any of its children will be processed:
 
     ```html
-    <div id="container" ui="">
-        <div id="subcontainer1" ui=""></div>
-        <div id="subcontainer1" ui=""></div>
-    </div>
+        
+        <div id="container" ui="">
+            <div id="subcontainer1" ui=""></div>
+            <div id="subcontainer1" ui=""></div>
+        </div>
+        
     ```
 
 Inside of the containers you could add content with webui-views or plain html:
 
     ```html
-    <div id="container" ui="">
-        <div id="subcontainer1" ui="">
-            <span ui="">Text with webui</span>
+        
+        <div id="container" ui="">
+            <div id="subcontainer1" ui="">
+                <span ui="">Text with webui</span>
+            </div>
+            <div id="subcontainer1" ui="">
+                <span>Just text not processed in webui</span>
+            </div>
         </div>
-        <div id="subcontainer1" ui="">
-            <span>Just text not processed in webui</span>
-        </div>
-    </div>
+        
     ```
 
 2. Parameters
@@ -202,13 +208,13 @@ There are three special identifiers:
 
 All the parameters are used inside the "ui" attribute. 
 
-For example: ui="l:p; ab:l; w:100%"
+For example: ui="l:p; ab:l; w:30%"
 
  * l:p - The left side of the view will be at the left side of the parent
  * ab:l - The view will be below the last one, as a list.
  * w:30% - The width of the view will be the 30% of the width of the parent.
 
-```html
+    ```html
       
       <html>
           <head>
@@ -218,27 +224,19 @@ For example: ui="l:p; ab:l; w:100%"
           <body>
           
           <div ui="s">
-            <span ui="t:p;l:p">Top-Left</span>
+            <div>
+                <span ui="l:p;ab:l;w:30%">Text</span>
+            </div>
           </div>
           
           <script>
           
-            configUI({
-                viewColors: true,
-                showLogs: true,
-                viewLogs: 'logs',
-                dimens: {
-                    ms: 10, 	//margin small
-                    mm: 20, 	//margin medium
-                    mb: 100 	//margin big
-                }
-            });
-            
             drawUIAll();
           </script>
           
           </body>
       </html>
+      
     ```
 
 5. Examples
@@ -304,6 +302,7 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
           
           </body>
       </html>
+      
     ```
    
    
