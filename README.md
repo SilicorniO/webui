@@ -23,7 +23,7 @@ Built with basic Javascript, it should be working in most of browsers.
 
 You can find the latest minified version in the builds folder. If you need to debug you can use logs and the core version directly in your project.
 
-1. Add the script reference in your website
+### 1. Add the script reference in your website
  
    ```html
       
@@ -38,7 +38,7 @@ You can find the latest minified version in the builds folder. If you need to de
       
    ```
 
-2. Add the first call to use webui in your page.
+### 2. Add the first call to use webui in your page.
 
    ```html
       
@@ -58,7 +58,7 @@ You can find the latest minified version in the builds folder. If you need to de
       
    ```
    
-3. Now you can use webui in your page:
+### 3. Now you can use webui in your page:
 
    The webui framework needs a parent div called screen. If you are using "drawUIAll()" you will need to add this div inside the "body" tag. This method is useful if you want to build the base of your website with "webui".
   
@@ -84,7 +84,7 @@ You can find the latest minified version in the builds folder. If you need to de
       
    ```
 
-4. Webui can be used inside of your built pages, inside another tags. 
+### 4. Webui can be used inside of your built pages, inside another tags. 
 
    For this way you need to add an identifier of a div and to call to "drawForId('IDENTIFIER_OF_TAG')".
 
@@ -120,7 +120,7 @@ You can find the latest minified version in the builds folder. If you need to de
       
    ```
 
-5. Webui can search for you the containers defined as web-uiscreens.
+### 5. Webui can search for you the containers defined as web-uiscreens.
 
    You need to add the "s" parameter inside the "ui" attribute. Then call to "drawUIAll()".
 
@@ -152,7 +152,7 @@ You can find the latest minified version in the builds folder. If you need to de
 
 ## Usage
 
-1. Containers
+### 1. Containers
 
 Once you have a screen in your page you can start adding more views. The views are any tag you want. It is recommended to use div as containers and the rest of tags as common use.
 
@@ -191,7 +191,7 @@ Inside of the containers you could add content with webui-views or plain html:
         
    ```
 
-2. Parameters
+### 2. Parameters
 
 You can define the position of your webui-view with short commands inside the "ui" attribute. These are the commands and their possible values:
 
@@ -227,7 +227,7 @@ You can define the position of your webui-view with short commands inside the "u
  * sh - Scroll horizontal: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
  * s - Screen: () Just add this parameter to define the tag as a screen. Call to "drawUIAll". This is equivalent to give an identifier to the tag and call to "drawUIForId('ID')".
 
-3. Identifiers of the views
+### 3. Identifiers of the views
 
 Each view has an identifier. It is not mandatory to define one, if you don't add it, the webui framework will generate one. If you are debugging may be easier to set identifier in all views you want to check to find the problem.
 
@@ -237,7 +237,7 @@ There are three special identifiers:
  * p - Parent: This is the identifier of the parent view. If you want to set a parameter in the view referenced to its parent you just need to write PARAMETER:"p".
  * l - Last: This is the identifier of the last view in the code. If you want to set a parameter in the view referenced to its parent you just need to write PARAMETER:"l".
 
-4. Applying parameters
+### 4. Applying parameters
 
 All the parameters are used inside the "ui" attribute. 
 
@@ -272,7 +272,7 @@ For example: ui="l:p; ab:l; w:30%"
       
     ```
 
-5. Examples
+### 5. Examples
 
 Please, to learn more, check the examples in "tests" folder. You can clone the project and execute the examples directly in your browser.
 
