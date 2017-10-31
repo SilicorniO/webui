@@ -2,6 +2,8 @@
 Easier way to set the position of the views/tags in a website. 
 Built with basic Javascript, it should be working in most of browsers. 
 
+![alt text](https://raw.githubusercontent.com/SilicorniO/webui/master/tests/webui-tests-positions.png)
+
 ## Features
  * Set horizontal position of a view: Left, Right, Middle, Percentage, ...
  * Set vertical position of a view: Top, Bottom, Middle, Percentage, ...
@@ -48,7 +50,7 @@ You can find the latest minified version in the builds folder. If you need to de
           <body>
           
           <script>
-            drawUIAll();
+            drawUI();
           </script>
           
           </body>
@@ -74,7 +76,7 @@ You can find the latest minified version in the builds folder. If you need to de
           </div>
           
           <script>
-            drawUIAll();
+            drawUI();
           </script>
           
           </body>
@@ -111,6 +113,36 @@ You can find the latest minified version in the builds folder. If you need to de
           
           <script>
             drawUIForId('screen');
+          </script>
+          
+          </body>
+      </html>
+      
+   ```
+
+5. Webui can search for you the containers defined as web-uiscreens.
+
+   You need to add the "s" parameter inside the "ui" attribute. Then call to "drawUIAll()".
+
+   ```html
+      
+      <html>
+          <head>
+            <!-- WEBUI SCRIPT REFERNCE -->
+            <script type="text/javascript" src="webui-1.0.0.min.js"></script>
+          </head>
+          <body>
+          
+          <div ui="s">
+            <span ui="t:p;l:p">Top-Left</span>
+          </div>
+
+          <div ui="s">
+            <span ui="b:p;r:p">Bottom-Right</span>
+          </div>
+          
+          <script>
+            drawUIAll();
           </script>
           
           </body>
@@ -193,6 +225,7 @@ You can define the position of your webui-view with short commands inside the "u
  * cui - Children ui: ("n") If you don't want to process the children of the view although they have "ui" attribute.
  * sv - Scroll vertical: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
  * sh - Scroll horizontal: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
+ * s - Screen: () Just add this parameter to define the tag as a screen. Call to "drawUIAll". This is equivalent to give an identifier to the tag and call to "drawUIForId('ID')".
 
 3. Identifiers of the views
 

@@ -22,7 +22,7 @@ function configUI(configuration){
 	uiConfiguration = configuration;
 	    
     if(configuration['viewColors']){
-        viewColors = configuration.viewColors;
+        viewColors = true;
     }
 	
 	if(configuration['showLogs']){
@@ -73,6 +73,7 @@ function drawUI(cbEvents){
 	drawUIScreen(screen, coreConfig, cbEvents);
 }
 
+window['drawUIAll'] = drawUIAll;
 /**
 * Execute UI
 **/

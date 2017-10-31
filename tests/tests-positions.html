@@ -1,0 +1,134 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="../builds/webui-1.0.0.min.js"></script>
+    </head>
+    <body style="margin:0">
+
+        <div ui="sv;w:100%;h:100%">
+
+            <!-- ROW 1 -->
+        
+            <div id="test001" ui="w:200;h:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <span ui="t:p;l:p">Top-Left</span>
+                </div>
+            </div>
+
+            <div id="test002" ui="are:l;w:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div ui="r:p;b:p">Bottom-Right</div>
+                </div>
+            </div>
+
+            <div id="test003" ui="are:l;w:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div ui="gh:c;gv:c">Center</div>
+                </div>
+            </div>
+
+            <!-- ROW 2 -->
+
+            <div id="test004" ui="abe:test001;l:p;h:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div ui="t:p;gh:c">Top-Center</div>
+                    <div ui="l:p;gv:c">Left-Center</div>
+                    <div ui="r:p;gv:c">Right-Center</div>
+                    <div ui="b:p;gh:c">Bottom-Center</div>
+                </div>
+            </div>
+
+            <div id="test005" ui="are:l;w:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div id="cc005" ui="g:c,c">Center</div>
+                    <div ui="al:cc005;gv:c">At-Left</div>
+                    <div ui="at:cc005;gh:c">At-Top</div>
+                    <div ui="ar:cc005;gv:c">At-Right</div>
+                    <div ui="ab:cc005;gh:c">At-Bottom</div>
+                </div>
+            </div>
+
+            <div id="test006" ui="are:l;w:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div id="cc006" ui="g:c,c">Center</div>
+                    <div ui="al:cc006;gv:c;mr:ms">MrgnR</div>
+                    <div ui="at:cc006;gh:c;mb:ms">MrgnB</div>
+                    <div ui="ar:cc006;gv:c;ml:ms">MrgnL</div>
+                    <div ui="ab:cc006;gh:c;mt:ms">MrgnT</div>
+                </div>
+            </div>
+
+            <!-- ROW 3 -->
+
+            <div id="test007" ui="abe:test004;l:p;h:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div ui="p:mm"><span ui="">Padding-All</span></div>
+                </div>
+            </div>
+
+            <div id="test008" ui="are:l;w:400;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div id="cc008" ui="g:c,c">
+                        <div ui="">Center long long</div>
+                        <div ui="ab:l">Double</div>
+                    </div>
+                    <div ui="ale:cc008;gv:c">At-Left-Equal</div>
+                    <div ui="ate:cc008;gh:c">At-Top-Equal</div>
+                    <div ui="are:cc008;gv:c">At-Right-Equal</div>
+                    <div ui="abe:cc008;gh:c">At-Bottom-Equal</div>
+                </div>
+            </div>
+
+            <!-- ROW 4 -->
+
+            <div id="test009" ui="abe:test007;l:p;h:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div ui="">Item list</div>
+                    <div ui="ab:l">Item list</div>
+                    <div ui="ab:l">Item list</div>
+                    <div ui="ab:l">Item list</div>
+                </div>
+            </div>
+
+            <div id="test010" ui="are:l;w:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    <div ui="w:100;h:100;sv">
+                        <div ui="">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                        <div ui="ab:l">vertical scroll</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="test011" ui="are:l;w:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p">
+                    
+                </div>
+            </div>
+
+        </div>
+        
+        <script>
+        configUI({
+            viewColors: true,
+            showLogs: true,
+            dimens: {
+                mxs: 5,     //margin extra-small
+                ms: 10, 	//margin small
+                mm: 20, 	//margin medium
+                mb: 100, 	//margin big
+                mxb: 150    //margin extra-big
+            }
+        });
+        
+        drawUI();
+        </script>
+        
+    </body>
+</html>

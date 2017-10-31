@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="../builds/webui-1.0.0.min.js"></script>
+    </head>
+    <body style="margin:0">
+        
+        <div ui="w:100%;h:100%">
+
+            <div ui="w:200;sv;t:p;l:p;b:p" style="border:2px solid black">
+                <ul>
+                    <li><a href="javascript:loadTest('test001')">Test001</a></li>
+                    <li><a href="javascript:loadTest('test002')">Test002</a></li>
+                    <li><a href="javascript:loadTest('test003')">Test003</a></li>
+                    <li><a href="javascript:loadTest('test004')">Test004</a></li>
+                    <li><a href="javascript:loadTest('test005')">Test005</a></li>
+                    <li><a href="javascript:loadTest('test006')">Test006</a></li>
+                    <li><a href="javascript:loadTest('test007')">Test007</a></li>
+                    <li><a href="javascript:loadTest('test008')">Test008</a></li>
+                    <li><a href="javascript:loadTest('test009')">Test009</a></li>
+                    <li><a href="javascript:loadTest('test010')">Test010</a></li>
+                </ul>
+            </div>
+
+            <div ui="ar:l;r:p;t:p;b:p">
+                <iframe id="frameTest" src="test001.html" width="100%" height="100%"></iframe>
+            </div>
+
+        </div>
+
+        <script>
+
+        function loadTest(testName){
+            document.getElementById('frameTest').src = testName + '.html';
+        }
+
+        configUI({
+            viewColors: false,
+            showLogs: false,
+            dimens: {
+                mxs: 5,     //margin extra-small
+                ms: 10, 	//margin small
+                mm: 20, 	//margin medium
+                mb: 100, 	//margin big
+                mxb: 150    //margin extra-big
+            }
+        });
+        
+        drawUI();
+        </script>
+        
+    </body>
+</html>
