@@ -158,27 +158,27 @@ Once you have a screen in your page you can start adding more views. The views a
 
 If you want a tag to convert in a webui-view, you have to add the "ui" attribute. For example:
 
-    ```html
+   ```html
         
         <div id="container" ui="">
         </div>
         
-    ```
+   ```
     
 You can add containers inside containers as views. Remember adding the attribute "ui" to all tags you want to be processed. If a tag hasn't got it, any of its children will be processed:
 
-    ```html
+   ```html
         
         <div id="container" ui="">
             <div id="subcontainer1" ui=""></div>
             <div id="subcontainer1" ui=""></div>
         </div>
         
-    ```
+   ```
 
 Inside of the containers you could add content with webui-views or plain html:
 
-    ```html
+   ```html
         
         <div id="container" ui="">
             <div id="subcontainer1" ui="">
@@ -189,7 +189,7 @@ Inside of the containers you could add content with webui-views or plain html:
             </div>
         </div>
         
-    ```
+   ```
 
 2. Parameters
 
