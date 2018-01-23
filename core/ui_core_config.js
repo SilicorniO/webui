@@ -8,7 +8,8 @@
 function createCoreConfig(uiConf){
 		
 	var coreConfig = {
-		suffixs: [],
+		attribute: 'ui',
+		attributes: [],
 		dimens: {},
 		
 		getDimen: function(name){
@@ -23,9 +24,14 @@ function createCoreConfig(uiConf){
 	if(!uiConf){
 		return coreConfig;
 	}
+
+	//set attribute
+	if(uiConf['attribute']){
+		coreConfig['attribute'] = uiConf['attribute'];
+	}
 	
-	//initialize array of suffix
-	var aSuffix = [];
+	//initialize array of attributes
+	var aAttributes = [];
 	
 	//initialize dimens
 	var dimens = {};
@@ -55,8 +61,8 @@ function createCoreConfig(uiConf){
 				(!screenMode['heightStart'] || screenMode['heightStart']==0 || screenMode['heightStart']<heightScreen) && 
 				(!screenMode['heightEnd'] || screenMode['heightEnd']==0 || screenMode['heightEnd']<heightScreen) 
 			){
-				aSuffix.push(screenMode['suffix']);
-				log('SHOWING SUFFIX: ' + screenMode['suffix']);
+				aAttributes.push(screenMode['attribute']);
+				log('SHOWING ATTRIBUTE: ' + screenMode['attribute']);
 				//add dimens of this screen mode overriding existing
 				if(screenMode['dimens']){
 					var dimenKeys = Object.keys(screenMode['dimens']);
@@ -69,7 +75,7 @@ function createCoreConfig(uiConf){
 	}
 	
 	//set values
-	coreConfig.suffixs = aSuffix;
+	coreConfig.attributes = aAttributes;
 	coreConfig.dimens = dimens;
 	
 	return coreConfig;

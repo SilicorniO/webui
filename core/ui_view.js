@@ -6,13 +6,13 @@ var VIEW_SIZE_LIMIT = 100000;
 * Generate a new parent view that is called screen
 * @constructor
 * @param views Array of views to add to the screen
-* @param suffixs 
+* @param coreConfig configuration of core 
 * @return Screen generated
 **/
-function createScreen(id, ele, views, suffixs){
+function createScreen(id, ele, views, coreConfig){
 	var screenView;
 	if(ele!=null){
-		screenView = createViewFromElement(ele, "", "", "ui", suffixs);
+		screenView = createViewFromElement(ele, "", "", coreConfig.attribute, coreConfig.attributes);
 	}else{
 		screenView = createView(id);
 	}
@@ -345,10 +345,10 @@ function createView(id){
 * @param parentId to assign to the view created
 * @param lastViewId with the identifier of the view before
 * @param attributeMain with the name of the attribute to read
-* @param attributeSuffixs with the name of the attributes to read as secondary
+* @param attributes with the name of the attributes to read as secondary
 * @return View generated
 **/
-function createViewFromElement(element, parentId, lastViewId, attributeMain, attributeSuffixs){
+function createViewFromElement(element, parentId, lastViewId, attributeMain, attributes){
 
 	//create the view and assign the parent identifier
 	var view = createView(element.id);
@@ -359,8 +359,8 @@ function createViewFromElement(element, parentId, lastViewId, attributeMain, att
 	
 	//read main attributes
 	var aValues = readAttributes(element.getAttribute(attributeMain));
-	for(var i=0; i<attributeSuffixs.length; i++){
-		aValues = aValues.concat(readAttributes(element.getAttribute(attributeMain+attributeSuffixs[i])));
+	for(var i=0; i<attributes.length; i++){
+		aValues = aValues.concat(readAttributes(element.getAttribute(attributes[i])));
 	}
 	
 	//check if we have attributes

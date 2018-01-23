@@ -261,13 +261,13 @@ function restoreSizes(view, viewsSizes){
 * Get a list of children of the parent as views
 * @param parentId String name of the parent
 * @param parent Element from HTML
-* @param suffixs String[] to add to the attribute UI
+* @param attributes String[] to add to the attribute UI
 * @return Array with the list of views
 **/
-function getChildrenViews(parentId, parent, suffixs){
+function getChildrenViews(parentId, parent, coreConfig){
 		
 	//get the children
-	var children = getChildrenViewsWithParentId(parent, parent, suffixs);
+	var children = getChildrenViewsWithParentId(parent, parent, coreConfig);
 	
 	//set the flag to false because all events have been added to the images
 	imgEventsAdded = true;
@@ -280,10 +280,10 @@ function getChildrenViews(parentId, parent, suffixs){
 * Get a list of children of the parent as views
 * @param parentId String identifier of the parent, can be null
 * @param parent Element from HTML
-* @param suffixs String[] to add to the attribute UI
+* @param coreConfig CoreConfig with configuration of core
 * @return Array with the list of views
 **/
-function getChildrenViewsWithParentId(parentId, parent, suffixs){
+function getChildrenViewsWithParentId(parentId, parent, coreConfig){
 
 	var views = new Array();
 
@@ -306,7 +306,7 @@ function getChildrenViewsWithParentId(parentId, parent, suffixs){
 	for(var i=0; i<childNodes.length; i++){
 		var element = childNodes[i];
 		var checkingChildren = false;
-        if(element.tagName!=null && element.getAttribute("ui")!=null && element.style.display!='none'){
+        if(element.tagName!=null && element.getAttribute(coreConfig.attribute)!=null && element.style.display!='none'){
 			
 			//assign an id if necessary
 			if(element.id.length==0){
@@ -315,7 +315,7 @@ function getChildrenViewsWithParentId(parentId, parent, suffixs){
 			}
 			
 			//create the view and add it to the list of views
-			var view = createViewFromElement(element, parentId, lastViewId, "ui", suffixs);
+			var view = createViewFromElement(element, parentId, lastViewId, coreConfig.attribute, coreConfig.attributes);
 			views.push(view);
 			
 			//save last view for next one
@@ -323,7 +323,7 @@ function getChildrenViewsWithParentId(parentId, parent, suffixs){
 			
 			//add views of their children
 			if(view.childrenUI){
-				view.children = getChildrenViewsWithParentId(parentId, element, suffixs);
+				view.children = getChildrenViewsWithParentId(parentId, element, coreConfig);
 				checkingChildren = true;
 			}
 		}
@@ -359,7 +359,7 @@ function addEventImages(element, applyChildren){
 	}	
 }
 
-function getAllScreens(parent, screens){
+function getAllScreens(parent, screens, coreConfig){
 
 	//if no parent received it is the first call and we have to get the body
 	if(parent == null){
@@ -370,7 +370,7 @@ function getAllScreens(parent, screens){
 		screens = [];
 	}
 
-	var attributeMain = "ui";
+	var attributeMain = coreConfig.attribute;
 
 	//search for a children with screen values
 	var childNodes = parent.childNodes;
@@ -400,7 +400,7 @@ function getAllScreens(parent, screens){
 			}
 
 			//search for more screens
-			getAllScreens(child, screens);
+			getAllScreens(child, screens, coreConfig);
 		}	
 	}
 

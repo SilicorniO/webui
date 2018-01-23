@@ -58,10 +58,10 @@ function drawUI(cbEvents){
     var coreConfig = init();
 			
 	//read views from html
-	var views = getChildrenViews(null, null, coreConfig.suffixs);
+	var views = getChildrenViews(null, null, coreConfig);
 			
 	//create screen and add it in the first position
-	var screen = createScreen("s", null, views, coreConfig.suffixs);
+	var screen = createScreen("s", null, views, coreConfig);
 	
 	//save size of views
 	screen.sizes = saveSizes(screen.view);
@@ -81,9 +81,12 @@ function drawUIAll(cbEvents){
     
 	//start genral counter
 	startCounter('all');
+
+	//initialize variables
+    var coreConfig = init();
 	
 	//search all the screens
-	var screens = getAllScreens(null, null);
+	var screens = getAllScreens(null, null, coreConfig);
 
 	//draw all screens
 	for(var i=0; i<screens.length; i++){
@@ -110,10 +113,10 @@ function drawUIForId(id, cbEvents){
 	}
 	
 	//read views from html
-	var views = getChildrenViews(id, ele, coreConfig.suffixs);
+	var views = getChildrenViews(id, ele, coreConfig);
 	
 	//create screen and add it in the first position
-	var screen = createScreen(id, ele, views, coreConfig.suffixs);
+	var screen = createScreen(id, ele, views, coreConfig);
 	
 	//save size of views
 	screen.sizes = saveSizes(screen.view);

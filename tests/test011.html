@@ -12,38 +12,16 @@
 </head>
 <body style="margin:0">
     
-    <div id="screen" ui="s;w:100%;h:100%">
-        <span ui="t:p" uim="l:p" uit="gh:c" uid="r:p">
-            <div>
-                <span>Mobile: top-left</span><br />
-                <span>Tablet: top-center</span><br />
-                <span>Desktop: top-right</span>
-            </div>
+    <div id="screen" data-ui="s;w:100%;h:100%">
+        <div id="content" data-ui="gh:c;gv:c">Testing attribute with different name</div>
     </div>
     
     <script>
     configUI({
+        attribute: 'data-ui',
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs',
-        screenModes: [
-            {
-                //mobile
-                attribute: "uim",
-                widthEnd: 450
-            },
-            {
-                //tablet
-                attribute: "uit",
-                widthStart: 451,
-                widthEnd: 700
-            },
-            {
-                //desktop
-                attribute: "uid",
-                widthStart: 701
-            }
-        ]
+        viewLogs: 'logs'
     });
     
     drawUIAll();
