@@ -27,7 +27,7 @@ function createCoreConfig(uiConf){
 
 	//set attribute
 	if(uiConf['attribute']){
-		coreConfig['attribute'] = uiConf['attribute'];
+		coreConfig.attribute = uiConf['attribute'];
 	}
 	
 	//initialize array of attributes
