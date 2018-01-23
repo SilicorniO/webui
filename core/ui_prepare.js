@@ -261,7 +261,7 @@ function restoreSizes(view, viewsSizes){
 * Get a list of children of the parent as views
 * @param parentId String name of the parent
 * @param parent Element from HTML
-* @param attributes String[] to add to the attribute UI
+* @param coreConfig configuration of the core
 * @return Array with the list of views
 **/
 function getChildrenViews(parentId, parent, coreConfig){
