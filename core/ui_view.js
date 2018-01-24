@@ -382,9 +382,13 @@ function createViewFromElement(element, parentId, lastViewId, attributeMain, att
 		}
 					
 		if(attr=='w'){
-			view.setWidth(value);		
+			view.setWidth(value);	
+		}else if(attr=='fw'){
+			view.setWidth('100%');	
 		}else if(attr=='h'){
 			view.setHeight(value);
+		}else if(attr=='fh'){
+			view.setHeight('100%');	
 		}else if(attr=='l'){
 			view.setLeft(value);
 		}else if(attr=='r'){
