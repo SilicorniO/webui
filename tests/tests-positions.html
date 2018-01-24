@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script type="text/javascript" src="../builds/webui-1.0.0.min.js"></script>
+        <script type="text/javascript" src="../builds/webui-1.1.1-dev.min.js"></script>
     </head>
     <body style="margin:0">
 
@@ -9,19 +9,19 @@
 
             <!-- ROW 1 -->
         
-            <div id="test001" ui="w:200;h:200;p:mm">
+            <div id="test001" ui="w:600;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <span ui="t:p;l:p">Top-Left</span>
                 </div>
             </div>
 
-            <div id="test002" ui="are:l;w:200;p:mm">
+            <div id="test002" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div ui="r:p;b:p">Bottom-Right</div>
                 </div>
             </div>
 
-            <div id="test003" ui="are:l;w:200;p:mm">
+            <div id="test003" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div ui="gh:c;gv:c">Center</div>
                 </div>
@@ -29,7 +29,7 @@
 
             <!-- ROW 2 -->
 
-            <div id="test004" ui="abe:test001;l:p;h:200;p:mm">
+            <div id="test004" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div ui="t:p;gh:c">Top-Center</div>
                     <div ui="l:p;gv:c">Left-Center</div>
@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            <div id="test005" ui="are:l;w:200;p:mm">
+            <div id="test005" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div id="cc005" ui="g:c,c">Center</div>
                     <div ui="al:cc005;gv:c">At-Left</div>
@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-            <div id="test006" ui="are:l;w:200;p:mm">
+            <div id="test006" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div id="cc006" ui="g:c,c">Center</div>
                     <div ui="al:cc006;gv:c;mr:ms">MrgnR</div>
@@ -60,13 +60,13 @@
 
             <!-- ROW 3 -->
 
-            <div id="test007" ui="abe:test004;l:p;h:200;p:mm">
+            <div id="test007" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div ui="p:mm"><span ui="">Padding-All</span></div>
                 </div>
             </div>
 
-            <div id="test008" ui="are:l;w:400;p:mm">
+            <div id="test008" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div id="cc008" ui="g:c,c">
                         <div ui="">Center long long</div>
@@ -81,7 +81,7 @@
 
             <!-- ROW 4 -->
 
-            <div id="test009" ui="abe:test007;l:p;h:200;p:mm">
+            <div id="test009" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div ui="">Item list</div>
                     <div ui="ab:l">Item list</div>
@@ -90,7 +90,7 @@
                 </div>
             </div>
 
-            <div id="test010" ui="are:l;w:200;p:mm">
+            <div id="test010" ui="abe:l;h:200;p:mm">
                 <div ui="l:p;r:p;t:p;b:p">
                     <div ui="w:100;h:100;sv">
                         <div ui="">vertical scroll</div>
@@ -106,9 +106,24 @@
                 </div>
             </div>
 
-            <div id="test011" ui="are:l;w:200;p:mm">
-                <div ui="l:p;r:p;t:p;b:p">
-                    
+            <div id="test011" ui="abe:l;h:200;p:mm">
+                <div ui="l:p;r:p;t:p;b:p;w:100%">
+                    <div ui="w:100%">
+                        <span ui="w:25%">[1] 25%</span>
+                        <span ui="ar:l;w:25%">[2] 25%</span>
+                        <span ui="ar:l;w:25%">[3] 25%</span>
+                        <span ui="ar:l;w:25%">[4] 25%</span>
+                    </div>
+                    <div ui="w:100%;ab:l">
+                        <span ui="w:25%">[1] 25%</span>
+                        <span ui="w:25%1">[2] 25%</span>
+                        <span ui="w:25%2">[3] 25%</span>
+                        <span ui="w:25%3">[4] 25%</span>
+                    </div>
+                    <div ui="w:100%;ab:l">
+                        <span ui="w:50%">[1] 50%</span>
+                        <span ui="r:p;w:50%">[2] 50%</span>
+                    </div>
                 </div>
             </div>
 

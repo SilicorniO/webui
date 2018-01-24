@@ -53,7 +53,7 @@ function calculateViewHor(view, parentView, arrayViews, indexes, width, viewsRes
 	}else if(view.sizeWidth=='sp'){
 		
 		//apply percent
-		applyPercentHor(view, width);		
+		applyPercentHor(view, parentView, width);		
 		
 	}
 	
@@ -153,7 +153,7 @@ function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRe
 	}else if(view.sizeHeight=='sp'){
 		
 		//apply percent
-		applyPercentVer(view, height);		
+		applyPercentVer(view, parentView, height);		
 		
 	}
 	
@@ -484,20 +484,25 @@ function applySizeChildrenVer(view){
 /**
 * Apply percent to a view with a width setted
 * @param view View to set percent
+* @param parentView View of the parent to know its size
+* @param width width to apply if right was not applied
 **/
-function applyPercentHor(view, width){
+function applyPercentHor(view, parentView, width){
 	
-	if(!view.rightChanged || !view.leftChanged){
-		view.right = width;
+	if(view.rightChanged && !view.leftChanged){
+		view.left = view.right - ((parentView.width * view.percentWidth) / 100);
+	}else{
+		view.right = view.left + ((parentView.width * view.percentWidth) / 100);
 	}
-	view.right = view.left + (((view.right-view.left) * view.percentWidth) / 100);
 
 	//move the percent if necessary
-	var percentLeft = (view.right-view.left) * (view.percentLeft);
-	view.left += percentLeft;
-	view.right += percentLeft;
+	if(view.percentLeft>0){
+		var percentLeft = (view.right-view.left) * (view.percentLeft);
+		view.left += percentLeft;
+		view.right += percentLeft;
+	}
 
-	//masrk right and left as changed
+	//mark left and right as changed
 	view.rightChanged = true;
 	view.leftChanged = true;
 }
@@ -505,18 +510,24 @@ function applyPercentHor(view, width){
 /**
 * Apply percent to a view with a width setted
 * @param view View to set percent
+* @param parentView View of the parent to know its size
+* @param height height to apply if top was not applied
 **/
-function applyPercentVer(view, height){
+function applyPercentVer(view, parentView, height){
 	
-	if(!view.bottomChanged || !view.topChanged){
-		view.bottom = height;
+	if(view.bottomChanged && !view.topChanged){
+		view.top = view.bottom - ((parentView.height * view.percentHeight) / 100);
+	}else{
+		view.bottom = view.top + ((parentView.height * view.percentHeight) / 100);
 	}
-	view.bottom = view.top + ((view.bottom-view.top) * view.percentHeight / 100);
+	
 
 	//move the percent if necessary
-	var percentTop = (view.bottom-view.top) * (view.percentTop);
-	view.top += percentTop;
-	view.bottom += percentTop;
+	if(view.percentTop>0){
+		var percentTop = (view.bottom-view.top) * (view.percentTop);
+		view.top += percentTop;
+		view.bottom += percentTop;
+	}
 
 	//masrk right and left as changed
 	view.bottomChanged = true;
