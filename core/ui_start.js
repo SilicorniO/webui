@@ -242,4 +242,48 @@ function getUiCoreConfig(){
 	
 }
 
+window['timerRedraw'] = timerRedraw;
+/**
+* Catch a lot of requests and call to callback once after timeout
+* @param cb Callback to call when it is time to redraw
+* @param timeMillis milliseconds to wait
+**/
+var time = null;
+function timerRedraw(cb, timeMillis){
+
+	if(!timeMillis){
+		timeMillis = 20;
+	}
+
+	//start the timer if not started
+	if(!time){
+		timerReadrawLauncher(timeMillis, cb);
+	}
+
+	//update the time
+	var waiting = !time;
+	time = (new Date()).getTime();
+	time += timeMillis;
+}
+
+function timerReadrawLauncher(timeInMillis, cb){
+	setTimeout(function(){
+
+		//check time is after timer
+		var now = (new Date()).getTime();
+		if(now > time){
+
+			//redraw
+			cb();
+
+			//clean the timer
+			time = null;
+		}else{
+
+			//run timer again with rest of milliseconds
+			timerReadrawLauncher(time - now, cb);
+		}
+
+	}, timeInMillis);
+}
 
