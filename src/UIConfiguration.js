@@ -1,33 +1,47 @@
 
 /**
-* Generate a new CoreConfig for the UIconfig object
-* @constructor
-* @param uiConf Object to read values
-* @return CoreConfig generated
-**/
-function createCoreConfig(uiConf){
-		
-	var coreConfig = {
-		attribute: 'ui',
-		attributes: [],
-		dimens: {},
-		
-		getDimen: function(name){
-			if(typeof this.dimens[name] !== 'undefined'){
-				return parseInt(this.dimens[name]);
-			}else{
-				return parseInt(name);
-			}
-		}
-	};
-	
+ * @constructor
+ * @param {UIConfiguration} uiConf 
+ */
+function UIConfiguration(uiConf){
+
+	this.attribute = 'ui';
+	this.attributes = [];
+	this.dimens = {};
+	this.timeRedraw = 20;
+
+	//show colors to know the size of the views
+	this.viewColors = false;
+
+	//show or hide logs of WebUI
+	this.showLogs = false;
+
+	//view where to show the logs in screen
+	this.logsView = null;
+
+	//if no configuration received we use default values
 	if(!uiConf){
-		return coreConfig;
+		return;
+	}
+
+	if(uiConf['viewColors']){
+        this.viewColors = true;
+    }
+	
+	if(uiConf['showLogs']){
+		this.showLogs = true;
+		if(uiConf.viewLogs){
+			this.logsView = document.getElementById(uiConf.viewLogs);
+		}
+	}
+
+	if(uiConf['timeRedraw']!=null && !isNaN(uiConf['timeRedraw'])){
+		this.timeRedraw = parseInt(uiConf['timeRedraw']);
 	}
 
 	//set attribute
 	if(uiConf['attribute']){
-		coreConfig.attribute = uiConf['attribute'];
+		this.attribute = uiConf['attribute'];
 	}
 	
 	//initialize array of attributes
@@ -75,8 +89,16 @@ function createCoreConfig(uiConf){
 	}
 	
 	//set values
-	coreConfig.attributes = aAttributes;
-	coreConfig.dimens = dimens;
+	this.attributes = aAttributes;
+	this.dimens = dimens;
+}
+
+UIConfiguration.prototype.getDimen = function(name){
 	
-	return coreConfig;
+	if(typeof this.dimens[name] !== 'undefined'){
+		return parseInt(this.dimens[name]);
+	}else{
+		return parseInt(name);
+	}
+
 }

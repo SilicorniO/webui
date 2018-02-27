@@ -1,14 +1,17 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../core/ui_start.js"></script>
-    <script type="text/javascript" src="../core/ui_view.js"></script>
-    <script type="text/javascript" src="../core/ui_core_config.js"></script>
-    <script type="text/javascript" src="../core/ui_prepare.js"></script>
-    <script type="text/javascript" src="../core/ui_core.js"></script>
-    <script type="text/javascript" src="../core/ui_draw.js"></script>
-    <script type="text/javascript" src="../core/ui_general.js"></script>
-    <script type="text/javascript" src="../core/ui_logs.js"></script>
+    <script type="text/javascript" src="../src/utils/UIRedrawTimer.js"></script>
+    <script type="text/javascript" src="../src/utils/UIViewUtils.js"></script>
+    <script type="text/javascript" src="../src/utils/UIUtils.js"></script>
+    <script type="text/javascript" src="../src/general/UILogFuncs.js"></script>
+    <script type="text/javascript" src="../src/general/UIGeneralFuncs.js"></script>
+    <script type="text/javascript" src="../src/UIConfiguration.js"></script>
+    <script type="text/javascript" src="../src/UIView.js"></script>
+    <script type="text/javascript" src="../src/UIPrepare.js"></script>
+    <script type="text/javascript" src="../src/UIDraw.js"></script>
+    <script type="text/javascript" src="../src/UICore.js"></script>
+    <script type="text/javascript" src="../src/WebUI.js"></script>
 </head>
 <body style="margin:0">
     
@@ -36,7 +39,8 @@
     </div>
     
     <script>
-    configUI({
+    var webUI = new WebUI();
+    webUI.start({
         viewColors: true,
         showLogs: true,
         viewLogs: 'logs',
@@ -47,8 +51,8 @@
         }
     });
     
-    drawUIForId('screen1');
-    drawUIForId('screen2');
+    webUI.drawUIForId('screen1');
+    webUI.drawUIForId('screen2');
     </script>
     
 </body>

@@ -1,12 +1,19 @@
 
-/** Value to incremenet and create auto ids **/
-var generatedId = 0;
+/** 
+ * @constructor
+*/
+function UIPrepare(){
 
-/** Flag to know if image events have been added **/
-var imgEventsAdded = false;
+	/** Value to incremenet and create auto ids **/
+	this.generatedId = 0;
+
+	/** Flag to know if image events have been added **/
+	this.imgEventsAdded = false;
+
+}
 
 //generate list of indexes
-function generateIndexes(views){
+UIPrepare.prototype.generateIndexes = function(views){
 		
 	var indexes = new Array();
 		
@@ -21,7 +28,7 @@ function generateIndexes(views){
 * Generate an array of views from one parent view
 * @param view View to read, recursive by children
 **/
-function generateArrayViews(view, aViews){
+UIPrepare.prototype.generateArrayViews = function(view, aViews){
 	if(aViews==null){
 		aViews = new Array();
 	}
@@ -31,7 +38,7 @@ function generateArrayViews(view, aViews){
 	
 	//add the children
 	for(var i=0; i<view.children.length; i++){
-		generateArrayViews(view.children[i], aViews);
+		this.generateArrayViews(view.children[i], aViews);
 	}
 	
 	return aViews;
@@ -41,16 +48,16 @@ function generateArrayViews(view, aViews){
 * Order the children of the parent view received
 * @param parentView View to order the childrens
 **/
-function orderViews(parentView){
+UIPrepare.prototype.orderViews = function(parentView){
 						
 	//then order all the views with parent screen	
-	parentView.childrenOrderHor = orderViewsSameParent(parentView.children, true);
-	parentView.childrenOrderVer = orderViewsSameParent(parentView.children, false);
+	parentView.childrenOrderHor = this.orderViewsSameParent(parentView.children, true);
+	parentView.childrenOrderVer = this.orderViewsSameParent(parentView.children, false);
 		
 	//for each one, add the view and then its ordered children
 	for(var i=0; i<parentView.children.length; i++){
 		if(parentView.children[i].children.length>0){
-			orderViews(parentView.children[i]);
+			this.orderViews(parentView.children[i]);
 		}
 	}
 				
@@ -62,7 +69,7 @@ function orderViews(parentView){
 * @param hor Boolean TRUE for horizontal dependencies, FALSE for vertical dependecies
 * @return Array of views from params, in order
 **/
-function orderViewsSameParent(views, hor){
+UIPrepare.prototype.orderViewsSameParent = function(views, hor){
   	
 	//clonea array of views to not change it
 	var oViews = views.slice();
@@ -88,7 +95,7 @@ function orderViewsSameParent(views, hor){
 	}
 	
 	//array of references of oViews to search them faster
-	var indexes = generateIndexes(oViews);
+	var indexes = this.generateIndexes(oViews);
 	
 	//search dependencies until we have all children with them
 	var allviewsSetted;
@@ -145,10 +152,10 @@ function orderViewsSameParent(views, hor){
 * Load the sizes of all views and translate paddings and margins to dimens
 * @param views Array of views to load size
 **/
-function loadSizes(views, coreConfig){
+UIPrepare.prototype.loadSizes = function(views, coreConfig){
 
 	//generate an infinite parent for calculations
-	const VIEW_SIZE_LIMIT = 100000;
+	var VIEW_SIZE_LIMIT = 100000;
 	var infiniteParent = document.createElement('div');
 	infiniteParent.style.display = 'inline-block';
 	infiniteParent.style.width = VIEW_SIZE_LIMIT;
@@ -160,18 +167,18 @@ function loadSizes(views, coreConfig){
 		var ele = document.getElementById(view.id);
 		
 		if(view.sizeWidth=='sc' && view.children.length==0){
-			updateWidthView(view, ele, infiniteParent);
+			view.width = UIViewUtils.calculateWidthView(view, ele, infiniteParent);
 		}
 		
 		if(view.sizeHeight=='sc' && view.children.length==0){
-			updateHeightView(view, ele, infiniteParent);
+			view.height = UIViewUtils.calculateHeightView(view, ele, infiniteParent);
 		}
 		
 		//translate paddings and margins
 		view.applyDimens(coreConfig);
 		
 		if(view.children.length>0){
-			loadSizes(view.children, coreConfig);
+			this.loadSizes(view.children, coreConfig);
 		}
 	}
 
@@ -182,12 +189,10 @@ function loadSizes(views, coreConfig){
 
 /**
 * Load the size of the screenView
-* @param screen View with screen value (body)
+* @param screenView View with screen value (body)
+* @param ele Element ref
 **/
-function loadSizeScreen(screen, ele){
-
-	//view of the screen
-	var screenView = screen.view;
+UIPrepare.prototype.loadSizeScreen = function(screenView, ele){
 
 	//get the container
 	if(!ele){
@@ -235,36 +240,16 @@ function loadSizeScreen(screen, ele){
 }
 
 /**
-* Return an array of sizes for the views received
-* @param view View father
-* @return Array of sizes ['width'] and ['height']
-**/
-function saveSizes(view){
-	
-	var viewsSizes = new Array();
-	
-	for(var i=0; i<view.children.length; i++){
-		viewsSizes.push({
-			width: view.children[i].width,
-			height: view.children[i].height,
-			children: saveSizes(view.children[i])
-		});
-	}
-	
-	return viewsSizes;
-}
-
-/**
 * Restore the sizes of the views
 * @param view parent view to apply sizes 
 * @param viewsSizes Array of sizes
 **/
-function restoreSizes(view, viewsSizes){
+UIPrepare.prototype.restoreSizes = function(view, viewsSizes){
 		
 	for(var i=0; i<view.children.length && i<viewsSizes.length; i++){
 		view.children[i].width = viewsSizes[i].width;
 		view.children[i].height = viewsSizes[i].height;
-		restoreSizes(view.children[i], viewsSizes[i].children);
+		this.restoreSizes(view.children[i], viewsSizes[i].children);
 	}
 }
 
@@ -275,13 +260,13 @@ function restoreSizes(view, viewsSizes){
 * @param coreConfig configuration of the core
 * @return Array with the list of views
 **/
-function getChildrenViews(parentId, parent, coreConfig){
+UIPrepare.prototype.getChildrenViews = function(parentId, parent, coreConfig){
 		
 	//get the children
-	var children = getChildrenViewsWithParentId(parent, parent, coreConfig);
+	var children = this.getChildrenViewsWithParentId(parent, parent, coreConfig);
 	
 	//set the flag to false because all events have been added to the images
-	imgEventsAdded = true;
+	this.imgEventsAdded = true;
 	
 	//return the children
 	return children;
@@ -294,7 +279,7 @@ function getChildrenViews(parentId, parent, coreConfig){
 * @param coreConfig CoreConfig with configuration of core
 * @return Array with the list of views
 **/
-function getChildrenViewsWithParentId(parentId, parent, coreConfig){
+UIPrepare.prototype.getChildrenViewsWithParentId = function(parentId, parent, coreConfig){
 
 	var views = new Array();
 
@@ -321,12 +306,12 @@ function getChildrenViewsWithParentId(parentId, parent, coreConfig){
 			
 			//assign an id if necessary
 			if(element.id.length==0){
-				element.id = "_aID_" + generatedId;
-				generatedId++;
+				element.id = "_aID_" + this.generatedId;
+				this.generatedId++;
 			}
 			
 			//create the view and add it to the list of views
-			var view = createViewFromElement(element, parentId, lastViewId, coreConfig.attribute, coreConfig.attributes);
+			var view = new UIView(element, parentId, lastViewId, coreConfig.attribute, coreConfig.attributes);
 			views.push(view);
 			
 			//save last view for next one
@@ -334,14 +319,14 @@ function getChildrenViewsWithParentId(parentId, parent, coreConfig){
 			
 			//add views of their children
 			if(view.childrenUI){
-				view.children = getChildrenViewsWithParentId(parentId, element, coreConfig);
+				view.children = this.getChildrenViewsWithParentId(parentId, element, coreConfig);
 				checkingChildren = true;
 			}
 		}
 		
 		//when an image is loaded we load the framework again
-		if(!imgEventsAdded){
-			addEventImages(element, !checkingChildren);
+		if(!this.imgEventsAdded){
+			this.addEventImages(element, !checkingChildren);
 		}
 	}
 	
@@ -354,7 +339,7 @@ function getChildrenViewsWithParentId(parentId, parent, coreConfig){
 * @param element to check 
 * @param applyChildren boolean TRUE for continue all the tree, FALSE just set the onload to the element
 **/
-function addEventImages(element, applyChildren){
+UIPrepare.prototype.addEventImages = function(element, applyChildren){
 	
 	if(element.tagName!=null && element.tagName.toLowerCase()=="img"){
 		element.onload = function(){
@@ -365,12 +350,12 @@ function addEventImages(element, applyChildren){
 	if(applyChildren){
 		var children = element.childNodes;
 		for(var i=0; i<children.length; i++){
-			addEventImages(children[i], true);
+			this.addEventImages(children[i], true);
 		}
 	}	
 }
 
-function getAllScreens(parent, screens, coreConfig){
+UIPrepare.prototype.getAllScreens = function(parent, screens, coreConfig){
 
 	//if no parent received it is the first call and we have to get the body
 	if(parent == null){
@@ -391,15 +376,15 @@ function getAllScreens(parent, screens, coreConfig){
 			if(child.getAttribute(attributeMain)!=null && child.style.display!='none'){
 				
 				//read main attributes to search screen attribute
-				var aValues = readAttributes(child.getAttribute(attributeMain));
+				var aValues = UIUtils.readAttributes(child.getAttribute(attributeMain));
 				for(var n=0; n<aValues.length; n++){
 					var attr = aValues[n].attr;
 					if(attr=='s'){
 						
 						//assign an id if it does not have one
 						if(child.id.length==0){
-							child.id = "_aID_" + generatedId;
-							generatedId++;
+							child.id = "_aID_" + this.generatedId;
+							this.generatedId++;
 						}
 
 						//save the identifier of the screen
@@ -411,7 +396,7 @@ function getAllScreens(parent, screens, coreConfig){
 			}
 
 			//search for more screens
-			getAllScreens(child, screens, coreConfig);
+			this.getAllScreens(child, screens, coreConfig);
 		}	
 	}
 

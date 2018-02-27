@@ -1,11 +1,17 @@
 
+/** 
+ * @constructor
+*/
+function UIDraw(){
+
+}
 
 /**
 * Apply positions for the views
 * @param views Array of views to apply position
 * @return int maximum Y positon of a children
 **/
-function applyPositions(views){
+UIDraw.prototype.applyPositions = function(views, viewColors){
     
     var maxX = 0;
 	var maxY = 0;
@@ -65,10 +71,10 @@ function applyPositions(views){
         
         //apply view color if activated 
         if(viewColors){
-            ele.style.backgroundColor = generateRandomViewColor();
+            ele.style.backgroundColor = this.generateRandomViewColor();
         }
 		
-        var childrenSize = applyPositions(view.children);
+        var childrenSize = this.applyPositions(view.children);
         if(childrenSize.maxX>maxX){
             maxX = childrenSize.maxX;
         }
@@ -81,7 +87,7 @@ function applyPositions(views){
 	
 }
     
-function generateRandomViewColor(){
+UIDraw.prototype.generateRandomViewColor = function(){
     var r = parseInt(Math.random()*255);
     var g = parseInt(Math.random()*255);
     var b = parseInt(Math.random()*255);
@@ -94,7 +100,7 @@ function generateRandomViewColor(){
 * @param width int minimum width for the screen
 * @param height int minimum height for the screen
 **/
-function applySizeScreen(screenView, width, height){
+UIDraw.prototype.applySizeScreen = function(screenView, width, height){
     
     var ele = document.getElementById(screenView.id);
     if(screenView.id!="s" && ele!=null){

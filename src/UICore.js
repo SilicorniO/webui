@@ -1,14 +1,21 @@
 
-var uiCoreConfig;
+/**
+ * @constructor
+ * @param {UIConfiguration} coreConfig 
+ * @param {Number} scrollWidth 
+ */
+function UICore(coreConfig, scrollWidth){
 
-function calculateScreen(screenView, coreConfig){
-	
-	//save screenSizeRatio
-	uiCoreConfig = coreConfig;
+	this.uiCoreConfig = coreConfig;
+	this.scrollWidth = scrollWidth;
+
+}
+
+UICore.prototype.calculateScreen = function(uiPrepare, screenView){
 	
 	//generate list of views and indexes for quick access
-	var arrayViews = generateArrayViews(screenView);
-	var indexes = generateIndexes(arrayViews);
+	var arrayViews = uiPrepare.generateArrayViews(screenView);
+	var indexes = uiPrepare.generateIndexes(arrayViews);
     
     var viewsRestored;
 	
@@ -23,24 +30,24 @@ function calculateScreen(screenView, coreConfig){
         }
     
         for(var i=0; i<screenView.childrenOrderHor.length; i++){
-            calculateViewHor(screenView.childrenOrderHor[i], screenView, arrayViews, indexes, screenView.width, viewsRestored);
+            this.calculateViewHor(screenView.childrenOrderHor[i], screenView, arrayViews, indexes, screenView.width, viewsRestored);
         }
 
         for(var i=0; i<screenView.childrenOrderVer.length; i++){
-            var viewReturn = calculateViewVer(screenView.childrenOrderVer[i], screenView, arrayViews, indexes, screenView.height, viewsRestored);
+            var viewReturn = this.calculateViewVer(screenView.childrenOrderVer[i], screenView, arrayViews, indexes, screenView.height, viewsRestored);
         }
         
     }while(viewsRestored.length>0);
 }
 
-function calculateViewHor(view, parentView, arrayViews, indexes, width, viewsRestored){
+UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, indexes, width, viewsRestored){
 		
 	//eval references to try to calculate the width
 	var references = view.getReferencesHor();
 	for(var n=0; n<references.length; n++){
 		var dependency = references[n];
 		if(dependency.length>0){
-			evalDependenceHor(view, parentView, width, n, arrayViews[indexes[dependency]]);
+			this.evalDependenceHor(view, parentView, width, n, arrayViews[indexes[dependency]]);
 		}
 	}
 	
@@ -48,26 +55,26 @@ function calculateViewHor(view, parentView, arrayViews, indexes, width, viewsRes
 	if(view.sizeWidth=='s'){
 		
 		//fixed width
-		applyFixedSizeHor(view);
+		this.applyFixedSizeHor(view);
 	
 	}else if(view.sizeWidth=='sp'){
 		
 		//apply percent
-		applyPercentHor(view, parentView, width);		
+		this.applyPercentHor(view, parentView, width);		
 		
 	}
 	
 	//apply margins to left and right
-	assignMarginsHor(view);
+	this.assignMarginsHor(view);
 			
 	//calculate width if it is possible
 	if(view.leftChanged && view.rightChanged){
 		
 		//calculate the width
-		assignSizeHor(view, width);
+		this.assignSizeHor(view, width);
 		
 		//check gravity
-		assignGravityHor(view, width);
+		this.assignGravityHor(view, width);
 	
 		//if there are children we eval them with width restrictions
 		if(view.childrenOrderHor.length>0){
@@ -76,11 +83,11 @@ function calculateViewHor(view, parentView, arrayViews, indexes, width, viewsRes
 			var viewWidth = view.scrollHorizontal? 0 : view.width - view.paddingLeft - view.paddingRight;
 			
 			for(var i=0; i<view.childrenOrderHor.length; i++){
-				calculateViewHor(view.childrenOrderHor[i], view, arrayViews, indexes, viewWidth, viewsRestored);
+				this.calculateViewHor(view.childrenOrderHor[i], view, arrayViews, indexes, viewWidth, viewsRestored);
 			}
 			
 			//move left and right of all children using the paddingLeft
-			applyPaddingChildrenHor(view);
+			this.applyPaddingChildrenHor(view);
 			
 		}
 		
@@ -95,34 +102,34 @@ function calculateViewHor(view, parentView, arrayViews, indexes, width, viewsRes
 			
 			//calculate the children width
 			for(var i=0; i<view.childrenOrderHor.length; i++){
-				calculateViewHor(view.childrenOrderHor[i], view, arrayViews, indexes, viewWidth, viewsRestored);
+				this.calculateViewHor(view.childrenOrderHor[i], view, arrayViews, indexes, viewWidth, viewsRestored);
 			}
 			
 			//move left and right of all children using the paddingLeft
-			applyPaddingChildrenHor(view);
+			this.applyPaddingChildrenHor(view);
 			
 			//set the width of the children
-			applySizeChildrenHor(view);
+			this.applySizeChildrenHor(view);
 			
 		}else{
 			//else if there are not children we calculate the content size
-			applySizeContentHor(view);
+			this.applySizeContentHor(view);
 			
 		}
 		
 		//calculate the width
-		assignSizeHor(view, width);
+		this.assignSizeHor(view, width);
 						
 		//check gravity
-		assignGravityHor(view, width);
+		this.assignGravityHor(view, width);
 				
 	}
 	
 	//check if size of children if bigger than container to add vertical scroll
-	if(applyScrollHor(view, width)){
+	if(this.applyScrollHor(view, width)){
                 
         //apply the padding of the scroll to the element
-        view.paddingBottom += scrollWidth;
+        view.paddingBottom += this.scrollWidth;
         view.scrollHorizontalApplied = true;
         
         //save the view as one to recalculate
@@ -130,7 +137,7 @@ function calculateViewHor(view, parentView, arrayViews, indexes, width, viewsRes
     }
 }
 
-function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRestored){
+UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, indexes, height, viewsRestored){
 	
     //save state of the view to restore it if it is necessary
 //    var viewSaved = view.clone();
@@ -140,7 +147,7 @@ function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRe
 	for(var n=0; n<references.length; n++){
 		var dependency = references[n];
 		if(dependency.length>0){
-			evalDependenceVer(view, parentView, height, n, arrayViews[indexes[dependency]]);
+			this.evalDependenceVer(view, parentView, height, n, arrayViews[indexes[dependency]]);
 		}
 	}
 	
@@ -148,26 +155,26 @@ function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRe
 	if(view.sizeHeight=='s'){
 		
 		//fixed height
-		applyFixedSizeVer(view);
+		this.applyFixedSizeVer(view);
 	
 	}else if(view.sizeHeight=='sp'){
 		
 		//apply percent
-		applyPercentVer(view, parentView, height);		
+		this.applyPercentVer(view, parentView, height);		
 		
 	}
 	
 	//apply margins to top and bottom
-	assignMarginsVer(view);
+	this.assignMarginsVer(view);
 			
 	//calculate width if it is possible
 	if(view.topChanged && view.bottomChanged){
 		
 		//calculate the height
-		assignSizeVer(view, height);
+		this.assignSizeVer(view, height);
 		
 		//check gravity
-		assignGravityVer(view, height);
+		this.assignGravityVer(view, height);
 	
 		//if there are children we eval them with width restrictions
 		if(view.childrenOrderVer.length>0){
@@ -176,11 +183,11 @@ function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRe
 			var viewHeight = view.scrollVertical? 0 : view.height - view.paddingTop - view.paddingBottom;
 			
 			for(var i=0; i<view.childrenOrderVer.length; i++){
-				calculateViewVer(view.childrenOrderVer[i], view, arrayViews, indexes, viewHeight, viewsRestored);
+				this.calculateViewVer(view.childrenOrderVer[i], view, arrayViews, indexes, viewHeight, viewsRestored);
 			}
 			
 			//move top and bottom of all children using the paddingTop
-			applyPaddingChildrenVer(view);
+			this.applyPaddingChildrenVer(view);
 		}
 		
 	}else{
@@ -194,33 +201,33 @@ function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRe
 			
 			//calculate the children height
 			for(var i=0; i<view.childrenOrderVer.length; i++){
-                calculateViewVer(view.childrenOrderVer[i], view, arrayViews, indexes, viewHeight, viewsRestored);
+                this.calculateViewVer(view.childrenOrderVer[i], view, arrayViews, indexes, viewHeight, viewsRestored);
 			}
 			
 			//move top and bottom of all children using the paddingTop
-			applyPaddingChildrenVer(view);
+			this.applyPaddingChildrenVer(view);
 			
 			//set the width of the children
-			applySizeChildrenVer(view);
+			this.applySizeChildrenVer(view);
 			
 		}else{
 			//else if there are not children we calculate the content size
-			applySizeContentVer(view);
+			this.applySizeContentVer(view);
 			
 		}
 		
 		//calculate the width
-		assignSizeVer(view, height);
+		this.assignSizeVer(view, height);
 		
 		//check gravity
-		assignGravityVer(view, height);
+		this.assignGravityVer(view, height);
 	}
 			
 	//check if size of children if bigger than container to add vertical scroll
-	if(applyScrollVer(view, height)){
+	if(this.applyScrollVer(view, height)){
                 
         //apply the padding of the scroll to the element
-        view.paddingRight += scrollWidth;
+        view.paddingRight += this.scrollWidth;
         view.scrollVerticalApplied = true;
         
         //save the view as one to recalculate
@@ -228,40 +235,21 @@ function calculateViewVer(view, parentView, arrayViews, indexes, height, viewsRe
     }
 }
 
-/**
-* Replace the view received in the parent and in the array of views received
-* @param view View cloned
-* @param parentView View parent
-* @param arrayViews Array views
-* @param indexes Array of index of the arrayViews
-**/
-function replaceClonedView(view, parentView, arrayViews, indexes){
-    
-    //mark it as replaced
-    view.replaced = true;
-    
-    //replace it in the parent
-    parentView.replaceSon(view);
-    
-    //replace it in the array of views
-    arrayViews[indexes[view.id]] = view;
-}
-
-function assignSizeHor(view, width){
+UICore.prototype.assignSizeHor = function(view, width){
 	if(view.right>width && width>0){
 		view.right = width;	
 	}
 	view.width = view.right - view.left;
 }
 
-function assignSizeVer(view, height){
+UICore.prototype.assignSizeVer = function(view, height){
 	if(view.bottom>height && height>0){
 		view.bottom = height;
 	}
 	view.height = view.bottom - view.top;
 }
 
-function applyFixedSizeHor(view){
+UICore.prototype.applyFixedSizeHor = function(view){
 	//set left and top if they are not setted
 	if(view.rightChanged){
 		view.left = view.right - view.width;
@@ -273,7 +261,7 @@ function applyFixedSizeHor(view){
 	}
 }
 
-function applyFixedSizeVer(view){
+UICore.prototype.applyFixedSizeVer = function(view){
 	//set bottom and top if they are not setted
 	if(view.bottomChanged){
 		view.top = view.bottom - view.height;
@@ -289,7 +277,7 @@ function applyFixedSizeVer(view){
 * Add the padding of the view to all its children
 * @param view parent
 **/
-function applyPaddingChildrenHor(view){
+UICore.prototype.applyPaddingChildrenHor = function(view){
 	if(view.paddingLeft!=0){
 		for(var i=0; i<view.children.length; i++){
 			view.children[i].left += view.paddingLeft;
@@ -302,7 +290,7 @@ function applyPaddingChildrenHor(view){
 * Add the padding of the view to all its children
 * @param view parent
 **/
-function applyPaddingChildrenVer(view){
+UICore.prototype.applyPaddingChildrenVer = function(view){
 	if(view.paddingTop!=0){
 		for(var i=0; i<view.children.length; i++){
 			view.children[i].top += view.paddingTop;
@@ -315,7 +303,7 @@ function applyPaddingChildrenVer(view){
 * Apply scroll to the view if their children are widther than parent
 * @param view View parent
 **/
-function applyScrollHor(view, width){
+UICore.prototype.applyScrollHor = function(view, width){
 	if(view.scrollHorizontal){
 		var maxX = 0;
 		for(var i=0; i<view.children.length; i++){
@@ -346,7 +334,7 @@ function applyScrollHor(view, width){
 * Apply scroll to the view if their children are taller than parent
 * @param view View parent
 **/
-function applyScrollVer(view, height){
+UICore.prototype.applyScrollVer = function(view, height){
 	if(view.scrollVertical){
 		var maxY = 0;
 		for(var i=0; i<view.children.length; i++){
@@ -377,7 +365,7 @@ function applyScrollVer(view, height){
 * Calculate the left and right values with the content
 * @param view View to set size with content
 **/
-function applySizeContentHor(view){
+UICore.prototype.applySizeContentHor = function(view){
 		
 	//if the size depends of children, calculate the position of children
 	if(view.rightChanged){
@@ -395,7 +383,7 @@ function applySizeContentHor(view){
 * Calculate the left and right values with the content
 * @param view View to set size with content
 **/
-function applySizeContentVer(view){
+UICore.prototype.applySizeContentVer = function(view){
 	
 	//if the size depends of children, calculate the position of children
 	if(view.bottomChanged){
@@ -418,7 +406,7 @@ function applySizeContentVer(view){
 * Calculate the left or the right with the size of the children if the sizeWidth is "sc"
 * @param view View to set the size
 **/
-function applySizeChildrenHor(view){
+UICore.prototype.applySizeChildrenHor = function(view){
 	
 	var maxX = 0;
 	for(var i=0; i<view.children.length; i++){
@@ -452,7 +440,7 @@ function applySizeChildrenHor(view){
 * Calculate the left or the right with the size of the children if the sizeWidth is "sc"
 * @param view View to set the size
 **/
-function applySizeChildrenVer(view){
+UICore.prototype.applySizeChildrenVer = function(view){
 	
 	var maxY = 0;
 	for(var i=0; i<view.children.length; i++){
@@ -487,7 +475,7 @@ function applySizeChildrenVer(view){
 * @param parentView View of the parent to know its size
 * @param width width to apply if right was not applied
 **/
-function applyPercentHor(view, parentView, width){
+UICore.prototype.applyPercentHor = function(view, parentView, width){
 	
 	if(view.rightChanged && !view.leftChanged){
 		view.left = view.right - ((parentView.width * view.percentWidth) / 100);
@@ -513,7 +501,7 @@ function applyPercentHor(view, parentView, width){
 * @param parentView View of the parent to know its size
 * @param height height to apply if top was not applied
 **/
-function applyPercentVer(view, parentView, height){
+UICore.prototype.applyPercentVer = function(view, parentView, height){
 	
 	if(view.bottomChanged && !view.topChanged){
 		view.top = view.bottom - ((parentView.height * view.percentHeight) / 100);
@@ -539,7 +527,7 @@ function applyPercentVer(view, parentView, height){
 * @param view View to get and change values
 * @param width int
 **/
-function assignGravityHor(view, width){
+UICore.prototype.assignGravityHor = function(view, width){
 	
 	//horizontal
 	if(view.gravityHor!='n'){
@@ -564,7 +552,7 @@ function assignGravityHor(view, width){
 * @param view View to get and change values
 * @param height int
 **/
-function assignGravityVer(view, height){
+UICore.prototype.assignGravityVer = function(view, height){
 	
 	//horizontal
 	if(view.gravityVer!='n'){
@@ -588,7 +576,7 @@ function assignGravityVer(view, height){
 * Assign margin values to the view
 * @param view View to get and change values
 **/
-function assignMarginsHor(view){
+UICore.prototype.assignMarginsHor = function(view){
 	
 	//get real margin values
 	var viewMarginLeft = view.marginLeft;
@@ -612,11 +600,11 @@ function assignMarginsHor(view){
 * Assign margin values to the view
 * @param view View to get and change values
 **/
-function assignMarginsVer(view){
+UICore.prototype.assignMarginsVer = function(view){
 	
 	//save margin to apply to their children
-	var viewMarginTop = uiCoreConfig.getDimen(view.marginTop);
-	var viewMarginBottom = uiCoreConfig.getDimen(view.marginBottom);
+	var viewMarginTop = this.uiCoreConfig.getDimen(view.marginTop);
+	var viewMarginBottom = this.uiCoreConfig.getDimen(view.marginBottom);
 	
 	if(view.marginTop!=0 && view.topChanged){
 		view.top += viewMarginTop;
@@ -640,7 +628,7 @@ function assignMarginsVer(view){
 * @param iReference index of reference to evaluate
 * @param viewDependency from wich get the value
 **/
-function evalDependenceHor(view, parentView, width, iReference, viewDependency){
+UICore.prototype.evalDependenceHor = function(view, parentView, width, iReference, viewDependency){
 	
 	if(viewDependency==null){
 		logE("The view '" + view.id + "' has a wrong reference");
@@ -686,7 +674,7 @@ function evalDependenceHor(view, parentView, width, iReference, viewDependency){
 * @param iReference index of reference to evaluate
 * @param viewDependency from wich get the value
 **/
-function evalDependenceVer(view, parentView, height, iReference, viewDependency){
+UICore.prototype.evalDependenceVer = function(view, parentView, height, iReference, viewDependency){
 	
 	if(viewDependency==null){
 		logE("The view '" + view.id + "' has a wrong reference");

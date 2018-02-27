@@ -47,12 +47,12 @@ function cleanViews(view){
 var counters = {};
 
 function startCounter(name){
-    let now = new Date().getTime();
+    var now = new Date().getTime();
 	counters[name] = now;
 }
 
 function endCounter(name){
-    let now = new Date().getTime();
+    var now = new Date().getTime();
 	return (now - counters[name]);
 }
 
