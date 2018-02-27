@@ -146,17 +146,25 @@ function orderViewsSameParent(views, hor){
 * @param views Array of views to load size
 **/
 function loadSizes(views, coreConfig){
+
+	//generate an infinite parent for calculations
+	const VIEW_SIZE_LIMIT = 100000;
+	var infiniteParent = document.createElement('div');
+	infiniteParent.style.display = 'inline-block';
+	infiniteParent.style.width = VIEW_SIZE_LIMIT;
+	infiniteParent.style.height = VIEW_SIZE_LIMIT;
+	document.getElementsByTagName("BODY")[0].appendChild(infiniteParent);
 	
 	for(var i=0; i<views.length; i++){
 		var view = views[i];
 		var ele = document.getElementById(view.id);
 		
 		if(view.sizeWidth=='sc' && view.children.length==0){
-			updateWidthView(view, ele);
+			updateWidthView(view, ele, infiniteParent);
 		}
 		
 		if(view.sizeHeight=='sc' && view.children.length==0){
-			updateHeightView(view, ele);
+			updateHeightView(view, ele, infiniteParent);
 		}
 		
 		//translate paddings and margins
@@ -166,6 +174,9 @@ function loadSizes(views, coreConfig){
 			loadSizes(view.children, coreConfig);
 		}
 	}
+
+	//remove infinite parent
+	document.getElementsByTagName("BODY")[0].removeChild(infiniteParent);
 
 }
 

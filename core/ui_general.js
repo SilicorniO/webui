@@ -47,11 +47,13 @@ function cleanViews(view){
 var counters = {};
 
 function startCounter(name){
-	counters[name] = (new Date()).getMilliseconds();
+    let now = new Date().getTime();
+	counters[name] = now;
 }
 
 function endCounter(name){
-	return (new Date()).getMilliseconds() - counters[name];
+    let now = new Date().getTime();
+	return (now - counters[name]);
 }
 
 function endCounterLog(name){

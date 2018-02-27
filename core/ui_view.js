@@ -1,7 +1,4 @@
 
-/** Limit size of a view **/
-var VIEW_SIZE_LIMIT = 100000;
-
 /**
 * Generate a new parent view that is called screen
 * @constructor
@@ -524,13 +521,15 @@ function readAttributes(text){
 * @param view View to change the height
 * @param ele DOM element to calculate the width
 **/
-function updateWidthView(view, ele){
-            
-    //prepare parent to give the son a lot of space for calculation
-    var parent = ele.parentElement;
-    var parentWidth = parent.offsetWidth;
-    var parentScrollLeft = parent.scrollLeft;
-    parent.style.width = VIEW_SIZE_LIMIT;
+function updateWidthView(view, ele, infiniteParent){
+			
+	//prepare parent to give the son a lot of space for calculation
+	var parent = ele.parentElement;
+	parent.removeChild(ele);
+	infiniteParent.appendChild(ele);
+    // var parentWidth = parent.offsetWidth;
+    // var parentScrollLeft = parent.scrollLeft;
+    // parent.style.width = VIEW_SIZE_LIMIT;
     	
     //get the height width much space
 	ele.style.display = 'inline-block';
@@ -544,8 +543,10 @@ function updateWidthView(view, ele){
 	}
     
     //set values of parent back 
-    parent.style.width = parentWidth;
-    parent.scrollLeft = parentScrollLeft;
+    // parent.style.width = parentWidth;
+	// parent.scrollLeft = parentScrollLeft;
+	infiniteParent.removeChild(ele)
+	parent.appendChild(ele);
 }
 
 /**
@@ -553,13 +554,15 @@ function updateWidthView(view, ele){
 * @param view View to change the height
 * @param ele DOM element to calculate the height
 **/
-function updateHeightView(view, ele){
+function updateHeightView(view, ele, infiniteParent){
         
     //prepare parent to give the son a lot of space for calculation
-    var parent = ele.parentElement;
-    var parentHeight = parent.offsetHeight;
-    var parentScrollTop = parent.scrollTop;
-    parent.style.height = VIEW_SIZE_LIMIT;
+	var parent = ele.parentElement;
+	parent.removeChild(ele);
+	infiniteParent.appendChild(ele);
+    // var parentHeight = parent.offsetHeight;
+    // var parentScrollTop = parent.scrollTop;
+    // parent.style.height = VIEW_SIZE_LIMIT;
     	    
     //get the width height much space
 	ele.style.display = 'inline-block';
@@ -573,7 +576,10 @@ function updateHeightView(view, ele){
 	}
     
     //set values of parent back 
-    parent.style.height = parentHeight;
-    parent.scrollTop = parentScrollTop;
+    // parent.style.height = parentHeight;
+	// parent.scrollTop = parentScrollTop;
+	infiniteParent.removeChild(ele)
+	parent.appendChild(ele);
+
 }
 

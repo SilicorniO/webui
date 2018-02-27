@@ -101,6 +101,9 @@ window['drawUIForId'] = drawUIForId;
 * @param id identifier of element in HTML
 **/
 function drawUIForId(id, cbEvents){
+
+	//start genral counter
+	startCounter('all');
 		
     //initialize variables
     var coreConfig = init();
@@ -138,13 +141,18 @@ function drawUIScreen(screen, coreConfig, cbEvents){
 					
 	//---- PREPARE -----
 	startCounter('prepare');
+	startCounter('loadSizes');
 						
 	//load sizes of views
 	loadSizes(screen.view.children, coreConfig);
-				
+
+	endCounterLog('loadSizes');
+	startCounter('orderViews');
+	
 	//order views
 	orderViews(screen.view);
 	
+	endCounterLog('orderViews');
 	endCounterLog('prepare');
 	
 	//---- CORE -----
