@@ -196,7 +196,9 @@ Inside of the containers you could add content with webui-views or plain html:
 You can define the position of your webui-view with short commands inside the "ui" attribute. These are the commands and their possible values:
 
  * w - Width: ("sc") to set the width depending of the content). (X) where X is the number of pixels width. (X%) where X is the number with the percentage of space of its parent.
+ * fw - FullWidth: () to set width as 100% 
  * h - Height: ("sc") to set the height depending of the content). (X) where X is the number of pixels height. (X%) where X is the number with the percentage of space of its parent.
+ * fh - FullHeight: () to set height as 100%
  * l - Left: (ID) set the same left than the identified view.
  * r - Right: (ID) set the same right than the identified view.
  * t - Top: (ID) set the same too than the identified view.
@@ -284,6 +286,7 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
  * showLogs: Show live information.
  * viewLogs: Identifier of the tag where you want to see the logs if the console is not right for you.
  * dimens: Allows to create reference to different sizes. It is better to use variables for dimensions and change it depending of the size of device.
+ * attribute: You can define the name of the attribute to use with web-ui. NOTE: If you are using react you need this attribute starts with 'data-'.
  * screenModes: You can define different "ui" attributes to use for each width of the device. Check the examples for more information.
    
    ```html
@@ -305,6 +308,7 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
                 viewColors: true,
                 showLogs: true,
                 viewLogs: 'logs',
+                attribute: 'ui',
                 dimens: {
                     ms: 10, 	//margin small
                     mm: 20, 	//margin medium
@@ -313,18 +317,18 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
                 screenModes: [
                 {
                     //mobile
-                    suffix: "m",
+                    attribute: "uim",
                     widthEnd: 450
                 },
                 {
                     //tablet
-                    suffix: "t",
+                    attribute: "uit",
                     widthStart: 451,
                     widthEnd: 700
                 },
                 {
                     //desktop
-                    suffix: "d",
+                    attribute: "uid",
                     widthStart: 701
                 }
                 ]
