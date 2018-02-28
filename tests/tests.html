@@ -5,7 +5,7 @@
     </head>
     <body style="margin:0">
         
-        <div ui="w:100%;h:100%">
+        <div ui="s;w:100%;h:100%">
 
             <div ui="w:200;sv;t:p;l:p;b:p" style="border:2px solid black">
                 <ul>
@@ -33,10 +33,10 @@
         function loadTest(testName){
             document.getElementById('frameTest').src = testName + '.html';
         }
-
-        webUI.start({
+        
+        WebUI.start({
             viewColors: false,
-            showLogs: false,
+            showLogs: true,
             dimens: {
                 mxs: 5,     //margin extra-small
                 ms: 10, 	//margin small

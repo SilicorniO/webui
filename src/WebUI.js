@@ -1,8 +1,7 @@
 
 //Static classess
-window['UIViewUtils'] = new UIViewUtils();
-window['UIUtils'] = new UIUtils();
-window['webUI'] = new WebUI();
+var UIViewUtilsInstance = new UIViewUtils();
+var UIUtilsInstance = new UIUtils();
 
 /**  
  * @constructor
@@ -20,37 +19,15 @@ function WebUI(){
 	this.idUI = null;
 
 	//controllers
-	this.uiPrepare = new UIPrepare();
+	this.uiPrepare = new UIPrepare(this.refreshUI);
 	this.uiDraw = new UIDraw();
 	this.uiCore = null;
 
-	//loaded configuration
-	this.configuration = new UIConfiguration();
+	//configuration
+	this.configuration = null;
 
 	//timer for repainting
 	this.redrawTimer = new UIRedrawTimer();
-}
-
-/**
- * Start running the webUI listening for dom changes and initial start
- * @param {UIConfiguration} configuration 
- */
-WebUI.prototype.start = function(configuration){
-
-	//calculate the size of scrollbars
-    if(this.scrollWidth==0){
-        this.scrollWidth = getScrollWidth();
-    } 
-
-	//save configuration
-	this.configuration = new UIConfiguration(configuration);
-
-	//apply global values for logs
-	uiShowLogs = this.configuration.showLogs;
-	uiViewLogs = this.configuration.logsView;
-
-	//prepare core with the configuration
-	this.uiCore = new UICore(this.configuration, this.scrollWidth);
 
 	//redraw function
 	this.redraw = function() {
@@ -60,10 +37,32 @@ WebUI.prototype.start = function(configuration){
 			this.drawUIAll();
 		}).bind(this), this.configuration.timeRedraw);
 	}
+}
 
+/**
+ * Start running the webUI listening for dom changes and initial start
+ * @param {UIConfiguration} configuration 
+ */
+WebUI.prototype.start = function(configuration){
+	
+	//calculate the size of scrollbars
+    if(this.scrollWidth==0){
+        this.scrollWidth = getScrollWidth();
+    } 
+	
+	//save configuration
+	this.configuration = new UIConfiguration(configuration);
+	
+	//apply global values for logs
+	uiShowLogs = this.configuration.showLogs;
+	uiViewLogs = this.configuration.logsView;
+	
+	//prepare core with the configuration
+	this.uiCore = new UICore(this.configuration, this.scrollWidth);
+	
 	//start running on actual dom
 	this.drawUIAll();
-
+	
 	//listen dom events
 	this.listenDomEvents();
 	
@@ -72,19 +71,20 @@ WebUI.prototype.start = function(configuration){
 WebUI.prototype.listenDomEvents = function(){
 	
 	var self = this;
-
+	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeInserted", function (event) {
 		self.redraw();
 	}, false);
-
+	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeRemoved", function (event) {
 		self.redraw();
 	}, false);
-
+	
 	//execute draw each time the size of screen is modified
 	window.onresize = function(e){
 		self.redraw();
 	}
+	
 }
 
 /**
@@ -96,6 +96,7 @@ WebUI.prototype.refreshUI = function(){
 
 /**
 * Execute UI
+* @param {Function=} cbEvents where to return the data with information
 **/
 WebUI.prototype.drawUIAll = function(cbEvents){
     
@@ -188,8 +189,7 @@ WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
 	//call to listener of events
 	if(cbEvents){
 		cbEvents({
-			'name': 'end',
-			'suffixs': this.configuration.suffixs
+			'name': 'end'
 		});
 	}
 
@@ -199,3 +199,8 @@ WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
 	//end counter
 	endCounterLog('all');
 }
+
+var WebUIInstance = new WebUI();
+window['WebUI'] = WebUIInstance;
+window['WebUI']['start'] = WebUIInstance.start;
+window['WebUI']['refresh'] = WebUIInstance.refreshUI;

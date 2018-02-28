@@ -1,7 +1,7 @@
 
 /**
  * @constructor
- * @param {UIConfiguration} uiConf 
+ * @param uiConf 
  */
 function UIConfiguration(uiConf){
 
@@ -36,7 +36,7 @@ function UIConfiguration(uiConf){
 	}
 
 	if(uiConf['timeRedraw']!=null && !isNaN(uiConf['timeRedraw'])){
-		this.timeRedraw = parseInt(uiConf['timeRedraw']);
+		this.timeRedraw = parseInt(uiConf['timeRedraw'], 10);
 	}
 
 	//set attribute
@@ -96,9 +96,9 @@ function UIConfiguration(uiConf){
 UIConfiguration.prototype.getDimen = function(name){
 	
 	if(typeof this.dimens[name] !== 'undefined'){
-		return parseInt(this.dimens[name]);
+		return parseInt(this.dimens[name], 10);
 	}else{
-		return parseInt(name);
+		return parseInt(name, 10);
 	}
 
 }

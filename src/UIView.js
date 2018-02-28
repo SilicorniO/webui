@@ -3,11 +3,10 @@
 * Create a view object reading the HTML of the element 
 * @constructor
 * @param element where to read data
-* @param parentId to assign to the view created
-* @param lastViewId with the identifier of the view before
-* @param attributeMain with the name of the attribute to read
-* @param attributes with the name of the attributes to read as secondary
-* @return View generated
+* @param {string=} parentId to assign to the view created
+* @param {string=} lastViewId with the identifier of the view before
+* @param {string=} attributeMain with the name of the attribute to read
+* @param {Array<string>=} attributes with the name of the attributes to read as secondary
 **/
 function UIView(element, parentId, lastViewId, attributeMain, attributes){
 
@@ -107,11 +106,11 @@ UIView.prototype.setWidth = function(w){
 		var indexPercent = w.indexOf('%');
 		this.percentWidth = parseFloat(w.substring(0, indexPercent));
 		if(indexPercent<w.length-1){
-			this.percentLeft = parseInt(w.substring(indexPercent+1, w.length));
+			this.percentLeft = parseInt(w.substring(indexPercent+1, w.length), 10);
 		}
 		this.sizeWidth = "sp"; //size_percent
 	}else{
-		this.width = parseInt(w); 
+		this.width = parseInt(w, 10); 
 		this.sizeWidth = "s" //sized
 	}
 }
@@ -122,13 +121,13 @@ UIView.prototype.setHeight = function(h){
 		this.height = 0;
 	}else if(String(h).indexOf('%')!=-1){
 		var indexPercent = h.indexOf('%');
-		this.percentHeight = parseInt(h.substring(0, indexPercent));
+		this.percentHeight = parseInt(h.substring(0, indexPercent), 10);
 		if(indexPercent<h.length-1){
-			this.percentTop = parseInt(h.substring(indexPercent+1, h.length));
+			this.percentTop = parseInt(h.substring(indexPercent+1, h.length), 10);
 		}
 		this.sizeHeight = "sp"; //size_percent
 	}else{
-		this.height = parseInt(h); 
+		this.height = parseInt(h, 10); 
 		this.sizeHeight = "s" //sized
 	}
 }
@@ -253,7 +252,7 @@ UIView.prototype.applyDimens = function(coreConfig){
 UIView.prototype.clone = function(){
 	
 	//create a new instance
-	var view = new UIView(id);
+	var view = new UIView(this.id);
 	
 	//set all the values
 	view.parentId = this.parentId;
@@ -338,7 +337,7 @@ UIView.prototype.clone = function(){
 }
 		
 UIView.prototype.toString = function(){
-	return "[" + id + "]: ll:" + this.leftLeft + ", lr:" + this.leftRight + ", rr:" + this.rightRight + ", rl:" + this.rightLeft + ", tt:" + this.topTop + ",tb: " + this.topBottom + ", bb:" + this.bottomBottom + ", bt:" + this.bottomTop + ", ml:" + this.marginLeft + ", mr:" + this.marginRight + ", mt:" + this.marginTop + ",mb: " + this.marginBottom + ", pl:" + this.paddingLeft + ", pr:" + this.paddingRight + ", pt:" + this.paddingTop + ", pb:" + this.paddingBottom + ", w:" + this.width + ", h:" + this.height + ", sh:" + this.sizeWidth + ", sh:" + this.sizeHeight + ", pId:" + this.parentId + ", l:" + this.left + ", r:" + this.right + ", t:" + this.top + ", b:" + this.bottom;
+	return "[" + this.id + "]: ll:" + this.leftLeft + ", lr:" + this.leftRight + ", rr:" + this.rightRight + ", rl:" + this.rightLeft + ", tt:" + this.topTop + ",tb: " + this.topBottom + ", bb:" + this.bottomBottom + ", bt:" + this.bottomTop + ", ml:" + this.marginLeft + ", mr:" + this.marginRight + ", mt:" + this.marginTop + ",mb: " + this.marginBottom + ", pl:" + this.paddingLeft + ", pr:" + this.paddingRight + ", pt:" + this.paddingTop + ", pb:" + this.paddingBottom + ", w:" + this.width + ", h:" + this.height + ", sh:" + this.sizeWidth + ", sh:" + this.sizeHeight + ", pId:" + this.parentId + ", l:" + this.left + ", r:" + this.right + ", t:" + this.top + ", b:" + this.bottom;
 }
 
 /**
@@ -352,18 +351,15 @@ UIView.prototype.toString = function(){
 **/
 UIView.prototype.readUI = function(element, parentId, lastViewId, attributeMain, attributes){
 	
-	//array of attributes read
-	var aValues;
-	
 	//read main attributes
-	var aValues = UIUtils.readAttributes(element.getAttribute(attributeMain));
+	var aValues = UIUtilsInstance.readAttributes(element.getAttribute(attributeMain));
 	for(var i=0; i<attributes.length; i++){
-		aValues = aValues.concat(UIUtils.readAttributes(element.getAttribute(attributes[i])));
+		aValues = aValues.concat(UIUtilsInstance.readAttributes(element.getAttribute(attributes[i])));
 	}
 	
 	//check if we have attributes
 	if(aValues.length==0){
-		return view;
+		return;
 	}
 		
 	//set the ui values

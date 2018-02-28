@@ -2,7 +2,10 @@
 /** 
  * @constructor
 */
-function UIPrepare(){
+function UIPrepare(refreshFunc){
+
+	//save the refresh function
+	this.refreshFunc = refreshFunc;
 
 	/** Value to incremenet and create auto ids **/
 	this.generatedId = 0;
@@ -98,7 +101,7 @@ UIPrepare.prototype.orderViewsSameParent = function(views, hor){
 	var indexes = this.generateIndexes(oViews);
 	
 	//search dependencies until we have all children with them
-	var allviewsSetted;
+	var allViewsSetted;
 	var numViewsSetted;
 	do{
 		//initialize values
@@ -167,11 +170,11 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 		var ele = document.getElementById(view.id);
 		
 		if(view.sizeWidth=='sc' && view.children.length==0){
-			view.width = UIViewUtils.calculateWidthView(view, ele, infiniteParent);
+			view.width = UIViewUtilsInstance.calculateWidthView(view, ele, infiniteParent);
 		}
 		
 		if(view.sizeHeight=='sc' && view.children.length==0){
-			view.height = UIViewUtils.calculateHeightView(view, ele, infiniteParent);
+			view.height = UIViewUtilsInstance.calculateHeightView(view, ele, infiniteParent);
 		}
 		
 		//translate paddings and margins
@@ -263,7 +266,7 @@ UIPrepare.prototype.restoreSizes = function(view, viewsSizes){
 UIPrepare.prototype.getChildrenViews = function(parentId, parent, coreConfig){
 		
 	//get the children
-	var children = this.getChildrenViewsWithParentId(parent, parent, coreConfig);
+	var children = this.getChildrenViewsWithParentId(parentId, parent, coreConfig);
 	
 	//set the flag to false because all events have been added to the images
 	this.imgEventsAdded = true;
@@ -284,7 +287,6 @@ UIPrepare.prototype.getChildrenViewsWithParentId = function(parentId, parent, co
 	var views = new Array();
 
 	//get child nodes and parent id
-	var parentId;
 	if(parent==null){
 		parent = document.getElementsByTagName("BODY")[0];
         
@@ -342,9 +344,9 @@ UIPrepare.prototype.getChildrenViewsWithParentId = function(parentId, parent, co
 UIPrepare.prototype.addEventImages = function(element, applyChildren){
 	
 	if(element.tagName!=null && element.tagName.toLowerCase()=="img"){
-		element.onload = function(){
-			refreshUI();
-		};
+		element.onload = (function(){
+			this.refreshFunc();
+		}).bind(this);
 	}
 	
 	if(applyChildren){
@@ -376,7 +378,7 @@ UIPrepare.prototype.getAllScreens = function(parent, screens, coreConfig){
 			if(child.getAttribute(attributeMain)!=null && child.style.display!='none'){
 				
 				//read main attributes to search screen attribute
-				var aValues = UIUtils.readAttributes(child.getAttribute(attributeMain));
+				var aValues = UIUtilsInstance.readAttributes(child.getAttribute(attributeMain));
 				for(var n=0; n<aValues.length; n++){
 					var attr = aValues[n].attr;
 					if(attr=='s'){

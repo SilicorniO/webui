@@ -1,5 +1,7 @@
 
-
+/** 
+ * @constructor
+*/
 function UIViewUtils(){
 
 }

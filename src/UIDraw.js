@@ -35,12 +35,12 @@ UIDraw.prototype.applyPositions = function(views, viewColors){
         if(ele.childElementCount==0){
             var curStyle = window.getComputedStyle(ele);
             if(view.sizeWidth=='sc'){
-                paddingLeft = parseInt(curStyle.paddingLeft);
-                paddingRight = parseInt(curStyle.paddingRight);
+                paddingLeft = parseInt(curStyle.paddingLeft, 10);
+                paddingRight = parseInt(curStyle.paddingRight, 10);
             }
             if(view.sizeHeight=='sc'){
-                paddingTop = parseInt(curStyle.paddingTop);
-                paddingBottom = parseInt(curStyle.paddingBottom);
+                paddingTop = parseInt(curStyle.paddingTop, 10);
+                paddingBottom = parseInt(curStyle.paddingBottom, 10);
             }            
         }
         
@@ -74,7 +74,7 @@ UIDraw.prototype.applyPositions = function(views, viewColors){
             ele.style.backgroundColor = this.generateRandomViewColor();
         }
 		
-        var childrenSize = this.applyPositions(view.children);
+        var childrenSize = this.applyPositions(view.children, viewColors);
         if(childrenSize.maxX>maxX){
             maxX = childrenSize.maxX;
         }
@@ -88,9 +88,9 @@ UIDraw.prototype.applyPositions = function(views, viewColors){
 }
     
 UIDraw.prototype.generateRandomViewColor = function(){
-    var r = parseInt(Math.random()*255);
-    var g = parseInt(Math.random()*255);
-    var b = parseInt(Math.random()*255);
+    var r = parseInt(Math.random()*255, 10);
+    var g = parseInt(Math.random()*255, 10);
+    var b = parseInt(Math.random()*255, 10);
     return 'rgba(' + r +',' + g + ',' + b + ',0.4)';
 }
 
