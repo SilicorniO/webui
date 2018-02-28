@@ -31,14 +31,17 @@ function getScrollWidth () {
 
 /**
 * Call to clean of all views
-* @param view View parent to clean and its children
+* @param {UIView} view clean and its children
 **/
 function cleanViews(view){
-	
-	view.clean();
-	for(var i=0; i<view.children.length; i++){
-		cleanViews(view.children[i]);
-	}
+    
+    //clean the view
+    view.clean();
+    
+    //call to children
+	view.forEachChild(function(child, index){
+		cleanViews(child);
+	});
 	
 }
 

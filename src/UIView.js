@@ -12,9 +12,9 @@
 function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 
 	this.id = element.id;
+	this.element = element;
 	this.parent = parent;
 	this.screen = screen;
-	this.children = new Array();
 	this.childrenOrderHor = new Array();
 	this.childrenOrderVer = new Array();
 	this.childrenUI = true; 
@@ -90,19 +90,10 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this.childrenInOrder = false;
 
 	//initialize
-	this.readUI(element, parent, lastViewId, attributeMain, attributes);
-}
+	this.readUI(element, parent, lastViewId? lastViewId : "", attributeMain, attributes);
 
-/**
-* Generate a new parent view that is called screen
-* @constructor
-* @param ele Array of views to add to the screen
-* @param {UIConfiguration} coreConfig configuration of core 
-* @return Screen generated
-**/
-function UIViewScreen(ele, coreConfig){
-	
-	return new UIView(ele, null, null, "", coreConfig.attribute, coreConfig.attributes);
+	//set this instance into the element
+	element.ui = this;
 }
 
 UIView.prototype.setWidth = function(w){
@@ -198,30 +189,43 @@ UIView.prototype.setReference = function(i, value){
 		case 7: this.bottomTop = value; break;
 	}
 };
-        
-        //search the son in the arrays and replace them
-UIView.prototype.replaceSon = function(son){
-            
-	for(var i=0; i<this.children.length; i++){
-		if(this.children[i].id == son.id){
-			this.children[i] = son;
-			break;
-		}
-	}        
-	for(var i=0; i<this.childrenOrderHor.length; i++){
-		if(this.childrenOrderHor[i].id == son.id){
-			this.childrenOrderHor[i] = son;
-			break;
+
+/** 
+ * Check if this view has UI children
+ * @return {boolean} TRUE if has children
+*/
+UIView.prototype.hasUIChildren = function(){
+	var children = this.element.childNodes;
+	for(var i=0; i<children.length; i++){
+		if(children[i].ui){
+			return true;
 		}
 	}
-	for(var i=0; i<this.childrenOrderVer.length; i++){
-		if(this.childrenOrderVer[i].id == son.id){
-			this.childrenOrderVer[i] = son;
-			break;
+
+	return false;
+}
+
+/** 
+ * Get the children elements (childNodes)
+ * @return {Array<*>} Array of elements
+*/
+UIView.prototype.getChildElements = function(){
+	return this.element.childNodes;
+}
+
+/**
+ * Call to callback for each child with UI
+ * @param cb 
+ */
+UIView.prototype.forEachChild = function(cb){
+	var children = this.element.childNodes;
+	for(var i=0; i<children.length; i++){
+		var child = children[i].ui;
+		if(child){
+			cb(child, i);
 		}
 	}
-	
-};
+}
 		
 UIView.prototype.clean = function(){
 	this.leftChanged = false;
@@ -255,95 +259,13 @@ UIView.prototype.applyDimens = function(coreConfig){
 	this.marginBottom = coreConfig.getDimen(this.marginBottomDimen);
 	
 };
-        
-UIView.prototype.clone = function(){
-	
-	//create a new instance
-	var view = new UIView(this.id);
-	
-	//set all the values
-	view.parentId = this.parentId;
-	for(var i=0; i<this.children.length; i++){
-		view.children.push(this.children[i].clone());    
-	}            
-	for(var i=0; i<this.childrenOrderHor.length; i++){
-		for(var n=0; n<view.children.length; n++){
-			if(view.children[n].id == this.childrenOrderHor[i].id){
-				view.childrenOrderHor.push(view.children[n]);
-				break;
-			}
-		}
-	}
-	for(var i=0; i<this.childrenOrderVer.length; i++){
-		for(var n=0; n<view.children.length; n++){
-			if(view.children[n].id == this.childrenOrderVer[i].id){
-				view.childrenOrderVer.push(view.children[n]);
-				break;
-			}
-		}
-	}
-	view.childrenUI = this.childrenUI;
-	
-	view.order = this.order;
-	view.orderNum = this.orderNum;
-	view.dependenciesHor = this.dependenciesHor.slice();
-	view.dependenciesVer = this.dependenciesVer.slice();
-	
-	view.leftLeft = this.leftLeft;
-	view.leftRight = this.leftRight;
-	view.rightRight = this.rightRight;
-	view.rightLeft = this.rightLeft;
-	view.topTop = this.topTop;
-	view.topBottom = this.topBottom;
-	view.bottomBottom = this.bottomBottom;
-	view.bottomTop = this.bottomTop;
-	
-	view.sizeWidth = this.sizeWidth;
-	view.sizeHeight = this.sizeHeight;
-	
-	view.left = this.left;
-	view.top = this.top;
-	view.right = this.right;
-	view.bottom = this.bottom;
-	
-	view.leftChanged = this.leftChanged;
-	view.topChanged = this.topChanged;
-	view.rightChanged = this.rightChanged;
-	view.bottomChanged = this.bottomChanged;
-	
-	view.width = this.width;
-	view.height = this.height;
-	
-	view.scrollVertical = this.scrollVertical;
-	view.scrollHorizontal = this.scrollHorizontal;
-	
-	view.scrollVerticalApplied = this.scrollVerticalApplied;
-	view.scrollHorizontalApplied = this.scrollHorizontalApplied;
-	
-	view.percentWidth = this.percentWidth;
-	view.percentHeight = this.percentHeight;
-	view.percentLeft = this.percentLeft;
-	view.percentTop = this.percentTop;
-	
-	view.gravityHor = this.gravityHor;
-	view.gravityVer = this.gravityVer;
-	
-	view.marginLeft = this.marginLeft;
-	view.marginTop = this.marginTop;
-	view.marginRight = this.marginRight;
-	view.marginBottom = this.marginBottom;
-	
-	view.paddingLeft = this.paddingLeft;
-	view.paddingTop = this.paddingTop;
-	view.paddingRight = this.paddingRight;
-	view.paddingBottom = this.paddingBottom;
-	
-	//return the view
-	return view;
-}
 		
 UIView.prototype.toString = function(){
-	return "[" + this.id + "]: ll:" + this.leftLeft + ", lr:" + this.leftRight + ", rr:" + this.rightRight + ", rl:" + this.rightLeft + ", tt:" + this.topTop + ",tb: " + this.topBottom + ", bb:" + this.bottomBottom + ", bt:" + this.bottomTop + ", ml:" + this.marginLeft + ", mr:" + this.marginRight + ", mt:" + this.marginTop + ",mb: " + this.marginBottom + ", pl:" + this.paddingLeft + ", pr:" + this.paddingRight + ", pt:" + this.paddingTop + ", pb:" + this.paddingBottom + ", w:" + this.width + ", h:" + this.height + ", sh:" + this.sizeWidth + ", sh:" + this.sizeHeight + ", pId:" + this.parentId + ", l:" + this.left + ", r:" + this.right + ", t:" + this.top + ", b:" + this.bottom;
+	return "[" + this.id + "]: ll:" + this.leftLeft + ", lr:" + this.leftRight + ", rr:" + this.rightRight + ", rl:" + this.rightLeft + 
+		", tt:" + this.topTop + ",tb: " + this.topBottom + ", bb:" + this.bottomBottom + ", bt:" + this.bottomTop + ", ml:" + this.marginLeft + 
+		", mr:" + this.marginRight + ", mt:" + this.marginTop + ",mb: " + this.marginBottom + ", pl:" + this.paddingLeft + ", pr:" + this.paddingRight + 
+		", pt:" + this.paddingTop + ", pb:" + this.paddingBottom + ", w:" + this.width + ", h:" + this.height + ", sh:" + this.sizeWidth + ", sh:" + 
+		this.sizeHeight + ", pId:" + (this.parent? this.parent.id : "") + ", l:" + this.left + ", r:" + this.right + ", t:" + this.top + ", b:" + this.bottom;
 }
 
 /**

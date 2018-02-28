@@ -109,30 +109,6 @@ WebUI.prototype.refreshUI = function(){
 }
 
 /**
-* Execute UI for an ID
-* @param {string} screenId identifier of element in HTML
-**/
-WebUI.prototype.prepareScreen = function(screenId, cbEvents){
-		
-	//get the element with the ID
-	var ele = document.getElementById(screenId);
-	
-	//create screen and add it in the first position
-	var screen = new UIViewScreen(ele, this.configuration);
-
-	//read views from html
-	screen.children = this.uiPrepare.getChildrenViews(ele, screen, this.configuration);
-	
-	//update the size of the screen
-	this.uiPrepare.loadSizeScreen(screen, ele);
-			
-	//set the position of parent as relative because the children will be absolute
-	ele.style.position = "relative";
-	
-	return screen;
-}
-
-/**
 * Execute UI
 * @param {Function=} cbEvents where to return the data with information
 **/
@@ -141,32 +117,16 @@ WebUI.prototype.drawScreens = function(cbEvents){
 	//start genral counter
 	startCounter('all');
 
-	//search screens if we don't have any
-	var screenIds = this.uiViewsManager.screenIds;
-	if(screenIds.length==0){
-		startCounter('searchScreens');
-
-		//search all the screens
-		screenIds = this.uiPrepare.getAllScreenIds(null, null, this.configuration.attribute);
-
-		endCounterLog('searchScreens');
-	}
+	//prepare all dom from body
+	var bodyElement = document.getElementsByTagName("BODY")[0];
+	var screens = [];
+	this.uiPrepare.generateUIViews(bodyElement, this.configuration, screens);
 	
 	//draw all screens
-	for(var i=0; i<screenIds.length; i++){
-
-		//get the screen
-		var screenId = screenIds[i];
-		var screen = this.uiViewsManager.screens[screenId];
-
-		//generate the screen if it is necessary
-		if(!screen) {
-			screen = this.prepareScreen(screenId, cbEvents);
-			this.uiViewsManager.screens[screenId] = screen;
-		}
+	for(var i=0; i<screens.length; i++){
 		
 		//finish rest of calculations
-		this.drawUIScreen(screen, cbEvents);
+		this.drawUIScreen(screens[i], cbEvents);
 	}
 
 }
@@ -176,9 +136,12 @@ WebUI.prototype.drawUIScreen = function(screen, cbEvents){
 	//---- PREPARE -----
 	startCounter('prepare');
 	startCounter('loadSizes');
+
+	//update the size of the screen
+	this.uiPrepare.loadSizeScreen(screen);
 						
 	//load sizes of views
-	this.uiPrepare.loadSizesSlow(screen.children, this.configuration);
+	this.uiPrepare.loadSizesSlow(screen.getChildElements(), this.configuration);
 
 	endCounterLog('loadSizes');
 	startCounter('orderViews');
@@ -193,7 +156,7 @@ WebUI.prototype.drawUIScreen = function(screen, cbEvents){
 	startCounter('core');
 	
 	//assign position and sizes to screen
-	this.uiCore.calculateScreen(this.uiPrepare, screen);
+	this.uiCore.calculateScreen(screen);
 	
 	endCounterLog('core');
 				
@@ -201,7 +164,7 @@ WebUI.prototype.drawUIScreen = function(screen, cbEvents){
 	startCounter('draw');
 				
 	//apply position and sizes
-	var childrenSizes = this.uiDraw.applyPositions(screen.children, this.configuration.viewColors);
+	var childrenSizes = this.uiDraw.applyPositions(screen, this.configuration.viewColors);
 	
 	//resize screen if necessary
 	this.uiDraw.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY);

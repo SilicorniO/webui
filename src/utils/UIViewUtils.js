@@ -32,7 +32,7 @@ UIViewUtils.prototype.calculateWidthView = function(view, ele, index, infinitePa
     
     //set values of parent back 
 	infiniteParent.removeChild(ele)
-    parent.insertBefore(ele, parent.children[index]);
+    parent.insertBefore(ele, parent.getChildElements()[index]);
     
     return width;
 }
@@ -62,7 +62,7 @@ UIViewUtils.prototype.calculateHeightView = function(view, ele, index, infiniteP
 	}
     
 	infiniteParent.removeChild(ele)
-	parent.insertBefore(ele, parent.children[index]);
+	parent.insertBefore(ele, parent.getChildElements()[index]);
 
 	return height;
 }
@@ -130,12 +130,12 @@ UIViewUtils.prototype.calculateHeightViewSlow = function(view, ele){
 }
 
 //generate list of indexes
-UIViewUtils.prototype.generateIndexes = function(views){
+UIViewUtils.prototype.generateIndexes = function(elements){
 		
 	var indexes = new Array();
 		
-	for(var i=0; i<views.length; i++){
-		indexes[views[i].id] = i;
+	for(var i=0; i<elements.length; i++){
+		indexes[elements[i].id] = i;
 	}
 	
 	return indexes;
@@ -143,9 +143,12 @@ UIViewUtils.prototype.generateIndexes = function(views){
 
 /**
 * Generate an array of views from one parent view
-* @param view View to read, recursive by children
+* @param {UIView} view View to read, recursive by children
+* @param {Array<UIView>=} aViews Array of views used to add view
+* @return {Array<UIView>} array of views
 **/
 UIViewUtils.prototype.generateArrayViews = function(view, aViews){
+	
 	if(aViews==null){
 		aViews = new Array();
 	}
@@ -154,9 +157,9 @@ UIViewUtils.prototype.generateArrayViews = function(view, aViews){
 	aViews.push(view);
 	
 	//add the children
-	for(var i=0; i<view.children.length; i++){
-		this.generateArrayViews(view.children[i], aViews);
-	}
+	view.forEachChild((function(child, index){
+		this.generateArrayViews(child, aViews);
+	}).bind(this));
 	
 	return aViews;
 }
@@ -181,18 +184,16 @@ UIViewUtils.prototype.getViewsWithDependencyForView = function(view, hor, ver){
 
 	//get the views of the parent
 	var viewId = view.id;
-	var parentChildren = view.parent.children;
-	for(var i=0; i<parentChildren.length; i++){
-		var child = parentChildren[i];
+	view.parent.forEachChild(function(parentChild, index){
 		
 		if(
-			(hor && child.dependenciesHor.includes(viewId)) || 
-			(ver && child.dependenciesVer.includes(viewId))
+			(hor && parentChild.dependenciesHor.includes(viewId)) || 
+			(ver && parentChild.dependenciesVer.includes(viewId))
 		){
-			dependencyViews.push(child);
+			dependencyViews.push(parentChild);
 		}
 
-	}
+	});
 
 	//return the list of views with dependencies
 	return dependencyViews;

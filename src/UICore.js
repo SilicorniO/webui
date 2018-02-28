@@ -9,10 +9,10 @@ function UICore(scrollWidth){
 
 }
 
-UICore.prototype.calculateScreen = function(uiPrepare, screenView){
+UICore.prototype.calculateScreen = function(screen){
 	
 	//generate list of views and indexes for quick access
-	var arrayViews = UIViewUtilsInstance.generateArrayViews(screenView);
+	var arrayViews = UIViewUtilsInstance.generateArrayViews(screen);
 	var indexes = UIViewUtilsInstance.generateIndexes(arrayViews);
     
     var viewsRestored;
@@ -27,12 +27,12 @@ UICore.prototype.calculateScreen = function(uiPrepare, screenView){
 			arrayViews[i].clean();
         }
     
-        for(var i=0; i<screenView.childrenOrderHor.length; i++){
-            this.calculateViewHor(screenView.childrenOrderHor[i], screenView, arrayViews, indexes, screenView.width, viewsRestored);
+        for(var i=0; i<screen.childrenOrderHor.length; i++){
+            this.calculateViewHor(screen.childrenOrderHor[i], screen, arrayViews, indexes, screen.width, viewsRestored);
         }
 
-        for(var i=0; i<screenView.childrenOrderVer.length; i++){
-            var viewReturn = this.calculateViewVer(screenView.childrenOrderVer[i], screenView, arrayViews, indexes, screenView.height, viewsRestored);
+        for(var i=0; i<screen.childrenOrderVer.length; i++){
+            var viewReturn = this.calculateViewVer(screen.childrenOrderVer[i], screen, arrayViews, indexes, screen.height, viewsRestored);
         }
         
     }while(viewsRestored.length>0);
@@ -136,9 +136,6 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 }
 
 UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, indexes, height, viewsRestored){
-	
-    //save state of the view to restore it if it is necessary
-//    var viewSaved = view.clone();
     
 	//eval references to try to calculate the height
 	var references = view.getReferencesVer();
@@ -277,10 +274,10 @@ UICore.prototype.applyFixedSizeVer = function(view){
 **/
 UICore.prototype.applyPaddingChildrenHor = function(view){
 	if(view.paddingLeft!=0){
-		for(var i=0; i<view.children.length; i++){
-			view.children[i].left += view.paddingLeft;
-			view.children[i].right += view.paddingLeft;
-		}
+		view.forEachChild(function(child, index){
+			child.left += view.paddingLeft;
+			child.right += view.paddingLeft;
+		});
 	}
 }
 
@@ -290,10 +287,10 @@ UICore.prototype.applyPaddingChildrenHor = function(view){
 **/
 UICore.prototype.applyPaddingChildrenVer = function(view){
 	if(view.paddingTop!=0){
-		for(var i=0; i<view.children.length; i++){
-			view.children[i].top += view.paddingTop;
-			view.children[i].bottom += view.paddingTop;
-		}
+		view.forEachChild(function(child, index){
+			child.top += view.paddingTop;
+			child.bottom += view.paddingTop;
+		});
 	}
 }
 
@@ -304,12 +301,11 @@ UICore.prototype.applyPaddingChildrenVer = function(view){
 UICore.prototype.applyScrollHor = function(view, width){
 	if(view.scrollHorizontal){
 		var maxX = 0;
-		for(var i=0; i<view.children.length; i++){
-			var child = view.children[i];
+		view.forEachChild(function(child, index){
 			if(child.right>maxX){
 				maxX = child.right;
 			}
-		}
+		});
 		if(maxX>width + view.paddingLeft){
             
             //check it here and not before because in the future we could change this state to not scroll without recalculate everything
@@ -335,12 +331,11 @@ UICore.prototype.applyScrollHor = function(view, width){
 UICore.prototype.applyScrollVer = function(view, height){
 	if(view.scrollVertical){
 		var maxY = 0;
-		for(var i=0; i<view.children.length; i++){
-			var child = view.children[i];
+		view.forEachChild(function(child, index){
 			if(child.bottom>maxY){
 				maxY = child.bottom;
 			}
-		}
+		});
 		if(view.sizeHeight!='sc' || (maxY>height+view.paddingTop)){
             
             //check it here and not before because in the future we could change this state to not scroll without recalculate everything
@@ -407,12 +402,11 @@ UICore.prototype.applySizeContentVer = function(view){
 UICore.prototype.applySizeChildrenHor = function(view){
 	
 	var maxX = 0;
-	for(var i=0; i<view.children.length; i++){
-		var child = view.children[i];
+	view.forEachChild(function(child, index){
 		if(child.right>maxX){
 			maxX = child.right;
 		}
-	}
+	});
 	if(view.rightChanged){
 		view.left = view.right - maxX - view.paddingLeft;
 		view.leftChanged = true;
@@ -424,13 +418,12 @@ UICore.prototype.applySizeChildrenHor = function(view){
 	
 	//apply width of children if they were waiting to have the parent size
 	//this is used for r:p and parent has no size defined
-	for(var i=0; i<view.children.length; i++){
-		var child = view.children[i];
+	view.forEachChild(function(child, index){
 		if(child.width<0){
 			child.right = maxX;
 			child.width = child.right - child.left;
 		}
-	}
+	});
 
 }
 
@@ -441,12 +434,11 @@ UICore.prototype.applySizeChildrenHor = function(view){
 UICore.prototype.applySizeChildrenVer = function(view){
 	
 	var maxY = 0;
-	for(var i=0; i<view.children.length; i++){
-		var child = view.children[i];
+	view.forEachChild(function(child, index){
 		if(child.bottom>maxY){
 			maxY = child.bottom;
 		}
-	}
+	});
 	if(view.bottomChanged){
 		view.top = view.bottom - maxY - view.paddingTop;
 		view.topChanged = true;
@@ -457,13 +449,12 @@ UICore.prototype.applySizeChildrenVer = function(view){
 	
 	//apply height of children if they were waiting to have the parent size
 	//this is used for b:p and parent has no size defined
-	for(var i=0; i<view.children.length; i++){
-		var child = view.children[i];
+	view.forEachChild(function(child, index){
 		if(child.height<0){
 			child.bottom = maxY;
 			child.height = child.bottom - child.top;
 		}
-	}
+	});
 			
 }
 

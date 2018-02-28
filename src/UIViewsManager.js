@@ -20,9 +20,10 @@ UIViewsManager.prototype.addScreen = function(screen){
     this.screenIds.push(screen.id);
 }
 
-UIViewsManager.prototype.elementAdded = function(element){
+UIViewsManager.prototype.elementAdded = function(element, attributeMain){
     
     //TODO check if has the attribute, else we search the first parent element with an attribute
+    var firstElement = this.searchViewWithAttributeInTree(element, attributeMain);
 
     //TODO search parent
 
@@ -68,6 +69,21 @@ UIViewsManager.prototype.removeView = function(view){
 
 }
 
+UIViewsManager.prototype.searchViewWithAttributeInTree = function(element, attributeMain){
+
+    if(element && element.tagName!=null && element.getAttribute(attributeMain)!=null){
+        return element;
+    }
+
+    //search in parent
+    if(element.parentNode!=null){
+        return this.searchViewWithAttributeInTree(element.parentNode, attributeMain);
+    }else{
+        return null;
+    }
+    
+}
+
 /**
  * Search in all the views of all screens a view, returning it
  * @param {string} viewId identifier to search
@@ -87,12 +103,12 @@ UIViewsManager.prototype.searchViewWithId = function(viewId){
         }
 
         //check children
-        for(var i=0; i<view.children.length; i++){
-            var child = searchView(viewId, view.children[i]);
+        view.forEachChild(function(viewChild, index){
+            var child = searchView(viewId, viewChild);
             if(child!=null){
                 return child;
             }
-        }
+        });
 
         return null;
     }

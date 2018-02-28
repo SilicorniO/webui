@@ -20,9 +20,9 @@ function logI(s){
 
 function logIView(prefix, view){
 	logI("[" + prefix + "] " + view.toString());
-	for(var i=0; i<view.children.length; i++){
-		logIView(prefix, view.children[i])
-	}
+	view.forEachChild(function(child, index){
+		logIView(prefix, child)
+	});
 }
 
 function logShow(type, text){

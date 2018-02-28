@@ -8,10 +8,11 @@ function UIDraw(){
 
 /**
 * Apply positions for the views
-* @param views Array of views to apply position
+* @param {UIView} view to draw children
+* @param {boolean} viewColors flag to show or not colors in views
 * @return int maximum Y positon of a children
 **/
-UIDraw.prototype.applyPositions = function(views, viewColors){
+UIDraw.prototype.applyPositions = function(view, viewColors){
     
     var maxX = 0;
 	var maxY = 0;
@@ -21,9 +22,8 @@ UIDraw.prototype.applyPositions = function(views, viewColors){
     var paddingTop = 0;
     var paddingBottom = 0;
 
-	for(var i=0; i<views.length; i++){
-		var view = views[i];
-		var ele = document.getElementById(view.id);
+	view.forEachChild((function(view, index){
+		var ele = view.element;
 		
         //initialize paddings
         paddingLeft = 0;
@@ -74,14 +74,14 @@ UIDraw.prototype.applyPositions = function(views, viewColors){
             ele.style.backgroundColor = this.generateRandomViewColor();
         }
 		
-        var childrenSize = this.applyPositions(view.children, viewColors);
+        var childrenSize = this.applyPositions(view, viewColors);
         if(childrenSize.maxX>maxX){
             maxX = childrenSize.maxX;
         }
 		if(childrenSize.maxY>maxY){
             maxY = childrenSize.maxY;
         }	
-	}
+	}).bind(this));
 	
 	return {maxX: maxX, maxY: maxY};
 	
