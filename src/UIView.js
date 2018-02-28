@@ -59,11 +59,21 @@ function UIView(element, parentId, lastViewId, attributeMain, attributes){
 	
 	this.gravityHor = 'n';
 	this.gravityVer = 'n';
+
+	this.marginLeftDimen = "0";
+	this.marginTopDimen = "0";
+	this.marginRightDimen = "0";
+	this.marginBottomDimen = "0";
 	
-	this.marginLeft = '0';
-	this.marginTop = '0';
-	this.marginRight = '0';
-	this.marginBottom = '0';
+	this.marginLeft = 0;
+	this.marginTop = 0;
+	this.marginRight = 0;
+	this.marginBottom = 0;
+
+	this.paddingLeftDimen = "0";
+	this.paddingTopDimen = "0";
+	this.paddingRightDimen = "0";
+	this.paddingBottomDimen = "0";
 	
 	this.paddingLeft = 0;
 	this.paddingTop = 0;
@@ -151,26 +161,26 @@ UIView.prototype.setGravity = function(gravityHor, gravityVer){
 	this.gravityVer = gravityVer
 }
 		
-UIView.prototype.setMarginLeft = function(margin){this.marginLeft = margin};
-UIView.prototype.setMarginTop = function(margin){this.marginTop = margin};
-UIView.prototype.setMarginRight = function(margin){this.marginRight = margin};
-UIView.prototype.setMarginBottom = function(margin){this.marginBottom = margin};
+UIView.prototype.setMarginLeft = function(margin){this.marginLeftDimen = margin};
+UIView.prototype.setMarginTop = function(margin){this.marginTopDimen = margin};
+UIView.prototype.setMarginRight = function(margin){this.marginRightDimen = margin};
+UIView.prototype.setMarginBottom = function(margin){this.marginBottomDimen = margin};
 UIView.prototype.setMargins = function(marginLeft, marginTop, marginRight, marginBottom){
-			this.marginLeft = marginLeft;
-			this.marginTop = marginTop;
-			this.marginRight = marginRight;
-			this.marginBottom = marginBottom;
+			this.marginLeftDimen = marginLeft;
+			this.marginTopDimen = marginTop;
+			this.marginRightDimen = marginRight;
+			this.marginBottomDimen = marginBottom;
 			};
 			
-UIView.prototype.setPaddingLeft = function(padding){this.paddingLeft = padding};
-UIView.prototype.setPaddingTop = function(padding){this.paddingTop = padding};
-UIView.prototype.setPaddingRight = function(padding){this.paddingRight = padding};
-UIView.prototype.setPaddingBottom = function(padding){this.paddingBottom = padding};
+UIView.prototype.setPaddingLeft = function(padding){this.paddingLeftDimen = padding};
+UIView.prototype.setPaddingTop = function(padding){this.paddingTopDimen = padding};
+UIView.prototype.setPaddingRight = function(padding){this.paddingRightDimen = padding};
+UIView.prototype.setPaddingBottom = function(padding){this.paddingBottomDimen = padding};
 UIView.prototype.setPaddings = function(paddingLeft, paddingTop, paddingRight, paddingBottom){
-			this.paddingLeft = paddingLeft;
-			this.paddingTop = paddingTop;
-			this.paddingRight = paddingRight;
-			this.paddingBottom = paddingBottom;
+			this.paddingLeftDimen = paddingLeft;
+			this.paddingTopDimen = paddingTop;
+			this.paddingRightDimen = paddingRight;
+			this.paddingBottomDimen = paddingBottom;
 			};
 			
 UIView.prototype.getReferences = function(){ return [this.leftLeft, this.leftRight, this.rightRight, this.rightLeft, this.topTop, this.topBottom, this.bottomBottom, this.bottomTop];};
@@ -237,15 +247,15 @@ UIView.prototype.clean = function(){
 
 UIView.prototype.applyDimens = function(coreConfig){
 	
-	this.paddingLeft = coreConfig.getDimen(this.paddingLeft);
-	this.paddingRight = coreConfig.getDimen(this.paddingRight);
-	this.paddingTop = coreConfig.getDimen(this.paddingTop);
-	this.paddingBottom = coreConfig.getDimen(this.paddingBottom);
+	this.paddingLeft = coreConfig.getDimen(this.paddingLeftDimen);
+	this.paddingRight = coreConfig.getDimen(this.paddingRightDimen);
+	this.paddingTop = coreConfig.getDimen(this.paddingTopDimen);
+	this.paddingBottom = coreConfig.getDimen(this.paddingBottomDimen);
 	
-	this.marginLeft = coreConfig.getDimen(this.marginLeft);
-	this.marginRight = coreConfig.getDimen(this.marginRight);
-	this.marginTop = coreConfig.getDimen(this.marginTop);
-	this.marginbottom = coreConfig.getDimen(this.marginBottom);
+	this.marginLeft = coreConfig.getDimen(this.marginLeftDimen);
+	this.marginRight = coreConfig.getDimen(this.marginRightDimen);
+	this.marginTop = coreConfig.getDimen(this.marginTopDimen);
+	this.marginBottom = coreConfig.getDimen(this.marginBottomDimen);
 	
 };
         

@@ -58,7 +58,7 @@ WebUI.prototype.start = function(configuration){
 	uiViewLogs = this.configuration.logsView;
 	
 	//prepare core with the configuration
-	this.uiCore = new UICore(this.configuration, this.scrollWidth);
+	this.uiCore = new UICore(this.scrollWidth);
 	
 	//start running on actual dom
 	this.drawUIAll();
@@ -157,7 +157,7 @@ WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
 	startCounter('loadSizes');
 						
 	//load sizes of views
-	this.uiPrepare.loadSizes(screenView.children, this.configuration);
+	this.uiPrepare.loadSizesSlow(screenView.children, this.configuration);
 
 	endCounterLog('loadSizes');
 	startCounter('orderViews');

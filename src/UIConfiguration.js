@@ -45,12 +45,12 @@ function UIConfiguration(uiConf){
 	}
 	
 	//initialize dimens
-	var dimens = {};
+	this.dimens = {};
 	if(uiConf['dimens']){
 		//copy all values
 		var dimenKeys = Object.keys(uiConf['dimens']);
 		for(var i=0;i<dimenKeys.length;i++){
-			dimens[dimenKeys[i]] = uiConf['dimens'][dimenKeys[i]];
+			this.dimens[dimenKeys[i]] = uiConf['dimens'][dimenKeys[i]];
 		}
 	}
 
@@ -64,7 +64,7 @@ UIConfiguration.prototype.refreshScreenSize = function(){
 
 	//initialize array of attributes
 	var aAttributes = [];
-	var dimens = {};
+	var dimens = this.dimens;
 
 	var widthScreen = window.innerWidth;
 	var heightScreen = window.innerHeight;
@@ -97,18 +97,20 @@ UIConfiguration.prototype.refreshScreenSize = function(){
 		}	
 	}
 	
-	//set values
+	//set attributes and dimens
 	this.attributes = aAttributes;
-	this.dimens = dimens;
-
+	this.selectedDimens = dimens;
 }
 
 UIConfiguration.prototype.getDimen = function(name){
 	
-	if(typeof this.dimens[name] !== 'undefined'){
-		return parseInt(this.dimens[name], 10);
-	}else{
+	if(this.selectedDimens[name]){
+		return parseInt(this.selectedDimens[name], 10);
+	}else if(name && !isNaN(parseInt(name))){
 		return parseInt(name, 10);
+	}else{
+		logE('The dimension "' + name + '" is not valid or it is not defined');
+		return 0;
 	}
 
 }

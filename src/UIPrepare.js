@@ -155,6 +155,34 @@ UIPrepare.prototype.orderViewsSameParent = function(views, hor){
 * Load the sizes of all views and translate paddings and margins to dimens
 * @param views Array of views to load size
 **/
+UIPrepare.prototype.loadSizesSlow = function(views, coreConfig){
+	
+	for(var i=0; i<views.length; i++){
+		var view = views[i];
+		var ele = document.getElementById(view.id);
+		
+		if(view.sizeWidth=='sc' && view.children.length==0){
+			view.width = UIViewUtilsInstance.calculateWidthViewSlow(view, ele);
+		}
+		
+		if(view.sizeHeight=='sc' && view.children.length==0){
+			view.height = UIViewUtilsInstance.calculateHeightViewSlow(view, ele);
+		}
+		
+		//translate paddings and margins
+		view.applyDimens(coreConfig);
+		
+		if(view.children.length>0){
+			this.loadSizesSlow(view.children, coreConfig);
+		}
+	}
+
+}
+
+/**
+* Load the sizes of all views and translate paddings and margins to dimens
+* @param views Array of views to load size
+**/
 UIPrepare.prototype.loadSizes = function(views, coreConfig){
 
 	//generate an infinite parent for calculations
@@ -163,30 +191,41 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 	infiniteParent.style.display = 'inline-block';
 	infiniteParent.style.width = VIEW_SIZE_LIMIT;
 	infiniteParent.style.height = VIEW_SIZE_LIMIT;
-	document.getElementsByTagName("BODY")[0].appendChild(infiniteParent);
+	infiniteParent.style.backgroundColor = "black";
+	infiniteParent.style.zIndex = -1;
+	var bodyEle = document.getElementById("screen");
+	bodyEle.appendChild(infiniteParent);
 	
+	var aViews = [];
 	for(var i=0; i<views.length; i++){
-		var view = views[i];
+		aViews.push(views[i]);
+	}
+	while(aViews.length>0){
+		var view = aViews[0];
+		aViews.splice(0, 1);
 		var ele = document.getElementById(view.id);
 		
 		if(view.sizeWidth=='sc' && view.children.length==0){
-			view.width = UIViewUtilsInstance.calculateWidthView(view, ele, infiniteParent);
+			view.width = UIViewUtilsInstance.calculateWidthView(view, ele, i, infiniteParent);
 		}
 		
 		if(view.sizeHeight=='sc' && view.children.length==0){
-			view.height = UIViewUtilsInstance.calculateHeightView(view, ele, infiniteParent);
+			view.height = UIViewUtilsInstance.calculateHeightView(view, ele, i, infiniteParent);
 		}
 		
 		//translate paddings and margins
 		view.applyDimens(coreConfig);
 		
 		if(view.children.length>0){
-			this.loadSizes(view.children, coreConfig);
+			for(var i=0; i<view.children.length; i++){
+				aViews.push(view.children[i]);
+			}
 		}
+
 	}
 
 	//remove infinite parent
-	document.getElementsByTagName("BODY")[0].removeChild(infiniteParent);
+	bodyEle.removeChild(infiniteParent);
 
 }
 

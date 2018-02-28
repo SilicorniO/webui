@@ -4,9 +4,8 @@
  * @param {UIConfiguration} coreConfig 
  * @param {Number} scrollWidth 
  */
-function UICore(coreConfig, scrollWidth){
+function UICore(scrollWidth){
 
-	this.uiCoreConfig = coreConfig;
 	this.scrollWidth = scrollWidth;
 
 }
@@ -193,7 +192,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 	}else{
 				
 		//if there are children we calculate the size of the children
-		//giving the width of the parent
+		//giving the height of the parent
 		if(view.childrenOrderVer.length>0){
 			
 			//calculate the real height with padding
@@ -603,8 +602,8 @@ UICore.prototype.assignMarginsHor = function(view){
 UICore.prototype.assignMarginsVer = function(view){
 	
 	//save margin to apply to their children
-	var viewMarginTop = this.uiCoreConfig.getDimen(view.marginTop);
-	var viewMarginBottom = this.uiCoreConfig.getDimen(view.marginBottom);
+	var viewMarginTop = view.marginTop;
+	var viewMarginBottom = view.marginBottom;
 	
 	if(view.marginTop!=0 && view.topChanged){
 		view.top += viewMarginTop;
