@@ -197,44 +197,33 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 **/
 UIPrepare.prototype.loadSizeScreen = function(screenView, ele){
 
-	//get the container
-	if(!ele){
-		//if the screen is the browser we get its size
-		screenView.width = window.innerWidth;
-		screenView.height = window.innerHeight;
-		screenView.right = screenView.width;
-		screenView.bottom = screenView.height;
-
-	}else{
-
-		//apply width and height if they are defined
-		if(screenView.sizeWidth!="sc"){
-			
-			if(screenView.sizeWidth=="s"){
-				ele.style.width = screenView.width + "px";
-			}else if(screenView.sizeWidth=="sp"){
-				ele.style.width = screenView.percentWidth + "%";
-			}
-			
-			screenView.width = ele.offsetWidth;
+	//apply width and height if they are defined
+	if(screenView.sizeWidth!="sc"){
+		
+		if(screenView.sizeWidth=="s"){
+			ele.style.width = screenView.width + "px";
+		}else if(screenView.sizeWidth=="sp"){
+			ele.style.width = screenView.percentWidth + "%";
 		}
-		if(screenView.sizeHeight!="sc"){
-			
-			if(screenView.sizeHeight=="s"){
-				ele.style.height = screenView.height + "px";
-			}else if(screenView.sizeWidth=="sp"){
-				ele.style.height = screenView.percentHeight + "%";
-			}
-			
-			screenView.height = ele.offsetHeight;
-		}
-		/*
-		screenView.width = ele.offsetWidth>0? ele.offsetWidth : window.innerWidth;
-		screenView.height = ele.offsetHeight>0? ele.offsetHeight : window.innerHeight;
-		*/
-		screenView.right = screenView.width;
-		screenView.bottom = screenView.height;
+		
+		screenView.width = ele.offsetWidth;
 	}
+	if(screenView.sizeHeight!="sc"){
+		
+		if(screenView.sizeHeight=="s"){
+			ele.style.height = screenView.height + "px";
+		}else if(screenView.sizeWidth=="sp"){
+			ele.style.height = screenView.percentHeight + "%";
+		}
+		
+		screenView.height = ele.offsetHeight;
+	}
+	/*
+	screenView.width = ele.offsetWidth>0? ele.offsetWidth : window.innerWidth;
+	screenView.height = ele.offsetHeight>0? ele.offsetHeight : window.innerHeight;
+	*/
+	screenView.right = screenView.width;
+	screenView.bottom = screenView.height;
 	
 	screenView.rightChanged = true;
 	screenView.leftChanged = true;
@@ -357,7 +346,7 @@ UIPrepare.prototype.addEventImages = function(element, applyChildren){
 	}	
 }
 
-UIPrepare.prototype.getAllScreens = function(parent, screens, coreConfig){
+UIPrepare.prototype.getAllScreens = function(parent, screens, attributeMain){
 
 	//if no parent received it is the first call and we have to get the body
 	if(parent == null){
@@ -368,37 +357,30 @@ UIPrepare.prototype.getAllScreens = function(parent, screens, coreConfig){
 		screens = [];
 	}
 
-	var attributeMain = coreConfig.attribute;
-
 	//search for a children with screen values
 	var childNodes = parent.childNodes;
 	for(var i=0; i<childNodes.length; i++){
 		var child = childNodes[i];
 		if(child && child.tagName!=null){
-			if(child.getAttribute(attributeMain)!=null && child.style.display!='none'){
+			if(child.getAttribute(attributeMain)!=null /*&& child.style.display!='none'*/){
 				
-				//read main attributes to search screen attribute
-				var aValues = UIUtilsInstance.readAttributes(child.getAttribute(attributeMain));
-				for(var n=0; n<aValues.length; n++){
-					var attr = aValues[n].attr;
-					if(attr=='s'){
-						
-						//assign an id if it does not have one
-						if(child.id.length==0){
-							child.id = "_aID_" + this.generatedId;
-							this.generatedId++;
-						}
-
-						//save the identifier of the screen
-						screens.push(child.id);
-
-						break;
+				//check if parent had the attribute, else this is a screen
+				if(parent.getAttribute(attributeMain)==null){
+					
+					//assign an id if it does not have one
+					if(child.id.length==0){
+						child.id = "_aID_" + this.generatedId;
+						this.generatedId++;
 					}
+
+					//save the identifier of the screen
+					screens.push(child.id);
+
 				}
 			}
 
 			//search for more screens
-			this.getAllScreens(child, screens, coreConfig);
+			this.getAllScreens(child, screens, attributeMain);
 		}	
 	}
 

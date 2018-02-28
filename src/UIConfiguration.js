@@ -44,9 +44,6 @@ function UIConfiguration(uiConf){
 		this.attribute = uiConf['attribute'];
 	}
 	
-	//initialize array of attributes
-	var aAttributes = [];
-	
 	//initialize dimens
 	var dimens = {};
 	if(uiConf['dimens']){
@@ -56,18 +53,30 @@ function UIConfiguration(uiConf){
 			dimens[dimenKeys[i]] = uiConf['dimens'][dimenKeys[i]];
 		}
 	}
+
+	//save screen modes
+	this.screenModes = uiConf['screenModes'];
 	
+	this.refreshScreenSize();
+}
+
+UIConfiguration.prototype.refreshScreenSize = function(){
+
+	//initialize array of attributes
+	var aAttributes = [];
+	var dimens = {};
+
 	var widthScreen = window.innerWidth;
 	var heightScreen = window.innerHeight;
 	
 	log('screen-width: ' + widthScreen);
 	log('screen-height: ' + heightScreen);
 	
-	if(uiConf['screenModes']){
-		for(var i=0; i<uiConf['screenModes'].length; i++){
+	if(this.screenModes){
+		for(var i=0; i<this.screenModes.length; i++){
 			
 			//get the screenMode
-			var screenMode = uiConf['screenModes'][i];
+			var screenMode = this.screenModes[i];
 			
 			//check each screenMode 
 			if(	(!screenMode['widthStart'] || screenMode['widthStart']==0 || screenMode['widthStart']<widthScreen) && 
@@ -91,6 +100,7 @@ function UIConfiguration(uiConf){
 	//set values
 	this.attributes = aAttributes;
 	this.dimens = dimens;
+
 }
 
 UIConfiguration.prototype.getDimen = function(name){

@@ -82,6 +82,7 @@ WebUI.prototype.listenDomEvents = function(){
 	
 	//execute draw each time the size of screen is modified
 	window.onresize = function(e){
+		self.configuration.refreshScreenSize();
 		self.redraw();
 	}
 	
@@ -104,7 +105,7 @@ WebUI.prototype.drawUIAll = function(cbEvents){
 	startCounter('all');
 	
 	//search all the screens
-	var screens = this.uiPrepare.getAllScreens(null, null, this.configuration);
+	var screens = this.uiPrepare.getAllScreens(null, null, this.configuration.attribute);
 
 	//draw all screens
 	for(var i=0; i<screens.length; i++){

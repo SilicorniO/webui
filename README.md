@@ -50,7 +50,7 @@ You can find the latest minified version in the builds folder. If you need to de
           <body>
           
           <script>
-            drawUI();
+            WebUI.start();
           </script>
           
           </body>
@@ -71,12 +71,12 @@ You can find the latest minified version in the builds folder. If you need to de
           </head>
           <body>
           
-          <div ui="s">
+          <div ui="fw;fh">
             <span ui="t:p;l:p">Top-Left</span>
           </div>
           
           <script>
-            drawUI();
+            WebUI.start();
           </script>
           
           </body>
@@ -112,7 +112,7 @@ You can find the latest minified version in the builds folder. If you need to de
         </div>
           
           <script>
-            drawUIForId('screen');
+            WebUI.start();
           </script>
           
           </body>
@@ -122,7 +122,7 @@ You can find the latest minified version in the builds folder. If you need to de
 
 ### 5. Webui can search for you the containers defined as web-uiscreens.
 
-   You need to add the "s" parameter inside the "ui" attribute. Then call to "drawUIAll()".
+   You don't need to add any parameter. All tags with main attribute whose parent haven't got it is a screen".
 
    ```html
       
@@ -133,16 +133,16 @@ You can find the latest minified version in the builds folder. If you need to de
           </head>
           <body>
           
-          <div ui="s">
+          <div ui="">
             <span ui="t:p;l:p">Top-Left</span>
           </div>
 
-          <div ui="s">
+          <div ui="">
             <span ui="b:p;r:p">Bottom-Right</span>
           </div>
           
           <script>
-            drawUIAll();
+            WebUI.start();
           </script>
           
           </body>
@@ -266,7 +266,7 @@ For example: ui="l:p; ab:l; w:30%"
           
           <script>
           
-            drawUIAll();
+            WebUI.start();
           </script>
           
           </body>
@@ -298,13 +298,13 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
           </head>
           <body>
           
-          <div ui="s">
+          <div ui="">
             <span ui="t:p;l:p">Top-Left</span>
           </div>
           
           <script>
           
-            configUI({
+            WebUI.start({
                 viewColors: true,
                 showLogs: true,
                 viewLogs: 'logs',
@@ -334,7 +334,6 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
                 ]
             });
             
-            drawUIAll();
           </script>
           
           </body>
