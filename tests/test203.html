@@ -15,7 +15,11 @@
 </head>
 <body style="margin:0">
     
-    <div id="screen1" ui="fw">
+    <div id="screen" ui="fw;fh">
+        <div id="container" ui=""></div>
+        <div id="buttons" ui="ab:l">
+            <a href="#" onClick="addElementUI()" ui="ar:l">Add element UI</a>
+        </div>
     </div>
     
     <script>
@@ -25,14 +29,14 @@
         viewLogs: 'logs',
         timeRedraw: 20
     });
+    
+    var container = document.getElementById('container');
 
-    //add a lot of children to the screen
-    var screen1 = document.getElementById('screen1');
-    for(var i=0; i<100; i++){
-        var div = document.createElement('div');
-        div.setAttribute('ui', 'ab:l;gh:c');
-        div.innerHTML = "Speed processing";
-        screen1.appendChild(div);
+    function addElementUI(){
+        var element = document.createElement('span');
+        element.innerHTML = "element";
+        element.setAttribute('ui', 'ml:100;ab:l');
+        container.appendChild(element);
     }
     
 

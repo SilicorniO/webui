@@ -18,6 +18,14 @@ function WebUI(){
 	/** Identifier to use when call to refresh the framework **/
 	this.idUI = null;
 
+	//screens
+	this.screenIds = [];
+	this.screens = {};
+
+	//ids of nodes changed
+	this.nodesAdded = [];
+	this.nodesRemoved = [];
+
 	//controllers
 	this.uiPrepare = new UIPrepare(this.refreshUI);
 	this.uiDraw = new UIDraw();
@@ -33,8 +41,11 @@ function WebUI(){
 	this.redraw = function() {
 
 		this.redrawTimer.timer((function(){
+
+			//when a node is added we have to check the relationship with the rest of views
+
 			//TODO change fot not calculating all every time
-			this.drawUIAll();
+			this.drawScreens();
 		}).bind(this), this.configuration.timeRedraw);
 	}
 }
@@ -61,7 +72,7 @@ WebUI.prototype.start = function(configuration){
 	this.uiCore = new UICore(this.scrollWidth);
 	
 	//start running on actual dom
-	this.drawUIAll();
+	this.drawScreens();
 	
 	//listen dom events
 	this.listenDomEvents();
@@ -73,10 +84,15 @@ WebUI.prototype.listenDomEvents = function(){
 	var self = this;
 	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeInserted", function (event) {
+		self.nodesAdded.push(event.srcElement);
+		self.screens = [];
 		self.redraw();
 	}, false);
 	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeRemoved", function (event) {
+		self.nodesRemoved.push(event.srcElement);
+		self.nodesRemoved.push(event.relatedNode);
+		self.screens = [];
 		self.redraw();
 	}, false);
 	
@@ -95,75 +111,87 @@ WebUI.prototype.refreshUI = function(){
 	this.redraw();
 }
 
-/**
-* Execute UI
-* @param {Function=} cbEvents where to return the data with information
-**/
-WebUI.prototype.drawUIAll = function(cbEvents){
-    
-	//start genral counter
-	startCounter('all');
-	
+WebUI.prototype.searchScreenIds = function(){
+
+	startCounter('searchScreens');
+
 	//search all the screens
-	var screens = this.uiPrepare.getAllScreens(null, null, this.configuration.attribute);
+	this.screenIds = this.uiPrepare.getAllScreenIds(null, null, this.configuration.attribute);
 
-	//draw all screens
-	for(var i=0; i<screens.length; i++){
-		this.drawUIForId(screens[i], cbEvents);
-	}
-
+	endCounterLog('searchScreens');
 }
 
 /**
 * Execute UI for an ID
-* @param id identifier of element in HTML
+* @param {string} screenId identifier of element in HTML
 **/
-WebUI.prototype.drawUIForId = function(id, cbEvents){
-
-	//start genral counter
-	startCounter('all');
+WebUI.prototype.prepareScreen = function(screenId, cbEvents){
 		
 	//get the element with the ID
-	var ele = document.getElementById(id);
-	if(ele == null){
-		logE("Error getting element with ID: " + id);
-		return;
-	}
+	var ele = document.getElementById(screenId);
 	
 	//read views from html
-	var views = this.uiPrepare.getChildrenViews(id, ele, this.configuration);
+	var views = this.uiPrepare.getChildrenViews(screenId, ele, this.configuration);
 	
 	//create screen and add it in the first position
-	var screenView = new UIViewScreen(id, ele, views, this.configuration);
+	var screen = new UIViewScreen(screenId, ele, views, this.configuration);
 	
 	//update the size of the screen
-	this.uiPrepare.loadSizeScreen(screenView, ele);
+	this.uiPrepare.loadSizeScreen(screen, ele);
 			
 	//set the position of parent as relative because the children will be absolute
 	ele.style.position = "relative";
 	
-	//finish rest of calculations
-	this.drawUIScreen(screenView, cbEvents);
+	return screen;
+}
+
+/**
+* Execute UI
+* @param {Function=} cbEvents where to return the data with information
+**/
+WebUI.prototype.drawScreens = function(cbEvents){
+    
+	//start genral counter
+	startCounter('all');
+
+	//search screens if we don't have any
+	if(this.screenIds.length==0){
+		this.searchScreenIds();
+	}
+	
+	//draw all screens
+	for(var i=0; i<this.screenIds.length; i++){
+
+		//get the screen
+		var screenId = this.screenIds[i];
+		var screen = this.screens[screenId];
+
+		//generate the screen if it is necessary
+		if(!screen) {
+			screen = this.prepareScreen(screenId, cbEvents);
+			this.screens[screenId] = screen;
+		}
+		
+		//finish rest of calculations
+		this.drawUIScreen(screen, cbEvents);
+	}
 
 }
 
-WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
-					
-	//hide screen
-	document.getElementById(screenView.id).style.opacity = '0.2';
+WebUI.prototype.drawUIScreen = function(screen, cbEvents){
 
 	//---- PREPARE -----
 	startCounter('prepare');
 	startCounter('loadSizes');
 						
 	//load sizes of views
-	this.uiPrepare.loadSizesSlow(screenView.children, this.configuration);
+	this.uiPrepare.loadSizesSlow(screen.children, this.configuration);
 
 	endCounterLog('loadSizes');
 	startCounter('orderViews');
 	
 	//order views
-	this.uiPrepare.orderViews(screenView);
+	this.uiPrepare.orderViews(screen);
 	
 	endCounterLog('orderViews');
 	endCounterLog('prepare');
@@ -172,7 +200,7 @@ WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
 	startCounter('core');
 	
 	//assign position and sizes to screen
-	this.uiCore.calculateScreen(this.uiPrepare, screenView);
+	this.uiCore.calculateScreen(this.uiPrepare, screen);
 	
 	endCounterLog('core');
 				
@@ -180,10 +208,10 @@ WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
 	startCounter('draw');
 				
 	//apply position and sizes
-	var childrenSizes = this.uiDraw.applyPositions(screenView.children, this.configuration.viewColors);
+	var childrenSizes = this.uiDraw.applyPositions(screen.children, this.configuration.viewColors);
 	
 	//resize screen if necessary
-	this.uiDraw.applySizeScreen(screenView, childrenSizes.maxX, childrenSizes.maxY);
+	this.uiDraw.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY);
 
 	endCounterLog('draw');
 
@@ -193,9 +221,6 @@ WebUI.prototype.drawUIScreen = function(screenView, cbEvents){
 			'name': 'end'
 		});
 	}
-
-	//show screen
-	document.getElementById(screenView.id).style.opacity = '1.0';
 	
 	//end counter
 	endCounterLog('all');

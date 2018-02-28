@@ -82,6 +82,10 @@ function UIView(element, parentId, lastViewId, attributeMain, attributes){
 	
 	this.replaced = false;
 
+	//flags for changes
+	this.sizeLoaded = false;
+	this.childrenInOrder = false;
+
 	//initialize
 	if(parentId!=null){
 		this.readUI(element, parentId, lastViewId, attributeMain, attributes)

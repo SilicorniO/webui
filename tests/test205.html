@@ -15,7 +15,14 @@
 </head>
 <body style="margin:0">
     
-    <div id="screen1" ui="fw">
+    <div id="screen" ui="fw;fh">
+        <div id="container" ui="">
+            <div id="element1" ui="">element 1</div>
+            <div id="element2" ui="ab:l">element 2</div>
+        </div>
+        <div id="buttons" ui="ab:l">
+            <a href="#" onClick="removeElementUI()" ui="ar:l">Remove element UI</a>
+        </div>
     </div>
     
     <script>
@@ -25,14 +32,11 @@
         viewLogs: 'logs',
         timeRedraw: 20
     });
+    
+    var element2 = document.getElementById('element2');
 
-    //add a lot of children to the screen
-    var screen1 = document.getElementById('screen1');
-    for(var i=0; i<100; i++){
-        var div = document.createElement('div');
-        div.setAttribute('ui', 'ab:l;gh:c');
-        div.innerHTML = "Speed processing";
-        screen1.appendChild(div);
+    function removeElementUI(){
+        element2.parentNode.removeChild(element2);
     }
     
 

@@ -52,10 +52,17 @@ UIPrepare.prototype.generateArrayViews = function(view, aViews){
 * @param parentView View to order the childrens
 **/
 UIPrepare.prototype.orderViews = function(parentView){
-						
-	//then order all the views with parent screen	
-	parentView.childrenOrderHor = this.orderViewsSameParent(parentView.children, true);
-	parentView.childrenOrderVer = this.orderViewsSameParent(parentView.children, false);
+	
+	if(!parentView.childrenInOrder){
+
+		//then order all the views with parent screen	
+		parentView.childrenOrderHor = this.orderViewsSameParent(parentView.children, true);
+		parentView.childrenOrderVer = this.orderViewsSameParent(parentView.children, false);
+
+		//mark as parent with order
+		parentView.childrenInOrder = true;
+
+	}
 		
 	//for each one, add the view and then its ordered children
 	for(var i=0; i<parentView.children.length; i++){
@@ -161,20 +168,27 @@ UIPrepare.prototype.loadSizesSlow = function(views, coreConfig){
 		var view = views[i];
 		var ele = document.getElementById(view.id);
 		
-		if(view.sizeWidth=='sc' && view.children.length==0){
-			view.width = UIViewUtilsInstance.calculateWidthViewSlow(view, ele);
+		if(!view.sizeLoaded){
+
+			if(view.sizeWidth=='sc' && view.children.length==0){
+				view.width = UIViewUtilsInstance.calculateWidthViewSlow(view, ele);
+			}
+			
+			if(view.sizeHeight=='sc' && view.children.length==0){
+				view.height = UIViewUtilsInstance.calculateHeightViewSlow(view, ele);
+			}
+			
+			//translate paddings and margins
+			view.applyDimens(coreConfig);
+
+			//mark the sizeLoaded flag of this view as true
+			view.sizeLoaded = true;
 		}
-		
-		if(view.sizeHeight=='sc' && view.children.length==0){
-			view.height = UIViewUtilsInstance.calculateHeightViewSlow(view, ele);
-		}
-		
-		//translate paddings and margins
-		view.applyDimens(coreConfig);
 		
 		if(view.children.length>0){
 			this.loadSizesSlow(view.children, coreConfig);
 		}
+		
 	}
 
 }
@@ -204,18 +218,24 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 		var view = aViews[0];
 		aViews.splice(0, 1);
 		var ele = document.getElementById(view.id);
+
+		if(!view.sizeLoaded){
 		
-		if(view.sizeWidth=='sc' && view.children.length==0){
-			view.width = UIViewUtilsInstance.calculateWidthView(view, ele, i, infiniteParent);
+			if(view.sizeWidth=='sc' && view.children.length==0){
+				view.width = UIViewUtilsInstance.calculateWidthView(view, ele, i, infiniteParent);
+			}
+			
+			if(view.sizeHeight=='sc' && view.children.length==0){
+				view.height = UIViewUtilsInstance.calculateHeightView(view, ele, i, infiniteParent);
+			}
+			
+			//translate paddings and margins
+			view.applyDimens(coreConfig);
+
+			//mark the sizeLoaded flag of this view as true
+			view.sizeLoaded = true;
 		}
-		
-		if(view.sizeHeight=='sc' && view.children.length==0){
-			view.height = UIViewUtilsInstance.calculateHeightView(view, ele, i, infiniteParent);
-		}
-		
-		//translate paddings and margins
-		view.applyDimens(coreConfig);
-		
+			
 		if(view.children.length>0){
 			for(var i=0; i<view.children.length; i++){
 				aViews.push(view.children[i]);
@@ -234,40 +254,37 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 * @param screenView View with screen value (body)
 * @param ele Element ref
 **/
-UIPrepare.prototype.loadSizeScreen = function(screenView, ele){
+UIPrepare.prototype.loadSizeScreen = function(screen, ele){
 
 	//apply width and height if they are defined
-	if(screenView.sizeWidth!="sc"){
+	if(screen.sizeWidth!="sc"){
 		
-		if(screenView.sizeWidth=="s"){
-			ele.style.width = screenView.width + "px";
-		}else if(screenView.sizeWidth=="sp"){
-			ele.style.width = screenView.percentWidth + "%";
+		if(screen.sizeWidth=="s"){
+			ele.style.width = screen.width + "px";
+		}else if(screen.sizeWidth=="sp"){
+			ele.style.width = screen.percentWidth + "%";
 		}
 		
-		screenView.width = ele.offsetWidth;
+		screen.width = ele.offsetWidth;
 	}
-	if(screenView.sizeHeight!="sc"){
+	if(screen.sizeHeight!="sc"){
 		
-		if(screenView.sizeHeight=="s"){
-			ele.style.height = screenView.height + "px";
-		}else if(screenView.sizeWidth=="sp"){
-			ele.style.height = screenView.percentHeight + "%";
+		if(screen.sizeHeight=="s"){
+			ele.style.height = screen.height + "px";
+		}else if(screen.sizeWidth=="sp"){
+			ele.style.height = screen.percentHeight + "%";
 		}
 		
-		screenView.height = ele.offsetHeight;
+		screen.height = ele.offsetHeight;
 	}
-	/*
-	screenView.width = ele.offsetWidth>0? ele.offsetWidth : window.innerWidth;
-	screenView.height = ele.offsetHeight>0? ele.offsetHeight : window.innerHeight;
-	*/
-	screenView.right = screenView.width;
-	screenView.bottom = screenView.height;
 	
-	screenView.rightChanged = true;
-	screenView.leftChanged = true;
-	screenView.bottomChanged = true;
-	screenView.topChanged = true;
+	screen.right = screen.width;
+	screen.bottom = screen.height;
+	
+	screen.rightChanged = true;
+	screen.leftChanged = true;
+	screen.bottomChanged = true;
+	screen.topChanged = true;
 }
 
 /**
@@ -385,7 +402,7 @@ UIPrepare.prototype.addEventImages = function(element, applyChildren){
 	}	
 }
 
-UIPrepare.prototype.getAllScreens = function(parent, screens, attributeMain){
+UIPrepare.prototype.getAllScreenIds = function(parent, screens, attributeMain){
 
 	//if no parent received it is the first call and we have to get the body
 	if(parent == null){
@@ -419,7 +436,7 @@ UIPrepare.prototype.getAllScreens = function(parent, screens, attributeMain){
 			}
 
 			//search for more screens
-			this.getAllScreens(child, screens, attributeMain);
+			this.getAllScreenIds(child, screens, attributeMain);
 		}	
 	}
 
