@@ -128,3 +128,73 @@ UIViewUtils.prototype.calculateHeightViewSlow = function(view, ele){
 
 	return height;
 }
+
+//generate list of indexes
+UIViewUtils.prototype.generateIndexes = function(views){
+		
+	var indexes = new Array();
+		
+	for(var i=0; i<views.length; i++){
+		indexes[views[i].id] = i;
+	}
+	
+	return indexes;
+}
+
+/**
+* Generate an array of views from one parent view
+* @param view View to read, recursive by children
+**/
+UIViewUtils.prototype.generateArrayViews = function(view, aViews){
+	if(aViews==null){
+		aViews = new Array();
+	}
+	
+	//add the view
+	aViews.push(view);
+	
+	//add the children
+	for(var i=0; i<view.children.length; i++){
+		this.generateArrayViews(view.children[i], aViews);
+	}
+	
+	return aViews;
+}
+
+/**
+ * Search views wich have the given view as dependency. 
+ * Only search in same parent views
+ * @param {UIView} view UIView reference
+ * @param {boolean} hor TRUE for searching horizontal dependency
+ * @param {boolean} ver TRUE for searching vertical dependency
+ * @return {Array<UIView>} Array of views with dependency of the given view
+ */
+UIViewUtils.prototype.getViewsWithDependencyForView = function(view, hor, ver){
+
+	//generate the array with the views to return
+	var dependencyViews = [];
+
+	//check has parent, else we return empty array
+	if(!view.parent){
+		return dependencyViews;
+	}
+
+	//get the views of the parent
+	var viewId = view.id;
+	var parentChildren = view.parent.children;
+	for(var i=0; i<parentChildren.length; i++){
+		var child = parentChildren[i];
+		
+		if(
+			(hor && child.dependenciesHor.includes(viewId)) || 
+			(ver && child.dependenciesVer.includes(viewId))
+		){
+			dependencyViews.push(child);
+		}
+
+	}
+
+	//return the list of views with dependencies
+	return dependencyViews;
+
+}

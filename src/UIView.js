@@ -3,15 +3,17 @@
 * Create a view object reading the HTML of the element 
 * @constructor
 * @param element where to read data
-* @param {string=} parentId to assign to the view created
+* @param {UIView=} parent to assign to the view created
+* @param {UIView=} screen to assign to the view created
 * @param {string=} lastViewId with the identifier of the view before
 * @param {string=} attributeMain with the name of the attribute to read
 * @param {Array<string>=} attributes with the name of the attributes to read as secondary
 **/
-function UIView(element, parentId, lastViewId, attributeMain, attributes){
+function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 
 	this.id = element.id;
-	this.parentId = parentId;
+	this.parent = parent;
+	this.screen = screen;
 	this.children = new Array();
 	this.childrenOrderHor = new Array();
 	this.childrenOrderVer = new Array();
@@ -19,7 +21,8 @@ function UIView(element, parentId, lastViewId, attributeMain, attributes){
 	
 	this.order = 0;
 	this.orderNum = 0;
-	this.dependencies = new Array();
+	this.dependenciesHor= new Array();
+	this.dependenciesVer = new Array();
 	
 	this.leftLeft = '';
 	this.leftRight = '';
@@ -87,29 +90,19 @@ function UIView(element, parentId, lastViewId, attributeMain, attributes){
 	this.childrenInOrder = false;
 
 	//initialize
-	if(parentId!=null){
-		this.readUI(element, parentId, lastViewId, attributeMain, attributes)
-	}
+	this.readUI(element, parent, lastViewId, attributeMain, attributes);
 }
 
 /**
 * Generate a new parent view that is called screen
 * @constructor
-* @param views Array of views to add to the screen
-* @param coreConfig configuration of core 
+* @param ele Array of views to add to the screen
+* @param {UIConfiguration} coreConfig configuration of core 
 * @return Screen generated
 **/
-function UIViewScreen(id, ele, views, coreConfig){
+function UIViewScreen(ele, coreConfig){
 	
-	var screenView;
-	if(ele!=null){
-		screenView = new UIView(ele, "", "", coreConfig.attribute, coreConfig.attributes);
-	}else{
-		screenView = new UIView(id);
-	}
-	screenView.children = views;
-
-	return screenView
+	return new UIView(ele, null, null, "", coreConfig.attribute, coreConfig.attributes);
 }
 
 UIView.prototype.setWidth = function(w){
@@ -293,9 +286,8 @@ UIView.prototype.clone = function(){
 	
 	view.order = this.order;
 	view.orderNum = this.orderNum;
-	for(var i=0; i<this.dependencies.length; i++){
-		view.dependencies.push(this.dependencies[i]);
-	}
+	view.dependenciesHor = this.dependenciesHor.slice();
+	view.dependenciesVer = this.dependenciesVer.slice();
 	
 	view.leftLeft = this.leftLeft;
 	view.leftRight = this.leftRight;
@@ -357,13 +349,13 @@ UIView.prototype.toString = function(){
 /**
 * Create a view object reading the HTML of the element 
 * @param element where to read data
-* @param parentId to assign to the view created
+* @param parent to assign to the view created
 * @param lastViewId with the identifier of the view before
 * @param attributeMain with the name of the attribute to read
 * @param attributes with the name of the attributes to read as secondary
 * @return View generated
 **/
-UIView.prototype.readUI = function(element, parentId, lastViewId, attributeMain, attributes){
+UIView.prototype.readUI = function(element, parent, lastViewId, attributeMain, attributes){
 	
 	//read main attributes
 	var aValues = UIUtilsInstance.readAttributes(element.getAttribute(attributeMain));
@@ -375,6 +367,9 @@ UIView.prototype.readUI = function(element, parentId, lastViewId, attributeMain,
 	if(aValues.length==0){
 		return;
 	}
+
+	//set parent id as empty if it is not received
+	var parentId = parent? parent.id : '';
 		
 	//set the ui values
 	for(var i=0; i<aValues.length; i++){

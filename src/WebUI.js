@@ -18,15 +18,12 @@ function WebUI(){
 	/** Identifier to use when call to refresh the framework **/
 	this.idUI = null;
 
-	//screens
-	this.screenIds = [];
-	this.screens = {};
-
 	//ids of nodes changed
 	this.nodesAdded = [];
 	this.nodesRemoved = [];
 
 	//controllers
+	this.uiViewsManager = new UIViewsManager();
 	this.uiPrepare = new UIPrepare(this.refreshUI);
 	this.uiDraw = new UIDraw();
 	this.uiCore = null;
@@ -111,16 +108,6 @@ WebUI.prototype.refreshUI = function(){
 	this.redraw();
 }
 
-WebUI.prototype.searchScreenIds = function(){
-
-	startCounter('searchScreens');
-
-	//search all the screens
-	this.screenIds = this.uiPrepare.getAllScreenIds(null, null, this.configuration.attribute);
-
-	endCounterLog('searchScreens');
-}
-
 /**
 * Execute UI for an ID
 * @param {string} screenId identifier of element in HTML
@@ -130,11 +117,11 @@ WebUI.prototype.prepareScreen = function(screenId, cbEvents){
 	//get the element with the ID
 	var ele = document.getElementById(screenId);
 	
-	//read views from html
-	var views = this.uiPrepare.getChildrenViews(screenId, ele, this.configuration);
-	
 	//create screen and add it in the first position
-	var screen = new UIViewScreen(screenId, ele, views, this.configuration);
+	var screen = new UIViewScreen(ele, this.configuration);
+
+	//read views from html
+	screen.children = this.uiPrepare.getChildrenViews(ele, screen, this.configuration);
 	
 	//update the size of the screen
 	this.uiPrepare.loadSizeScreen(screen, ele);
@@ -155,21 +142,27 @@ WebUI.prototype.drawScreens = function(cbEvents){
 	startCounter('all');
 
 	//search screens if we don't have any
-	if(this.screenIds.length==0){
-		this.searchScreenIds();
+	var screenIds = this.uiViewsManager.screenIds;
+	if(screenIds.length==0){
+		startCounter('searchScreens');
+
+		//search all the screens
+		screenIds = this.uiPrepare.getAllScreenIds(null, null, this.configuration.attribute);
+
+		endCounterLog('searchScreens');
 	}
 	
 	//draw all screens
-	for(var i=0; i<this.screenIds.length; i++){
+	for(var i=0; i<screenIds.length; i++){
 
 		//get the screen
-		var screenId = this.screenIds[i];
-		var screen = this.screens[screenId];
+		var screenId = screenIds[i];
+		var screen = this.uiViewsManager.screens[screenId];
 
 		//generate the screen if it is necessary
 		if(!screen) {
 			screen = this.prepareScreen(screenId, cbEvents);
-			this.screens[screenId] = screen;
+			this.uiViewsManager.screens[screenId] = screen;
 		}
 		
 		//finish rest of calculations

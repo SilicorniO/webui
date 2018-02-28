@@ -106,7 +106,7 @@ UIConfiguration.prototype.getDimen = function(name){
 	
 	if(this.selectedDimens[name]){
 		return parseInt(this.selectedDimens[name], 10);
-	}else if(name && !isNaN(parseInt(name))){
+	}else if(name && !isNaN(parseInt(name, 10))){
 		return parseInt(name, 10);
 	}else{
 		logE('The dimension "' + name + '" is not valid or it is not defined');

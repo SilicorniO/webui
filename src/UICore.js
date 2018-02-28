@@ -1,7 +1,6 @@
 
 /**
  * @constructor
- * @param {UIConfiguration} coreConfig 
  * @param {Number} scrollWidth 
  */
 function UICore(scrollWidth){
@@ -13,8 +12,8 @@ function UICore(scrollWidth){
 UICore.prototype.calculateScreen = function(uiPrepare, screenView){
 	
 	//generate list of views and indexes for quick access
-	var arrayViews = uiPrepare.generateArrayViews(screenView);
-	var indexes = uiPrepare.generateIndexes(arrayViews);
+	var arrayViews = UIViewUtilsInstance.generateArrayViews(screenView);
+	var indexes = UIViewUtilsInstance.generateIndexes(arrayViews);
     
     var viewsRestored;
 	
