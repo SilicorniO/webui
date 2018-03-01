@@ -15,8 +15,8 @@ function WebUI(){
 	this.scrollWidth = 0;
 	this.scrollHeight = 0;
 
-	/** Identifier to use when call to refresh the framework **/
-	this.idUI = null;
+	//list of screens
+	this.screens = [];
 
 	//ids of nodes changed
 	this.nodesAdded = [];
@@ -24,7 +24,7 @@ function WebUI(){
 
 	//controllers
 	this.uiViewsManager = new UIViewsManager();
-	this.uiPrepare = new UIPrepare(this.refreshUI);
+	this.uiPrepare = new UIPrepare(this.refresh);
 	this.uiDraw = new UIDraw();
 	this.uiCore = null;
 
@@ -35,16 +35,40 @@ function WebUI(){
 	this.redrawTimer = new UIRedrawTimer();
 
 	//redraw function
-	this.redraw = function() {
+	this.redraw = (function() {
 
 		this.redrawTimer.timer((function(){
 
 			//when a node is added we have to check the relationship with the rest of views
+			while(this.nodesAdded.length>0){
+				
+				//get first node and remove from list
+				var node = this.nodesAdded[0];
+				this.nodesAdded.splice(0,1);
 
-			//TODO change fot not calculating all every time
+				//1. Search and add UI elements from this node. Adding newscreens to the list
+				this.uiPrepare.generateUIViews(node, this.configuration, this.screens)
+
+				//get the parent if has one
+				var parent = node.ui? node.ui.parent : null;
+				if(parent){
+
+					//2. Order views in parent
+					parent.childrenInOrder = false;
+
+					//3. Check if parent has size content, to mark it as modified
+					if(parent.sizeWidth=='sc' || parent.sizeHeight=='sc'){
+						parent.sizeLoaded = false;
+					}
+
+				}
+			}
+
+			//draw
 			this.drawScreens();
+
 		}).bind(this), this.configuration.timeRedraw);
-	}
+	}).bind(this);
 }
 
 /**
@@ -82,15 +106,13 @@ WebUI.prototype.listenDomEvents = function(){
 	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeInserted", function (event) {
 		self.nodesAdded.push(event.srcElement);
-		self.screens = [];
 		self.redraw();
 	}, false);
 	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeRemoved", function (event) {
-		self.nodesRemoved.push(event.srcElement);
-		self.nodesRemoved.push(event.relatedNode);
-		self.screens = [];
-		self.redraw();
+		// self.nodesRemoved.push(event.srcElement);
+		// self.nodesRemoved.push(event.relatedNode);
+		// self.redraw();
 	}, false);
 	
 	//execute draw each time the size of screen is modified
@@ -104,34 +126,34 @@ WebUI.prototype.listenDomEvents = function(){
 /**
 * Refresh the UI framework with the identifier saved if there was one
 **/
-WebUI.prototype.refreshUI = function(){
+WebUI.prototype.refresh = function(){
 	this.redraw();
 }
 
 /**
 * Execute UI
-* @param {Function=} cbEvents where to return the data with information
 **/
-WebUI.prototype.drawScreens = function(cbEvents){
+WebUI.prototype.drawScreens = function(){
     
 	//start genral counter
 	startCounter('all');
 
-	//prepare all dom from body
-	var bodyElement = document.getElementsByTagName("BODY")[0];
-	var screens = [];
-	this.uiPrepare.generateUIViews(bodyElement, this.configuration, screens);
+	//prepare all dom from body for the first time
+	if(this.screens.length==0){
+		var bodyElement = document.getElementsByTagName("BODY")[0];
+		this.uiPrepare.generateUIViews(bodyElement, this.configuration, this.screens);
+	}
 	
 	//draw all screens
-	for(var i=0; i<screens.length; i++){
+	for(var i=0; i<this.screens.length; i++){
 		
 		//finish rest of calculations
-		this.drawUIScreen(screens[i], cbEvents);
+		this.drawUIScreen(this.screens[i]);
 	}
 
 }
 
-WebUI.prototype.drawUIScreen = function(screen, cbEvents){
+WebUI.prototype.drawUIScreen = function(screen){
 
 	//---- PREPARE -----
 	startCounter('prepare');
@@ -172,8 +194,8 @@ WebUI.prototype.drawUIScreen = function(screen, cbEvents){
 	endCounterLog('draw');
 
 	//call to listener of events
-	if(cbEvents){
-		cbEvents({
+	if(this.configuration.events){
+		this.configuration.events({
 			'name': 'end'
 		});
 	}
@@ -185,4 +207,4 @@ WebUI.prototype.drawUIScreen = function(screen, cbEvents){
 var WebUIInstance = new WebUI();
 window['WebUI'] = WebUIInstance;
 window['WebUI']['start'] = WebUIInstance.start;
-window['WebUI']['refresh'] = WebUIInstance.refreshUI;
+window['WebUI']['refresh'] = WebUIInstance.refresh;

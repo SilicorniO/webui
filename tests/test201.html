@@ -29,9 +29,9 @@
 
     //add a lot of children to the screen
     var screen1 = document.getElementById('screen1');
-    for(var i=0; i<100; i++){
+    for(var i=0; i<200; i++){
         var div = document.createElement('div');
-        div.setAttribute('ui', 'ab:l;gh:c');
+        div.setAttribute('ui', 'gh:c' + (i>0? ";ab:l" : ""));
         div.innerHTML = "Speed processing";
         screen1.appendChild(div);
     }

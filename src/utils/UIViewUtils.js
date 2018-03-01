@@ -135,7 +135,9 @@ UIViewUtils.prototype.generateIndexes = function(elements){
 	var indexes = new Array();
 		
 	for(var i=0; i<elements.length; i++){
-		indexes[elements[i].id] = i;
+		if(elements[i].id){
+			indexes[elements[i].id] = i;
+		}
 	}
 	
 	return indexes;

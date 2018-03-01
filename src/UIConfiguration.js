@@ -35,6 +35,10 @@ function UIConfiguration(uiConf){
 		}
 	}
 
+	if(uiConf['events']!=null){
+		this.events = uiConf['events'];
+	}
+
 	if(uiConf['timeRedraw']!=null && !isNaN(uiConf['timeRedraw'])){
 		this.timeRedraw = parseInt(uiConf['timeRedraw'], 10);
 	}

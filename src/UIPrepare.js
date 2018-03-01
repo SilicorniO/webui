@@ -129,7 +129,7 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 		
 	}while(!allViewsSetted && numViewsSetted>0);
 	
-	if(numViewsSetted==0 && childElements.length>0 && views0dependencies<childElements.length){
+	if(numViewsSetted==0 && parent.hasUIChildren() && views0dependencies<childElements.length){
 		logE("Check cycle references in " + (hor? "horizontal" : "vertical")  + " for parent " + parent.id);
 	}
 	
@@ -239,6 +239,11 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 **/
 UIPrepare.prototype.loadSizeScreen = function(screen){
 
+	//check if screen has the size loaded
+	if(screen.sizeLoaded){
+		return;
+	}
+
 	//get the element
 	var ele = screen.element;
 
@@ -271,6 +276,9 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 	screen.leftChanged = true;
 	screen.bottomChanged = true;
 	screen.topChanged = true;
+
+	//mark size as loaded
+	screen.sizeLoaded = true;
 }
 
 /**
@@ -350,8 +358,14 @@ UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parent
 	//get the parent and the screen
 	var parent = null;
 	var screen = null;
-	if(parentElement!=null){
+	if(parentElement==null){
 		parentElement = element.parentNode;
+
+		//calculate the lastViewId
+		var previousElement = element.previousSibling;
+		if(previousElement!=null && previousElement.id){
+			lastViewId = previousElement.id
+		}
 	}
 	if(parentElement!=null && parentElement.ui){
 		parent = element.parentNode.ui;
