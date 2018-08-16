@@ -82,12 +82,13 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this.paddingTop = 0;
 	this.paddingRight = 0;
 	this.paddingBottom = 0;
-	
-	this.replaced = false;
 
 	//flags for changes
 	this.sizeLoaded = false;
 	this.childrenInOrder = false;
+
+	//animations
+	this.animationDuration = 0.3;
 
 	//initialize
 	this.readUI(element, parent, lastViewId? lastViewId : "", attributeMain, attributes);
@@ -111,6 +112,7 @@ UIView.prototype.setWidth = function(w){
 		this.width = parseInt(w, 10); 
 		this.sizeWidth = "s" //sized
 	}
+	this.sizeLoaded = false;
 }
 
 UIView.prototype.setHeight = function(h){
@@ -128,16 +130,41 @@ UIView.prototype.setHeight = function(h){
 		this.height = parseInt(h, 10); 
 		this.sizeHeight = "s" //sized
 	}
+	this.sizeLoaded = false;
 }
 
-UIView.prototype.setLeft = function(id){this.leftLeft = id};
-UIView.prototype.setRight = function(id){this.rightRight = id};
-UIView.prototype.setTop = function(id){this.topTop = id};
-UIView.prototype.setBottom = function(id){this.bottomBottom = id};
-UIView.prototype.setAtLeft = function(id){this.rightLeft = id};
-UIView.prototype.setAtRight = function(id){this.leftRight = id};
-UIView.prototype.setAtTop = function(id){this.bottomTop = id};
-UIView.prototype.setAtBottom = function(id){this.topBottom = id};
+UIView.prototype.setLeft = function(id){
+	this.leftLeft = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setRight = function(id){
+	this.rightRight = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setTop = function(id){
+	this.topTop = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setBottom = function(id){
+	this.bottomBottom = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setAtLeft = function(id){
+	this.rightLeft = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setAtRight = function(id){
+	this.leftRight = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setAtTop = function(id){
+	this.bottomTop = id;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setAtBottom = function(id){
+	this.topBottom = id;
+	this.sizeLoaded = false;
+};
 		
 UIView.prototype.setScrollVertical = function(id){this.scrollVertical = id};
 UIView.prototype.setScrollHorizontal = function(id){this.scrollHorizontal = id};
@@ -149,27 +176,57 @@ UIView.prototype.setGravity = function(gravityHor, gravityVer){
 	this.gravityVer = gravityVer
 }
 		
-UIView.prototype.setMarginLeft = function(margin){this.marginLeftDimen = margin};
-UIView.prototype.setMarginTop = function(margin){this.marginTopDimen = margin};
-UIView.prototype.setMarginRight = function(margin){this.marginRightDimen = margin};
-UIView.prototype.setMarginBottom = function(margin){this.marginBottomDimen = margin};
+UIView.prototype.setMarginLeft = function(margin){
+	this.marginLeftDimen = margin;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setMarginTop = function(margin){
+	this.marginTopDimen = margin;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setMarginRight = function(margin){
+	this.marginRightDimen = margin;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setMarginBottom = function(margin){
+	this.marginBottomDimen = margin;
+	this.sizeLoaded = false;
+};
 UIView.prototype.setMargins = function(marginLeft, marginTop, marginRight, marginBottom){
-			this.marginLeftDimen = marginLeft;
-			this.marginTopDimen = marginTop;
-			this.marginRightDimen = marginRight;
-			this.marginBottomDimen = marginBottom;
-			};
+	this.marginLeftDimen = marginLeft;
+	this.marginTopDimen = marginTop;
+	this.marginRightDimen = marginRight;
+	this.marginBottomDimen = marginBottom;
+	this.sizeLoaded = false;
+};
 			
-UIView.prototype.setPaddingLeft = function(padding){this.paddingLeftDimen = padding};
-UIView.prototype.setPaddingTop = function(padding){this.paddingTopDimen = padding};
-UIView.prototype.setPaddingRight = function(padding){this.paddingRightDimen = padding};
-UIView.prototype.setPaddingBottom = function(padding){this.paddingBottomDimen = padding};
+UIView.prototype.setPaddingLeft = function(padding){
+	this.paddingLeftDimen = padding;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setPaddingTop = function(padding){
+	this.paddingTopDimen = padding;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setPaddingRight = function(padding){
+	this.paddingRightDimen = padding;
+	this.sizeLoaded = false;
+};
+UIView.prototype.setPaddingBottom = function(padding){
+	this.paddingBottomDimen = padding;
+	this.sizeLoaded = false;
+};
 UIView.prototype.setPaddings = function(paddingLeft, paddingTop, paddingRight, paddingBottom){
-			this.paddingLeftDimen = paddingLeft;
-			this.paddingTopDimen = paddingTop;
-			this.paddingRightDimen = paddingRight;
-			this.paddingBottomDimen = paddingBottom;
-			};
+	this.paddingLeftDimen = paddingLeft;
+	this.paddingTopDimen = paddingTop;
+	this.paddingRightDimen = paddingRight;
+	this.paddingBottomDimen = paddingBottom;
+	this.sizeLoaded = false;
+};
+
+UIView.prototype.setAnimationDuration = function(animationDuration) {
+	this.animationDuration = animationDuration;
+}
 			
 UIView.prototype.getReferences = function(){ return [this.leftLeft, this.leftRight, this.rightRight, this.rightLeft, this.topTop, this.topBottom, this.bottomBottom, this.bottomTop];};
 		

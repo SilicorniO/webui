@@ -118,3 +118,20 @@ UIConfiguration.prototype.getDimen = function(name){
 	}
 
 }
+
+UIConfiguration.prototype.sendStartEvent = function() {
+	if(this.events){
+		this.events({
+			'name': 'start'
+		});
+	}
+}
+
+UIConfiguration.prototype.sendEndEvent = function() {
+	if(this.events){
+		this.events({
+			'name': 'end',
+			'attributes': this.attributes
+		});
+	}
+}

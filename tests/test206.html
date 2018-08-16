@@ -17,14 +17,37 @@
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <div id="content" ui="gh:c;gv:c">Center</div>
+        <span ui="">Testing events</span>
     </div>
     
     <script>
     WebUI.start({
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs'
+        viewLogs: 'logs',
+        timeRedraw: 20,
+        screenModes: [
+            {
+                //mobile
+                attribute: "uim",
+                widthEnd: 450
+            },
+            {
+                //tablet
+                attribute: "uit",
+                widthStart: 451,
+                widthEnd: 700
+            },
+            {
+                //desktop
+                attribute: "uid",
+                widthStart: 701
+            }
+        ],
+        events: function(event) {
+            console.log(event.name);
+            console.log(event.attributes);
+		}
     });
     
     </script>

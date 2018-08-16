@@ -51,16 +51,23 @@ UIDraw.prototype.applyPositions = function(view, viewColors){
             ele.style.padding = "0px";
         }
 		
-		//set location
-		ele.style.left = view.left + "px";
-		ele.style.top = view.top + "px";
-		if(view.width>0){
-			ele.style.width = (view.width-paddingLeft-paddingRight) + "px";
+        //set location
+        var left = parseInt(view.left, 10);
+        var top = parseInt(view.top, 10);
+        var width = view.width > 0 ? (view.width-paddingLeft-paddingRight) : 0;
+        var height = view.height > 0 ? (view.height-paddingTop-paddingBottom) : 0;
+		ele.style.left = left + "px";
+		ele.style.top = top + "px";
+		if(width > 0){
+			ele.style.width = width + "px";
 		}
-		if(view.height>0){
-			ele.style.height = (view.height-paddingTop-paddingBottom) + "px";
-		}
-		ele.style.position = "absolute";
+		if(height > 0){
+			ele.style.height = height + "px";
+        }
+        ele.style.position = "absolute";
+
+        //apply animation
+        ele.style.transition = "all " + view.animationDuration + "s ease 0s";
         
         if(view.left+view.width>maxX){
             maxX = view.left+view.width;

@@ -241,7 +241,7 @@ There are three special identifiers:
 
 ### 4. Applying parameters
 
-All the parameters are used inside the "ui" attribute. 
+All the parameters are used inside the "ui" attribute. Remember to set the size of the first UI view (called screen). 
 
 For example: ui="l:p; ab:l; w:30%"
 
@@ -258,9 +258,9 @@ For example: ui="l:p; ab:l; w:30%"
           </head>
           <body>
           
-          <div ui="s">
-            <div>
-                <span ui="l:p;ab:l;w:30%">Text</span>
+          <div ui="fw;fh">
+            <div ui="fw;fh">
+                <span ui="l:p;w:30%">Text</span>
             </div>
           </div>
           
@@ -274,7 +274,51 @@ For example: ui="l:p; ab:l; w:30%"
       
     ```
 
-### 5. Examples
+### 5. Applying parameters dinamically
+
+It is possible to modify the attributes dinamically. To do it you have to get the element and execute any of the methods of the ui attribute.
+
+For example: 
+
+    ```javascript
+
+      //get the element and change the width
+      var square1 = document.getElementById('square1');
+      square1.ui.setWidth("300");
+      
+      //refresh the WebUI to change the width of the element
+      WebUI.refresh();
+      
+    ```
+
+Don't change the attributes directly because WebUI may not refresh the element.
+
+The functions at the moment are:
+
+* setWidth(w)
+* setHeight(h)
+* setLeft(id)
+* setRight(id)
+* setTop(id)
+* setBottom(id)
+* setAtLeft(id)
+* setAtRight(id)
+* setAtTop(id)
+* setAtBottom(id)
+* setMarginLeft(margin)
+* setMarginRight(margin)
+* setMarginTop(margin)
+* setMarginBottom(margin)
+* setMargins(marginLeft, marginTop, marginRight, marginBottom)
+* setPaddingLeft(margin)
+* setPaddingRight(margin)
+* setPaddingTop(margin)
+* setPaddingBottom(margin)
+* setPaddings(paddingLeft, paddingTop, paddingRight, paddingBottom)
+
+All parameters are strings.
+
+### 6. Examples
 
 Please, to learn more, check the examples in "tests" folder. You can clone the project and execute the examples directly in your browser.
 
@@ -288,6 +332,7 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
  * dimens: Allows to create reference to different sizes. It is better to use variables for dimensions and change it depending of the size of device.
  * attribute: You can define the name of the attribute to use with web-ui. NOTE: If you are using react you need this attribute starts with 'data-'.
  * screenModes: You can define different "ui" attributes to use for each width of the device. Check the examples for more information.
+ * events: You can receive events. From the moment you can receive "start" and "end" events. End event has the list of attributes for the type of screen loaded.
    
    ```html
       
@@ -331,7 +376,11 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
                     attribute: "uid",
                     widthStart: 701
                 }
-                ]
+                ],
+                events: function(event) {
+                  console.log(event.name);
+                  console.log(event.attributes);
+                }
             });
             
           </script>

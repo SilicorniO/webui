@@ -145,15 +145,16 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 * Load the sizes of all views and translate paddings and margins to dimens
 * @param {Array<*>} elements Array of dom nodes to load size
 * @param {UIConfiguration} coreConfig
+* @param {boolean} forceSizeLoaded
 **/
-UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig){
+UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig, forceSizeLoaded = false){
 	
 	for(var i=0; i<elements.length; i++){
 		var ele = elements[i];
 		var view = ele.ui;
 		if(view){
 			
-			if(!view.sizeLoaded){
+			if(forceSizeLoaded || !view.sizeLoaded){
 
 				if(view.sizeWidth=='sc' && !view.hasUIChildren()){
 					view.width = UIViewUtilsInstance.calculateWidthViewSlow(view, ele);
@@ -170,7 +171,7 @@ UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig){
 				view.sizeLoaded = true;
 			}
 			
-			this.loadSizesSlow(view.getChildElements(), coreConfig);
+			this.loadSizesSlow(view.getChildElements(), coreConfig, forceSizeLoaded || !view.sizeLoaded);
 		}
 		
 	}
@@ -236,13 +237,12 @@ UIPrepare.prototype.loadSizes = function(views, coreConfig){
 /**
 * Load the size of the screenView
 * @param {UIView} screen View with screen value (body)
+* @return {boolean} flag to know if screen changed
 **/
 UIPrepare.prototype.loadSizeScreen = function(screen){
 
-	//check if screen has the size loaded
-	if(screen.sizeLoaded){
-		return;
-	}
+	//flag looking for changes
+	var sizeChanged = false;
 
 	//get the element
 	var ele = screen.element;
@@ -256,7 +256,11 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 			ele.style.width = screen.percentWidth + "%";
 		}
 		
-		screen.width = ele.offsetWidth;
+		var offsetWidth = ele.offsetWidth;
+		if (offsetWidth != screen.width) {
+			screen.width = offsetWidth;
+			sizeChanged = true;
+		}
 	}
 	if(screen.sizeHeight!="sc"){
 		
@@ -279,6 +283,9 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 
 	//mark size as loaded
 	screen.sizeLoaded = true;
+
+	//return the flag
+	return sizeChanged;
 }
 
 /**
@@ -323,7 +330,7 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config, l
 		//create the view and add it to the list of views
 		var view = new UIView(element, parent, screen, lastViewId, config.attribute, config.attributes);
 
-		//if it is an image we prepare to refresh when iamge is loaded
+		//if it is an image we prepare to refresh when image is loaded
 		if(element.tagName!=null && element.tagName.toLowerCase()=="img"){
 			element.onload = (function(){
  

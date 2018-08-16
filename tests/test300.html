@@ -17,16 +17,31 @@
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <div id="content" ui="gh:c;gv:c">Center</div>
+        <div id="square1" ui="w:200;h:200"></div>
+        <div id="square2" ui="ar:l;w:200;h:200;ml:100"></div>
     </div>
     
     <script>
     WebUI.start({
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs'
+        timeRedraw: 100
     });
-    
+
+    setTimeout(function(){
+        console.log("test");
+
+        var square1 = document.getElementById('square1');
+        square1.ui.setWidth("300");
+        console.log(square1.ui);
+        var square2 = document.getElementById('square2');
+        square2.ui.setMarginLeft("300");
+        square2.ui.setWidth("50");
+
+        WebUI.refresh();
+
+    }, 1000);
+
     </script>
     
 </body>

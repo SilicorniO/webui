@@ -24,7 +24,7 @@ function WebUI(){
 
 	//controllers
 	this.uiViewsManager = new UIViewsManager();
-	this.uiPrepare = new UIPrepare(this.refresh);
+	this.uiPrepare = new UIPrepare(this.refresh.bind(this));
 	this.uiDraw = new UIDraw();
 	this.uiCore = null;
 
@@ -47,7 +47,7 @@ function WebUI(){
 				this.nodesAdded.splice(0,1);
 
 				//1. Search and add UI elements from this node. Adding newscreens to the list
-				this.uiPrepare.generateUIViews(node, this.configuration, this.screens)
+				this.uiPrepare.generateUIViews(node, this.configuration, this.screens);
 
 				//get the parent if has one
 				var parent = node.ui? node.ui.parent : null;
@@ -69,6 +69,13 @@ function WebUI(){
 
 		}).bind(this), this.configuration.timeRedraw);
 	}).bind(this);
+
+	//window resize event
+	this.resize = (function() {
+		this.configuration.refreshScreenSize();
+		this.clearUI();
+		this.redraw();
+	}).bind(this)
 }
 
 /**
@@ -77,6 +84,9 @@ function WebUI(){
  */
 WebUI.prototype.start = function(configuration){
 	
+	//clear to avoid problems if it was called previously
+	this.clearUI();
+
 	//calculate the size of scrollbars
     if(this.scrollWidth==0){
         this.scrollWidth = getScrollWidth();
@@ -114,13 +124,37 @@ WebUI.prototype.listenDomEvents = function(){
 		// self.nodesRemoved.push(event.relatedNode);
 		// self.redraw();
 	}, false);
+
+	//add event listener for window resize
+	window.removeEventListener("resize", this.resize); 
+	window.addEventListener("resize", this.resize);
 	
-	//execute draw each time the size of screen is modified
-	window.onresize = function(e){
-		self.configuration.refreshScreenSize();
-		self.redraw();
+}
+
+WebUI.prototype.clearUI = function() {
+
+	//delete the UI element and childrens
+	var clearUI = function(element) {
+		if (element.ui) {
+			delete element.ui;
+			var viewChildNodes = element.childNodes;
+			if (viewChildNodes) {
+				for (var i = 0; i < viewChildNodes.length ; i++) {
+					clearUI(viewChildNodes[i]);
+				}
+			}
+		}
 	}
-	
+
+	//for each screen delete the UI element and its children
+	if (this.screens) {
+		this.screens.forEach( function(screen) {
+			clearUI(screen.element);
+		});
+
+		//delete all screens
+		this.screens = [];
+	}
 }
 
 /**
@@ -159,11 +193,14 @@ WebUI.prototype.drawUIScreen = function(screen){
 	startCounter('prepare');
 	startCounter('loadSizes');
 
+	//call to listener with start event
+	this.configuration.sendStartEvent();
+
 	//update the size of the screen
-	this.uiPrepare.loadSizeScreen(screen);
+	var screenSizeChanged = this.uiPrepare.loadSizeScreen(screen);
 						
 	//load sizes of views
-	this.uiPrepare.loadSizesSlow(screen.getChildElements(), this.configuration);
+	this.uiPrepare.loadSizesSlow(screen.getChildElements(), this.configuration, screenSizeChanged);
 
 	endCounterLog('loadSizes');
 	startCounter('orderViews');
@@ -193,12 +230,8 @@ WebUI.prototype.drawUIScreen = function(screen){
 
 	endCounterLog('draw');
 
-	//call to listener of events
-	if(this.configuration.events){
-		this.configuration.events({
-			'name': 'end'
-		});
-	}
+	//call to listener with end event
+	this.configuration.sendEndEvent();
 	
 	//end counter
 	endCounterLog('all');
