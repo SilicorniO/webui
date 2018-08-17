@@ -77,7 +77,18 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
         ele.style.position = "absolute";
 
         //apply animation
-        // ele.style.transition = "all " + view.animationDuration + "s ease 0s";
+        if (view.animationDurations.length > 0) {
+            ele.style.transition = "all " + view.animationDurations[0] + "s ease 0s";
+            ele.ui.animationDurations.splice(0, 1);
+
+            //remove transition after the end of the animation
+            var endTranstion = function (event) {
+                log(event);
+                ele.style.transition = '';
+                ele.removeEventListener("transitionend", endTranstion)
+            };
+            ele.addEventListener("transitionend", endTranstion);
+        }
         
         if(view.left+view.width>maxX){
             maxX = view.left+view.width;

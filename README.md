@@ -316,10 +316,41 @@ The functions at the moment are:
 * setPaddingBottom(margin)
 * setPaddings(paddingLeft, paddingTop, paddingRight, paddingBottom)
 * setVisibility(visibility)
+* animateNextRefresh(animationDuration)
 
 All parameters are strings.
 
-### 6. Examples
+### 6. Animations
+
+It is possible to animate the changes in the views automatically. You can do it calling to method "animateNextRefresh" of the view with the duration of the animation you want. 
+You will need to call to this method each time the refresh is going to be called. This prevents unexpected animations.
+You can be an example in test 300.
+
+    ```javascript
+      WebUI.start({
+          viewColors: true,
+          showLogs: true,
+          timeRedraw: 100
+      });
+
+      setTimeout(function(){
+
+          //get the reference of the element
+          var square1 = document.getElementById('square1');
+
+          //apply for example a different width to the view
+          square1.ui.setWidth("300");
+
+          //set the time to apply for the animation
+          square1.ui.animateNextRefresh(1.0);
+          
+          //call to refresh the UI
+          WebUI.refresh();
+
+      }, 1000);
+    ```
+
+### 7. Examples
 
 Please, to learn more, check the examples in "tests" folder. You can clone the project and execute the examples directly in your browser.
 

@@ -21,36 +21,29 @@
     </div>
     
     <script>
-    WebUI.start({
-        viewColors: true,
-        showLogs: true,
-        timeRedraw: 100
-    });
 
-    setTimeout(function(){
-        console.log("After first timeout");
+        numEnds = 0;
 
-        var square1 = document.getElementById('square1');
-        square1.ui.setWidth("300");
-        square1.ui.animateNextRefresh(1.0);
-        console.log(square1.ui);
-        var square2 = document.getElementById('square2');
-        square2.ui.setWidth("50");
-        square2.ui.animateNextRefresh(0.5);
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            timeRedraw: 100,
+            events: function(event) {
+                console.log(event);
+                if (event.name == 'end') {
+                    if (numEnds == 0) {
+                        numEnds += 1;
 
-        WebUI.refresh();
+                        console.log("After first end");
 
-        setTimeout(function(){
-            console.log("After second timeout");
-            
-            square2.ui.setMarginLeft("200");
-            square2.ui.animateNextRefresh(1.5);
+                        var square1 = document.getElementById('square1');
+                        square1.ui.setVisibility("g");
 
-            WebUI.refresh();
-
-        }, 1000);
-
-    }, 1000);
+                        WebUI.refresh();
+                    }
+                }
+            }
+        });
 
     </script>
     

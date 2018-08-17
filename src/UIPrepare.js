@@ -351,8 +351,10 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config, l
 		if(element.tagName!=null && element.tagName.toLowerCase()=="img"){
 			element.onload = (function(){
  
-				//TODO mark this view for reload
+				//mark this view for reload
+				element.sizeLoaded = false;
 				this.refreshFunc();
+				
 			}).bind(this);
 		}
 

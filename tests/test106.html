@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="../src/utils/UIRedrawTimer.js"></script>
+    <script type="text/javascript" src="../src/utils/UIViewUtils.js"></script>
+    <script type="text/javascript" src="../src/utils/UIUtils.js"></script>
+    <script type="text/javascript" src="../src/general/UILogFuncs.js"></script>
+    <script type="text/javascript" src="../src/general/UIGeneralFuncs.js"></script>
+    <script type="text/javascript" src="../src/UIConfiguration.js"></script>
+    <script type="text/javascript" src="../src/UIView.js"></script>
+    <script type="text/javascript" src="../src/UIPrepare.js"></script>
+    <script type="text/javascript" src="../src/UIDraw.js"></script>
+    <script type="text/javascript" src="../src/UICore.js"></script>
+    <script type="text/javascript" src="../src/WebUI.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="main" ui="fw;fh;sv">
+            <span ui="">Testing size calculation of screens</span>
+        </div>
+        <div id="test" ui="fw;fh">
+            <div class="testInside" ui="fw;fh;sv;m:20">
+                <span ui="">Inside</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs'
+    });
+
+    </script>
+    
+</body>
+</html>

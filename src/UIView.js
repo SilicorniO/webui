@@ -90,7 +90,7 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this.childrenInOrder = false;
 
 	//animations
-	this.animationDuration = 0.3;
+	this.animationDurations = [];
 
 	//initialize visibility with css
 	this.updateVisibilityWithCss();
@@ -100,6 +100,32 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 
 	//set this instance into the element
 	element.ui = this;
+	element['ui'] = this;
+
+	//public methods
+
+	this['setWidth'] = this.setWidth;
+	this['setHeight'] = this.setHeight;
+	this['setLeft'] = this.setLeft;
+	this['setRight'] = this.setRight;
+	this['setTop'] = this.setTop;
+	this['setBottom'] = this.setBottom;
+	this['setAtLeft'] = this.setAtLeft;
+	this['setAtRight'] = this.setAtRight;
+	this['setAtTop'] = this.setAtTop;
+	this['setAtBottom'] = this.setAtBottom;
+	this['setMarginLeft'] = this.setMarginLeft;
+	this['setMarginRight'] = this.setMarginRight;
+	this['setMarginTop'] = this.setMarginTop;
+	this['setMarginBottom'] = this.setMarginBottom;
+	this['setMargins'] = this.setMargins;
+	this['setPaddingLeft'] = this.setPaddingLeft;
+	this['setPaddingRight'] = this.setPaddingRight;
+	this['setPaddingTop'] = this.setPaddingTop;
+	this['setPaddingBottom'] = this.setPaddingBottom;
+	this['setPaddings'] = this.setPaddings;
+	this['setVisibility'] = this.setVisibility;
+	this['animateNextRefresh'] = this.animateNextRefresh;
 }
 
 UIView.prototype.setWidth = function(w){
@@ -230,6 +256,9 @@ UIView.prototype.setPaddings = function(paddingLeft, paddingTop, paddingRight, p
 };
 
 UIView.prototype.setVisibility = function(visibility) {
+	if (visibility != 'g' && this.visibility == 'g') {
+		this.sizeLoaded = false;
+	}
 	this.visibility = visibility;
 }
 
@@ -249,8 +278,8 @@ UIView.prototype.hasToBeCalculated = function() {
 	return this.visibility != 'g';
 }
 
-UIView.prototype.setAnimationDuration = function(animationDuration) {
-	this.animationDuration = animationDuration;
+UIView.prototype.animateNextRefresh = function(animationDuration) {
+	this.animationDurations.push(animationDuration);
 }
 			
 UIView.prototype.getReferences = function(){ return [this.leftLeft, this.leftRight, this.rightRight, this.rightLeft, this.topTop, this.topBottom, this.bottomBottom, this.bottomTop];};
@@ -503,17 +532,41 @@ UIView.prototype.readUI = function(element, parent, lastViewId, attributeMain, a
 	}
 	
 	//if no references we add one to the parent: top
-	var refs = false;
-	var references = this.getReferences();
-	for(var i=0; i<references.length; i++){
-		if(references[i].length>0){
-			refs = true;
+	// var refs = false;
+	// var references = this.getReferences();
+	// for(var i=0; i<references.length; i++){
+	// 	if(references[i].length>0){
+	// 		refs = true;
+	// 		break;
+	// 	}
+	// }
+	var refsHor = false;
+	var referencesHor = this.getReferencesHor();
+	for(var i=0; i<referencesHor.length; i++){
+		if(referencesHor[i].length>0){
+			refsHor = true;
 			break;
 		}
 	}
-	if(!refs){
-		this.setTop(parentId);
+	if (!refsHor) {
+		this.setLeft('p');
 	}
+
+	var refsVer = false;
+	var referencesVer = this.getReferencesVer();
+	for(var i=0; i<referencesVer.length; i++){
+		if(referencesVer[i].length>0){
+			refsVer = true;
+			break;
+		}
+	}
+	if (!refsVer) {
+		this.setTop('p');
+	}
+
+	// if(!refs){
+	// 	this.setTop(parentId);
+	// }
 	
 }
 
