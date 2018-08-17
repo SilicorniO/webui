@@ -92,6 +92,9 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	//animations
 	this.animationDuration = 0.3;
 
+	//initialize visibility with css
+	this.updateVisibilityWithCss();
+
 	//initialize
 	this.readUI(element, parent, lastViewId? lastViewId : "", attributeMain, attributes);
 
@@ -228,6 +231,18 @@ UIView.prototype.setPaddings = function(paddingLeft, paddingTop, paddingRight, p
 
 UIView.prototype.setVisibility = function(visibility) {
 	this.visibility = visibility;
+}
+
+UIView.prototype.updateVisibilityWithCss = function() {
+	if (this.element.style.display == 'none') {
+		this.setVisibility('g');
+	} else {
+		if (this.element.style.visibility == 'hidden') {
+			this.setVisibility('i');
+		} else {
+			this.setVisibility('v');
+		}
+	}
 }
 
 UIView.prototype.hasToBeCalculated = function() {

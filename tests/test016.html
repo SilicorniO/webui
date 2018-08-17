@@ -15,31 +15,26 @@
 </head>
 <body style="margin:0">
     
-    <div id="screen" ui="fw;fh">
-        <div id="container" ui="">
-            <span id="element1">element 1</span>
-            <span id="element2">element 2</span>
+    <div ui="fw;fh" id="screen">
+        <div ui="" id="title">Testing hidden in parents</div>
+        <div ui="ab:l;v:g" id="hidden">
+            <div ui="ab:l;v:v">son 1</div>
+            <div ui="ab:l;v:v">son 2</div>
         </div>
-        <div id="buttons" ui="ab:l">
-            <a href="#" onClick="removeElement()" ui="ar:l">Remove element</a>
+        <div ui="l:l;ab:l" id="below1">Below 1</div>
+        <div ui="ab:l;v:i" id="invisible">
+            <div ui="ab:l;v:v">son 1</div>
+            <div ui="ab:l;v:v">son 2</div>
         </div>
-    </div>
-    
+        <div ui="l:l;ab:l" id="below2">Below 2</div>
+
     <script>
     WebUI.start({
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs',
-        timeRedraw: 20
+        viewLogs: 'logs'
     });
     
-    var element2 = document.getElementById('element2');
-
-    function removeElement(){
-        element2.parentNode.removeChild(element2);
-    }
-    
-
     </script>
     
 </body>

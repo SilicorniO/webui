@@ -75,9 +75,9 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 				reference = parent.id;
 			} else if (reference == 'l') {
 				if (lastChild) {
-					reference = parent.id;
-				} else {
 					reference = lastChild.id;
+				} else {
+					reference = '';//parent.id;
 				}
 			}
 

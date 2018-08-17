@@ -8,11 +8,11 @@ function UIDraw(){
 
 /**
 * Apply positions for the views
-* @param {UIView} view to draw children
+* @param {UIView} parentView to draw children
 * @param {boolean} viewColors flag to show or not colors in views
 * @return int maximum Y positon of a children
 **/
-UIDraw.prototype.applyPositions = function(view, viewColors){
+UIDraw.prototype.applyPositions = function(parentView, viewColors){
     
     var maxX = 0;
 	var maxY = 0;
@@ -22,7 +22,7 @@ UIDraw.prototype.applyPositions = function(view, viewColors){
     var paddingTop = 0;
     var paddingBottom = 0;
 
-	view.forEachChild((function(view, index){
+	parentView.forEachChild((function(view, index){
 		var ele = view.element;
 		
         //initialize paddings
@@ -52,10 +52,10 @@ UIDraw.prototype.applyPositions = function(view, viewColors){
         }
 
         //hide view if visibility is gone
-        if (view.visibility == 'g') {
+        if (view.visibility == 'g' || parentView.visibility == 'g') {
             ele.style.display = "none";  
         }
-        if (view.visibility == 'i') {
+        if (view.visibility == 'i' || parentView.visibility == 'i') {
             ele.style.visibility = "hidden";
         } else {
             ele.style.visibility = "visible";

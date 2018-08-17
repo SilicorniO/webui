@@ -713,7 +713,7 @@ UICore.prototype.calculateViewDependency = function(view, viewDependency, parent
 		//get previous view and check is null to set as parent
 		var previousView = view.getPreviousView();
 		if (previousView == null) {
-			return parentView.id;
+			return '';//parentView.id;
 		} else {
 			return previousView.id;
 		}
