@@ -83,6 +83,8 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this.paddingRight = 0;
 	this.paddingBottom = 0;
 
+	this.visibility = 'v';
+
 	//flags for changes
 	this.sizeLoaded = false;
 	this.childrenInOrder = false;
@@ -224,6 +226,14 @@ UIView.prototype.setPaddings = function(paddingLeft, paddingTop, paddingRight, p
 	this.sizeLoaded = false;
 };
 
+UIView.prototype.setVisibility = function(visibility) {
+	this.visibility = visibility;
+}
+
+UIView.prototype.hasToBeCalculated = function() {
+	return this.visibility != 'g';
+}
+
 UIView.prototype.setAnimationDuration = function(animationDuration) {
 	this.animationDuration = animationDuration;
 }
@@ -283,6 +293,25 @@ UIView.prototype.forEachChild = function(cb){
 		}
 	}
 }
+
+UIView.prototype.getPreviousView = function() {
+
+	var previousView = null;
+	var childNodes = this.parent.element.childNodes;
+	for(var i=0; i<childNodes.length; i++){
+		var child = childNodes[i].ui;
+		if (child) {
+			if (child.id == this.id) {
+				return previousView;
+			} else if (child.hasToBeCalculated()){
+				previousView = child;
+			}
+		}
+	}
+
+	//not found
+	return null;
+} 
 		
 UIView.prototype.clean = function(){
 	this.leftChanged = false;
@@ -356,12 +385,12 @@ UIView.prototype.readUI = function(element, parent, lastViewId, attributeMain, a
 		var attr = aValues[i].attr;
 		var value = aValues[i].value;
 		
-		//check if value is a reference to the parent
-		if(value=='p'){
-			value = parentId;
-		}else if(value=='l'){
-			value = lastViewId;
-		}
+		// //check if value is a reference to the parent
+		// if(value=='p'){
+		// 	value = parentId;
+		// }else if(value=='l'){
+		// 	value = lastViewId;
+		// }
 					
 		if(attr=='w'){
 			this.setWidth(value);	
@@ -452,6 +481,9 @@ UIView.prototype.readUI = function(element, parent, lastViewId, attributeMain, a
 			this.setScrollVertical(true);
 		}else if(attr=='sh'){
 			this.setScrollHorizontal(true);
+		
+		}else if(attr=='v'){
+			this.setVisibility(value);
 		}
 	}
 	

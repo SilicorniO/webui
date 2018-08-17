@@ -26,16 +26,20 @@ UICore.prototype.calculateScreen = function(screen){
         for(var i=1; i<arrayViews.length; i++){
 			arrayViews[i].clean();
         }
-    
-        for(var i=0; i<screen.childrenOrderHor.length; i++){
-            this.calculateViewHor(screen.childrenOrderHor[i], screen, arrayViews, indexes, screen.width, viewsRestored);
-        }
 
-        for(var i=0; i<screen.childrenOrderVer.length; i++){
-            var viewReturn = this.calculateViewVer(screen.childrenOrderVer[i], screen, arrayViews, indexes, screen.height, viewsRestored);
-        }
+		//calculate views
+		this.calculateViewsHor(screen.childrenOrderHor, screen, arrayViews, indexes, screen.width, viewsRestored);
+		this.calculateViewsVer(screen.childrenOrderVer, screen, arrayViews, indexes, screen.height, viewsRestored);
         
     }while(viewsRestored.length>0);
+}
+
+UICore.prototype.calculateViewsHor = function(views, parentView, arrayViews, indexes, height, viewsRestored){
+	for(var i=0; i<views.length; i++){
+		if (views[i].hasToBeCalculated()) {
+			this.calculateViewHor(views[i], parentView, arrayViews, indexes, height, viewsRestored);
+		}
+	}
 }
 
 UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, indexes, width, viewsRestored){
@@ -43,7 +47,7 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 	//eval references to try to calculate the width
 	var references = view.getReferencesHor();
 	for(var n=0; n<references.length; n++){
-		var dependency = references[n];
+		var dependency = this.calculateViewDependency(view, references[n], parentView);
 		if(dependency.length>0){
 			this.evalDependenceHor(view, parentView, width, n, arrayViews[indexes[dependency]]);
 		}
@@ -79,10 +83,7 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 			
 			//calculate the real width with padding
 			var viewWidth = view.scrollHorizontal? 0 : view.width - view.paddingLeft - view.paddingRight;
-			
-			for(var i=0; i<view.childrenOrderHor.length; i++){
-				this.calculateViewHor(view.childrenOrderHor[i], view, arrayViews, indexes, viewWidth, viewsRestored);
-			}
+			this.calculateViewsHor(view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored);
 			
 			//move left and right of all children using the paddingLeft
 			this.applyPaddingChildrenHor(view);
@@ -97,11 +98,7 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 			
 			//calculate the real width with padding
 			var viewWidth = view.scrollHorizontal? 0 : width;
-			
-			//calculate the children width
-			for(var i=0; i<view.childrenOrderHor.length; i++){
-				this.calculateViewHor(view.childrenOrderHor[i], view, arrayViews, indexes, viewWidth, viewsRestored);
-			}
+			this.calculateViewsHor(view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored);
 			
 			//move left and right of all children using the paddingLeft
 			this.applyPaddingChildrenHor(view);
@@ -135,12 +132,20 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
     }
 }
 
+UICore.prototype.calculateViewsVer = function(views, parentView, arrayViews, indexes, height, viewsRestored){
+	for(var i=0; i<views.length; i++){
+		if (views[i].hasToBeCalculated()) {
+			this.calculateViewVer(views[i], parentView, arrayViews, indexes, height, viewsRestored);
+		}
+	}
+}
+
 UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, indexes, height, viewsRestored){
     
 	//eval references to try to calculate the height
 	var references = view.getReferencesVer();
 	for(var n=0; n<references.length; n++){
-		var dependency = references[n];
+		var dependency = this.calculateViewDependency(view, references[n], parentView);
 		if(dependency.length>0){
 			this.evalDependenceVer(view, parentView, height, n, arrayViews[indexes[dependency]]);
 		}
@@ -176,10 +181,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 			
 			//calculate the real height with padding
 			var viewHeight = view.scrollVertical? 0 : view.height - view.paddingTop - view.paddingBottom;
-			
-			for(var i=0; i<view.childrenOrderVer.length; i++){
-				this.calculateViewVer(view.childrenOrderVer[i], view, arrayViews, indexes, viewHeight, viewsRestored);
-			}
+			this.calculateViewsVer(view.childrenOrderVer, view, arrayViews, indexes, viewHeight, viewsRestored);
 			
 			//move top and bottom of all children using the paddingTop
 			this.applyPaddingChildrenVer(view);
@@ -195,9 +197,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 			var viewHeight = view.scrollVertical? 0 : height;
 			
 			//calculate the children height
-			for(var i=0; i<view.childrenOrderVer.length; i++){
-                this.calculateViewVer(view.childrenOrderVer[i], view, arrayViews, indexes, viewHeight, viewsRestored);
-			}
+            this.calculateViewsVer(view.childrenOrderVer, view, arrayViews, indexes, viewHeight, viewsRestored);
 			
 			//move top and bottom of all children using the paddingTop
 			this.applyPaddingChildrenVer(view);
@@ -701,4 +701,24 @@ UICore.prototype.evalDependenceVer = function(view, parentView, height, iReferen
 		break;
 	}
 	
+}
+
+UICore.prototype.calculateViewDependency = function(view, viewDependency, parentView) {
+	
+	//replace parent or last viewDependency
+	if (viewDependency == 'p') {
+		return parentView.id;
+	} else if (viewDependency == 'l') {
+
+		//get previous view and check is null to set as parent
+		var previousView = view.getPreviousView();
+		if (previousView == null) {
+			return parentView.id;
+		} else {
+			return previousView.id;
+		}
+	} else {
+		return viewDependency;
+	}
+
 }

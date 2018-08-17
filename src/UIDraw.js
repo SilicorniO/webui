@@ -50,6 +50,16 @@ UIDraw.prototype.applyPositions = function(view, viewColors){
         if(ele.childElementCount>0){
             ele.style.padding = "0px";
         }
+
+        //hide view if visibility is gone
+        if (view.visibility == 'g') {
+            ele.style.display = "none";  
+        }
+        if (view.visibility == 'i') {
+            ele.style.visibility = "hidden";
+        } else {
+            ele.style.visibility = "visible";
+        }
 		
         //set location
         var left = parseInt(view.left, 10);
@@ -67,7 +77,7 @@ UIDraw.prototype.applyPositions = function(view, viewColors){
         ele.style.position = "absolute";
 
         //apply animation
-        ele.style.transition = "all " + view.animationDuration + "s ease 0s";
+        // ele.style.transition = "all " + view.animationDuration + "s ease 0s";
         
         if(view.left+view.width>maxX){
             maxX = view.left+view.width;

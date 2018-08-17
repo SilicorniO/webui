@@ -62,11 +62,25 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 	
 	//prepare references in views
 	var views0dependencies = 0;
+	var lastChild = null;
 	parent.forEachChild(function(child, index){
 		var numDependencies = 0;
+		
 		var references = hor? child.getReferencesHor() : child.getReferencesVer();
 		for(var n=0; n<references.length; n++){
 			var reference = references[n];
+
+			//update p and l references
+			if (reference == 'p') {
+				reference = parent.id;
+			} else if (reference == 'l') {
+				if (lastChild) {
+					reference = parent.id;
+				} else {
+					reference = lastChild.id;
+				}
+			}
+
 			if(reference.length>0){
 				if(hor){
 					child.dependenciesHor.push(reference);
@@ -85,18 +99,21 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 
 		//add this child, only ui children
 		views.push(child);
+
+		//save last child for references
+		lastChild = child;
 	});
 	
 	//array of references of views to search them faster
 	var indexes = UIViewUtilsInstance.generateIndexes(childElements);
 	
 	//search dependencies until we have all children with them
-	var allViewsSetted;
-	var numViewsSetted;
+	var allViewsSet;
+	var numViewsSet;
 	do{
 		//initialize values
-		allViewsSetted = true;
-		numViewsSetted = 0;
+		allViewsSet = true;
+		numViewsSet = 0;
 		
 		//for each view check dependencies
 		parent.forEachChild(function(child, index){
@@ -120,16 +137,16 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 				//set value
 				if(sumDependencies>0){
 					child.orderNum = sumDependencies;
-					numViewsSetted++;
+					numViewsSet++;
 				}else{
-					allViewsSetted = false;
+					allViewsSet = false;
 				}
 			}
 		});
 		
-	}while(!allViewsSetted && numViewsSetted>0);
+	}while(!allViewsSet && numViewsSet>0);
 	
-	if(numViewsSetted==0 && parent.hasUIChildren() && views0dependencies<childElements.length){
+	if(numViewsSet==0 && parent.hasUIChildren() && views0dependencies<childElements.length){
 		logE("Check cycle references in " + (hor? "horizontal" : "vertical")  + " for parent " + parent.id);
 	}
 	
@@ -318,7 +335,7 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config, l
 		return element.ui;
 	}
 
-	//generate a ui if necessary
+	//generate an ui if necessary
 	if(element.tagName!=null && element.getAttribute(config.attribute)!=null){
 
 		//assign an id if necessary

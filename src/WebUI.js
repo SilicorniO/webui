@@ -23,7 +23,6 @@ function WebUI(){
 	this.nodesRemoved = [];
 
 	//controllers
-	this.uiViewsManager = new UIViewsManager();
 	this.uiPrepare = new UIPrepare(this.refresh.bind(this));
 	this.uiDraw = new UIDraw();
 	this.uiCore = null;

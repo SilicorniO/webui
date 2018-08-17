@@ -227,7 +227,7 @@ You can define the position of your webui-view with short commands inside the "u
  * cui - Children ui: ("n") If you don't want to process the children of the view although they have "ui" attribute.
  * sv - Scroll vertical: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
  * sh - Scroll horizontal: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
- * s - Screen: () Just add this parameter to define the tag as a screen. Call to "drawUIAll". This is equivalent to give an identifier to the tag and call to "drawUIForId('ID')".
+ * v - Visibility: ("v") to show the view, this is the default value. ("i") to set the view as invisible but having size. ("g") to hide view from eyes and calculations.
 
 ### 3. Identifiers of the views
 
@@ -315,6 +315,7 @@ The functions at the moment are:
 * setPaddingTop(margin)
 * setPaddingBottom(margin)
 * setPaddings(paddingLeft, paddingTop, paddingRight, paddingBottom)
+* setVisibility(visibility)
 
 All parameters are strings.
 

@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../src/utils/UIRedrawTimer.js"></script>
+    <script type="text/javascript" src="../src/utils/UIViewUtils.js"></script>
+    <script type="text/javascript" src="../src/utils/UIUtils.js"></script>
+    <script type="text/javascript" src="../src/general/UILogFuncs.js"></script>
+    <script type="text/javascript" src="../src/general/UIGeneralFuncs.js"></script>
+    <script type="text/javascript" src="../src/UIConfiguration.js"></script>
+    <script type="text/javascript" src="../src/UIView.js"></script>
+    <script type="text/javascript" src="../src/UIViewsManager.js"></script>
+    <script type="text/javascript" src="../src/UIPrepare.js"></script>
+    <script type="text/javascript" src="../src/UIDraw.js"></script>
+    <script type="text/javascript" src="../src/UICore.js"></script>
+    <script type="text/javascript" src="../src/WebUI.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div ui="fw;fh" id="screen">
+        <div ui="" id="title">Testing gone</div>
+        <div ui="ab:l;v:g" id="displaynone">Display none</div>
+        <div ui="l:l;ab:l" id="below">Below</div>
+        <div ui="ab:l;v:g" id="displaynone2">Display none 2</div>
+        <div ui="t:l;ar:l" id="right">Right below</div>
+
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs'
+    });
+    
+    </script>
+    
+</body>
+</html>
