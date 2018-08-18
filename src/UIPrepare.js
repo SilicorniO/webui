@@ -169,9 +169,14 @@ UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig, forceSizeLoad
 	for(var i=0; i<elements.length; i++){
 		var ele = elements[i];
 		var view = ele.ui;
-		if(view){
-			
-			if(forceSizeLoaded || !view.sizeLoaded){
+		if(view && view.hasToBeCalculated()){
+
+			//show view if it is not visible
+			if (ele.style.display == "none") {
+				ele.style.display = "inline-block";
+			}
+
+			if(view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded) ){
 
 				if(view.sizeWidth=='sc' && !view.hasUIChildren()){
 					view.width = UIViewUtilsInstance.calculateWidthViewSlow(view, ele);
@@ -186,6 +191,7 @@ UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig, forceSizeLoad
 
 				//mark the sizeLoaded flag of this view as true
 				view.sizeLoaded = true;
+			
 			}
 			
 			this.loadSizesSlow(view.getChildElements(), coreConfig, forceSizeLoaded || !view.sizeLoaded);
@@ -263,6 +269,7 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 
 	//get the element
 	var ele = screen.element;
+	ele.style.position = 'absolute';
 
 	//apply width and height if they are defined
 	if(screen.sizeWidth!="sc"){
@@ -289,6 +296,7 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 		
 		screen.height = ele.offsetHeight;
 	}
+	ele.style.position = 'relative';
 	
 	screen.right = screen.width;
 	screen.bottom = screen.height;

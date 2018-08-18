@@ -1,0 +1,45 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../src/utils/UIRedrawTimer.js"></script>
+    <script type="text/javascript" src="../src/utils/UIViewUtils.js"></script>
+    <script type="text/javascript" src="../src/utils/UIUtils.js"></script>
+    <script type="text/javascript" src="../src/general/UILogFuncs.js"></script>
+    <script type="text/javascript" src="../src/general/UIGeneralFuncs.js"></script>
+    <script type="text/javascript" src="../src/UIConfiguration.js"></script>
+    <script type="text/javascript" src="../src/UIView.js"></script>
+    <script type="text/javascript" src="../src/UIPrepare.js"></script>
+    <script type="text/javascript" src="../src/UIDraw.js"></script>
+    <script type="text/javascript" src="../src/UICore.js"></script>
+    <script type="text/javascript" src="../src/WebUI.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div ui="fw;" id="screen">
+        <div ui="fw" id="content">
+            <div ui="p:20" id="title">Testing hidden final view before - Line 1</div>
+            <div ui="ab:l;p:20;v:g" id="title2">Testing hidden final view before - Line 2</div>
+        </div>
+    </div>
+
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs'
+    });
+    
+    setTimeout(function(){
+        console.log("Show after timeout");
+        
+        var title2 = document.getElementById('title2');
+        title2.ui.setVisibility("v");
+
+        WebUI.refresh();
+
+    }, 1000);
+
+    </script>
+    
+</body>
+</html>

@@ -197,26 +197,29 @@ WebUI.prototype.drawUIScreen = function(screen){
 
 	//update the size of the screen
 	var screenSizeChanged = this.uiPrepare.loadSizeScreen(screen);
-						
-	//load sizes of views
-	this.uiPrepare.loadSizesSlow(screen.getChildElements(), this.configuration, screenSizeChanged);
+	
+	if (screen.hasToBeCalculated()) {
 
-	endCounterLog('loadSizes');
-	startCounter('orderViews');
-	
-	//order views
-	this.uiPrepare.orderViews(screen);
-	
-	endCounterLog('orderViews');
-	endCounterLog('prepare');
-	
-	//---- CORE -----
-	startCounter('core');
-	
-	//assign position and sizes to screen
-	this.uiCore.calculateScreen(screen);
-	
-	endCounterLog('core');
+		//load sizes of views
+		this.uiPrepare.loadSizesSlow(screen.getChildElements(), this.configuration, screenSizeChanged);
+		
+		endCounterLog('loadSizes');
+		startCounter('orderViews');
+		
+		//order views
+		this.uiPrepare.orderViews(screen);
+		
+		endCounterLog('orderViews');
+		endCounterLog('prepare');
+		
+		//---- CORE -----
+		startCounter('core');
+		
+		//assign position and sizes to screen
+		this.uiCore.calculateScreen(screen);
+		
+		endCounterLog('core');
+	}
 				
 	//---- DRAW -----
 	startCounter('draw');
