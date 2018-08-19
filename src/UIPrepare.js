@@ -179,11 +179,11 @@ UIPrepare.prototype.loadSizes = function(elements, coreConfig, forceSizeLoaded =
 			if(view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded) ){
 
 				if(view.sizeWidth=='sc' && !view.hasUIChildren()){
-					view.width = UIViewUtilsInstance.calculateWidthView(view, ele);
+					view.widthValue = UIViewUtilsInstance.calculateWidthView(view, ele);
 				}
 				
 				if(view.sizeHeight=='sc' && !view.hasUIChildren()){
-					view.height = UIViewUtilsInstance.calculateHeightView(view, ele);
+					view.heightValue = UIViewUtilsInstance.calculateHeightView(view, ele);
 				}
 				
 				//translate paddings and margins
@@ -219,9 +219,9 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 	if(screen.sizeWidth!="sc"){
 		
 		if(screen.sizeWidth=="s"){
-			ele.style.width = screen.width + "px";
+			ele.style.width = screen.widthValue + "px";
 		}else if(screen.sizeWidth=="sp"){
-			ele.style.width = screen.percentWidth + "%";
+			ele.style.width = screen.widthValue + "%";
 		}
 		
 		var offsetWidth = ele.offsetWidth;
@@ -233,9 +233,9 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 	if(screen.sizeHeight!="sc"){
 		
 		if(screen.sizeHeight=="s"){
-			ele.style.height = screen.height + "px";
+			ele.style.height = screen.heightValue + "px";
 		}else if(screen.sizeWidth=="sp"){
-			ele.style.height = screen.percentHeight + "%";
+			ele.style.height = screen.heightValue + "%";
 		}
 		
 		screen.height = ele.offsetHeight;
@@ -255,20 +255,6 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 
 	//return the flag
 	return sizeChanged;
-}
-
-/**
-* Restore the sizes of the views
-* @param view parent view to apply sizes 
-* @param viewsSizes Array of sizes
-**/
-UIPrepare.prototype.restoreSizes = function(view, viewsSizes){
-		
-	for(var i=0; i<view.children.length && i<viewsSizes.length; i++){
-		view.children[i].width = viewsSizes[i].width;
-		view.children[i].height = viewsSizes[i].height;
-		this.restoreSizes(view.children[i], viewsSizes[i].children);
-	}
 }
 
 /**

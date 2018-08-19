@@ -20,7 +20,7 @@ function WebUI(){
 
 	//ids of nodes changed
 	this.nodesAdded = [];
-	this.nodesRemoved = [];
+	this.parentNodesRemoved = [];
 
 	//controllers
 	this.uiPrepare = new UIPrepare(this.refresh.bind(this));
@@ -49,18 +49,54 @@ function WebUI(){
 				this.uiPrepare.generateUIViews(node, this.configuration, this.screens);
 
 				//get the parent if has one
-				var parent = node.ui? node.ui.parent : null;
-				if(parent){
+				var parentElement = node.parentNode;
+				if(parentElement && parentElement.ui){
+					var parentView = parentElement.ui;
 
 					//2. Order views in parent
-					parent.childrenInOrder = false;
+					parentView.childrenInOrder = false;
 
 					//3. Check if parent has size content, to mark it as modified
-					if(parent.sizeWidth=='sc' || parent.sizeHeight=='sc'){
-						parent.sizeLoaded = false;
+					if(parentView.sizeWidth=='sc' || parentView.sizeHeight=='sc'){
+						parentView.sizeLoaded = false;
 					}
 
 				}
+			}
+
+			//when a node is added we have to check the relationship with the rest of views
+			while(this.parentNodesRemoved.length>0){
+				
+				//get first node and remove from list
+				var parentNode = this.parentNodesRemoved[0];
+				this.parentNodesRemoved.splice(0,1);
+
+				//search the parent view with UI interface
+				var refreshParent = function(node) {
+
+					//check it has UI
+					if(node && node.ui){
+						var view = node.ui;
+	
+						//2. Order views in parent
+						view.childrenInOrder = false;
+	
+						//3. Check if parent has size content, to mark it as modified
+						if(view.sizeWidth=='sc' || view.sizeHeight=='sc'){
+							view.sizeLoaded = false;
+						}
+						return;
+					} else {
+
+						//search UI in parent
+						var parentNode = node.parentNode;
+						if (parentNode) {
+							refreshParent(parentNode);
+						}
+					}
+
+				}
+				refreshParent(parentNode);				
 			}
 
 			//draw
@@ -120,8 +156,8 @@ WebUI.prototype.listenDomEvents = function(){
 	
 	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeRemoved", function (event) {
 		// self.nodesRemoved.push(event.srcElement);
-		// self.nodesRemoved.push(event.relatedNode);
-		// self.redraw();
+		self.parentNodesRemoved.push(event.relatedNode);
+		self.redraw();
 	}, false);
 
 	//add event listener for window resize
@@ -225,7 +261,7 @@ WebUI.prototype.drawUIScreen = function(screen){
 	startCounter('draw');
 				
 	//apply position and sizes
-	var childrenSizes = this.uiDraw.applyPositions(screen, this.configuration.viewColors);
+	var childrenSizes = this.uiDraw.applyPositions(screen, this.configuration.viewColors, !screen.hasToBeCalculated());
 	
 	//resize screen if necessary
 	this.uiDraw.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY);

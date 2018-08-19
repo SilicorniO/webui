@@ -38,6 +38,10 @@
 
                         var square1 = document.getElementById('square1');
                         square1.ui.setVisibility("g");
+                        square1.ui.animateNextRefresh(1);
+
+                        var square2 = document.getElementById('square2');
+                        square2.ui.animateNextRefresh(1);
 
                         WebUI.refresh();
                     }

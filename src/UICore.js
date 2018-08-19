@@ -247,10 +247,10 @@ UICore.prototype.assignSizeVer = function(view, height){
 UICore.prototype.applyFixedSizeHor = function(view){
 	//set left and top if they are not setted
 	if(view.rightChanged){
-		view.left = view.right - view.width;
+		view.left = view.right - view.widthValue;
 		view.leftChanged = true;
 	}else{
-		view.right = view.left + view.width;
+		view.right = view.left + view.widthValue;
 		view.leftChanged = true;
 		view.rightChanged = true;
 	}
@@ -259,10 +259,10 @@ UICore.prototype.applyFixedSizeHor = function(view){
 UICore.prototype.applyFixedSizeVer = function(view){
 	//set bottom and top if they are not setted
 	if(view.bottomChanged){
-		view.top = view.bottom - view.height;
+		view.top = view.bottom - view.heightValue;
 		view.topChanged = true;
 	}else{
-		view.bottom = view.top + view.height;
+		view.bottom = view.top + view.heightValue;
 		view.topChanged = true;
 		view.bottomChanged = true;
 	}
@@ -362,11 +362,11 @@ UICore.prototype.applySizeContentHor = function(view){
 		
 	//if the size depends of children, calculate the position of children
 	if(view.rightChanged){
-		view.left = view.right - view.width;
+		view.left = view.right - view.widthValue;
 		view.leftChanged = true;
 	
 	}else if(view.right>=0){
-		view.right = view.left + view.width;
+		view.right = view.left + view.widthValue;
 		view.rightChanged = true;
 		view.leftChanged = true;
 	}
@@ -380,16 +380,16 @@ UICore.prototype.applySizeContentVer = function(view){
 	
 	//if the size depends of children, calculate the position of children
 	if(view.bottomChanged){
-		view.top = view.bottom - view.height;
+		view.top = view.bottom - view.heightValue;
 		view.topChanged = true;
 	
 	}else if(view.bottom>=0){
 		
 		var ele = document.getElementById(view.id);
 		ele.style.width = view.width + 'px';
-		view.height = ele.offsetHeight;	
+		view.heightValue = ele.offsetHeight;
 		
-		view.bottom = view.top + view.height;		
+		view.bottom = view.top + view.heightValue;		
 		view.bottomChanged = true;
 		view.topChanged = true;
 	}
@@ -467,16 +467,16 @@ UICore.prototype.applySizeChildrenVer = function(view){
 UICore.prototype.applyPercentHor = function(view, parentView, width){
 	
 	if(view.rightChanged && !view.leftChanged){
-		view.left = view.right - ((parentView.width * view.percentWidth) / 100);
+		view.left = view.right - ((parentView.width * view.widthValue) / 100);
 	}else{
-		view.right = view.left + ((parentView.width * view.percentWidth) / 100);
+		view.right = view.left + ((parentView.width * view.widthValue) / 100);
 	}
 
 	//move the percent if necessary
-	if(view.percentLeft>0){
-		var percentLeft = (view.right-view.left) * (view.percentLeft);
-		view.left += percentLeft;
-		view.right += percentLeft;
+	if(view.percentWidthPos>0){
+		var percentWidth = (view.right-view.left) * (view.percentWidthPos);
+		view.left += percentWidth;
+		view.right += percentWidth;
 	}
 
 	//mark left and right as changed
@@ -493,17 +493,17 @@ UICore.prototype.applyPercentHor = function(view, parentView, width){
 UICore.prototype.applyPercentVer = function(view, parentView, height){
 	
 	if(view.bottomChanged && !view.topChanged){
-		view.top = view.bottom - ((parentView.height * view.percentHeight) / 100);
+		view.top = view.bottom - ((parentView.height * view.heightValue) / 100);
 	}else{
-		view.bottom = view.top + ((parentView.height * view.percentHeight) / 100);
+		view.bottom = view.top + ((parentView.height * view.heightValue) / 100);
 	}
 	
 
 	//move the percent if necessary
-	if(view.percentTop>0){
-		var percentTop = (view.bottom-view.top) * (view.percentTop);
-		view.top += percentTop;
-		view.bottom += percentTop;
+	if(view.percentHeightPos>0){
+		var percentHeight = (view.bottom-view.top) * (view.percentHeightPos);
+		view.top += percentHeight;
+		view.bottom += percentHeight;
 	}
 
 	//masrk right and left as changed

@@ -138,14 +138,14 @@ UIDraw.prototype.applySizeScreen = function(screenView, width, height){
         if(screenView.sizeWidth=="s"){
             ele.style.width = screenView.width + "px";
         }else if(screenView.sizeWidth=="sp"){
-            ele.style.width = screenView.percentWidth + "%";
+            ele.style.width = screenView.widthValue + "%";
         }else{
             ele.style.width = width + "px";
         }
         if(screenView.sizeHeight=="s"){
             ele.style.height = screenView.height + "px";
         }else if(screenView.sizeHeight=="sp"){
-            ele.style.height = screenView.percentHeight + "%";
+            ele.style.height = screenView.heightValue + "%";
         }else{
             ele.style.height = height + "px";
         }

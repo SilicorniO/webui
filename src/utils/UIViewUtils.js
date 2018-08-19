@@ -23,7 +23,7 @@ UIViewUtils.prototype.calculateWidthView = function(view, ele, index, infinitePa
 	//get the height width much space
 	ele.style.position = 'fixed';
 	// ele.style.display = 'inline-block';
-    // ele.style.width = 'auto';
+    ele.style.width = 'auto';
     // ele.style.height = 'auto';
 	var width = ele.offsetWidth;
 	
@@ -57,7 +57,7 @@ UIViewUtils.prototype.calculateHeightView = function(view, ele, index, infiniteP
 	ele.style.position = 'fixed';
 	// ele.style.display = 'inline-block';
     // ele.style.width = 'auto';
-    // ele.style.height = 'auto';
+    ele.style.height = 'auto';
 	var height = ele.offsetHeight;
     	
     //increment for text calculations error

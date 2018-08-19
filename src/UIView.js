@@ -35,7 +35,39 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	
 	this.sizeWidth = 'sc'; //size_content
 	this.sizeHeight = 'sc'; //size_content
+
+	this.widthValue = 0;
+	this.heightValue = 0;
+
+	this.percentWidthPos = 0;
+	this.percentHeightPos = 0;
+
+	this.scrollVertical = false;
+	this.scrollHorizontal = false;
+
+	this.gravityHor = 'n';
+	this.gravityVer = 'n';
+
+	this.marginLeftDimen = "0";
+	this.marginTopDimen = "0";
+	this.marginRightDimen = "0";
+	this.marginBottomDimen = "0";
+
+	this.paddingLeftDimen = "0";
+	this.paddingTopDimen = "0";
+	this.paddingRightDimen = "0";
+	this.paddingBottomDimen = "0";
+
+	this.visibility = 'v';
+
+	//animations
+	this.animationDurations = [];
 	
+	//----- calculated -----
+
+	this.width = 0;
+	this.height = 0;
+
 	this.left = 0;
 	this.top = 0;
 	this.right = 0;
@@ -46,64 +78,27 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this.rightChanged = false;
 	this.bottomChanged = false;
 	
-	this.width = 0;
-	this.height = 0;
-	
-	this.scrollVertical = false;
-	this.scrollHorizontal = false;
-	
 	this.scrollVerticalApplied = false;
 	this.scrollHorizontalApplied = false;
-	
-	this.percentWidth = 0;
-	this.percentHeight = 0;
-	this.percentLeft = 0;
-	this.percentTop = 0;
-	
-	this.gravityHor = 'n';
-	this.gravityVer = 'n';
-
-	this.marginLeftDimen = "0";
-	this.marginTopDimen = "0";
-	this.marginRightDimen = "0";
-	this.marginBottomDimen = "0";
 	
 	this.marginLeft = 0;
 	this.marginTop = 0;
 	this.marginRight = 0;
 	this.marginBottom = 0;
 
-	this.paddingLeftDimen = "0";
-	this.paddingTopDimen = "0";
-	this.paddingRightDimen = "0";
-	this.paddingBottomDimen = "0";
-	
 	this.paddingLeft = 0;
 	this.paddingTop = 0;
 	this.paddingRight = 0;
 	this.paddingBottom = 0;
 
-	this.visibility = 'v';
-
-	//flags for changes
+	//----- Flags for changes -----
 	this.sizeLoaded = false;
 	this.childrenInOrder = false;
 
-	//animations
-	this.animationDurations = [];
+	//----- INIT -----
+	this.init(lastViewId, attributeMain, attributes);
 
-	//initialize visibility with css
-	this.updateVisibilityWithCss();
-
-	//initialize
-	this.readUI(element, parent, lastViewId? lastViewId : "", attributeMain, attributes);
-
-	//set this instance into the element
-	element.ui = this;
-	element['ui'] = this;
-
-	//public methods
-
+	//----- Public methods -----
 	this['setWidth'] = this.setWidth;
 	this['setHeight'] = this.setHeight;
 	this['setLeft'] = this.setLeft;
@@ -128,19 +123,32 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this['animateNextRefresh'] = this.animateNextRefresh;
 }
 
+UIView.prototype.init = function(lastViewId, attributeMain, attributes) {
+
+	//initialize visibility with css
+	// this.updateVisibilityWithCss();
+
+	//initialize
+	this.readUI(this.element, this.parent, lastViewId? lastViewId : "", attributeMain, attributes);
+
+	//set this instance into the element
+	this.element.ui = this;
+	this.element['ui'] = this;
+}
+
 UIView.prototype.setWidth = function(w){
 	if(w=="sc"){
 		this.sizeWidth = w;
-		this.width = 0;
+		this.widthValue = 0;
 	}else if(String(w).indexOf('%')!=-1){
 		var indexPercent = w.indexOf('%');
-		this.percentWidth = parseFloat(w.substring(0, indexPercent));
+		this.widthValue = parseFloat(w.substring(0, indexPercent));
 		if(indexPercent<w.length-1){
-			this.percentLeft = parseInt(w.substring(indexPercent+1, w.length), 10);
+			this.percentWidthPos = parseInt(w.substring(indexPercent+1, w.length), 10);
 		}
 		this.sizeWidth = "sp"; //size_percent
 	}else{
-		this.width = parseInt(w, 10); 
+		this.widthValue = parseInt(w, 10); 
 		this.sizeWidth = "s" //sized
 	}
 	this.sizeLoaded = false;
@@ -149,16 +157,16 @@ UIView.prototype.setWidth = function(w){
 UIView.prototype.setHeight = function(h){
 	if(h=="sc"){
 		this.sizeHeight = h;
-		this.height = 0;
+		this.heightValue = 0;
 	}else if(String(h).indexOf('%')!=-1){
 		var indexPercent = h.indexOf('%');
-		this.percentHeight = parseInt(h.substring(0, indexPercent), 10);
+		this.heightValue = parseInt(h.substring(0, indexPercent), 10);
 		if(indexPercent<h.length-1){
-			this.percentTop = parseInt(h.substring(indexPercent+1, h.length), 10);
+			this.percentHeightPos = parseInt(h.substring(indexPercent+1, h.length), 10);
 		}
 		this.sizeHeight = "sp"; //size_percent
 	}else{
-		this.height = parseInt(h, 10); 
+		this.heightValue = parseInt(h, 10); 
 		this.sizeHeight = "s" //sized
 	}
 	this.sizeLoaded = false;
@@ -358,22 +366,19 @@ UIView.prototype.getPreviousView = function() {
 } 
 		
 UIView.prototype.clean = function(){
+	
 	this.leftChanged = false;
 	this.topChanged = false;
 	this.rightChanged = false;
 	this.bottomChanged = false;
+	
 	this.left = 0;
 	this.top = 0;
 	this.right = 0;
 	this.bottom = 0;
-	
-	//clean percent to calculate it again
-	if(this.percentWidth>0){
-		this.sizeWidth = "sp";
-	}
-	if(this.percentHeight>0){
-		this.sizeHeight = "sp";
-	}
+
+	this.width = 0;
+	this.height = 0;
 };
 
 UIView.prototype.applyDimens = function(coreConfig){
