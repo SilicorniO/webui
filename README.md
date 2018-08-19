@@ -363,6 +363,9 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
  * viewLogs: Identifier of the tag where you want to see the logs if the console is not right for you.
  * dimens: Allows to create reference to different sizes. It is better to use variables for dimensions and change it depending of the size of device.
  * attribute: You can define the name of the attribute to use with web-ui. NOTE: If you are using react you need this attribute starts with 'data-'.
+ * animations: Values to use for animations.
+    * defaultTime: Default time for animations.
+    * defaultOpacity: Flag to show animation when the view is calculated for the first time.
  * screenModes: You can define different "ui" attributes to use for each width of the device. Check the examples for more information.
  * events: You can receive events. From the moment you can receive "start" and "end" events. End event has the list of attributes for the type of screen loaded.
    
@@ -386,6 +389,10 @@ Please, to learn more, check the examples in "tests" folder. You can clone the p
                 showLogs: true,
                 viewLogs: 'logs',
                 attribute: 'ui',
+                animations: {
+                    defaultTime: 0.3,
+                    defaultOpacity: true
+                },
                 dimens: {
                     ms: 10, 	//margin small
                     mm: 20, 	//margin medium
