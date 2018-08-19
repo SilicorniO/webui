@@ -15,14 +15,16 @@ function UIViewUtils(){
 UIViewUtils.prototype.calculateWidthView = function(view, ele, index, infiniteParent){
 	
 	//prepare parent to give the son a lot of space for calculation
-	var parent = ele.parentElement;
-	parent.removeChild(ele);
-	infiniteParent.appendChild(ele);
+	// var parent = ele.parentElement;
+    // var parentWidth = parent.offsetWidth;
+    // var parentScrollLeft = parent.scrollLeft;
+	// parent.style.width = 10000;
     	
-    //get the height width much space
-	ele.style.display = 'inline-block';
-    ele.style.width = 'auto';
-    ele.style.height = 'auto';
+	//get the height width much space
+	ele.style.position = 'fixed';
+	// ele.style.display = 'inline-block';
+    // ele.style.width = 'auto';
+    // ele.style.height = 'auto';
 	var width = ele.offsetWidth;
 	
     //increment for text calculations error
@@ -31,10 +33,10 @@ UIViewUtils.prototype.calculateWidthView = function(view, ele, index, infinitePa
 	}
     
     //set values of parent back 
-	infiniteParent.removeChild(ele)
-    parent.insertBefore(ele, parent.getChildElements()[index]);
-    
-    return width;
+    // parent.style.width = parentWidth;
+	// parent.scrollLeft = parentScrollLeft;
+	
+	return width;
 }
 
 /**
@@ -46,14 +48,16 @@ UIViewUtils.prototype.calculateWidthView = function(view, ele, index, infinitePa
 UIViewUtils.prototype.calculateHeightView = function(view, ele, index, infiniteParent){
         
     //prepare parent to give the son a lot of space for calculation
-	var parent = ele.parentElement;
-	parent.removeChild(ele);
-	infiniteParent.appendChild(ele);
+	// var parent = ele.parentElement;
+    // var parentHeight = parent.offsetHeight;
+    // var parentScrollTop = parent.scrollTop;
+    // parent.style.height = 10000;
     	    
-    //get the width height much space
-	ele.style.display = 'inline-block';
-    ele.style.width = 'auto';
-    ele.style.height = 'auto';
+	//get the width height much space
+	ele.style.position = 'fixed';
+	// ele.style.display = 'inline-block';
+    // ele.style.width = 'auto';
+    // ele.style.height = 'auto';
 	var height = ele.offsetHeight;
     	
     //increment for text calculations error
@@ -61,8 +65,9 @@ UIViewUtils.prototype.calculateHeightView = function(view, ele, index, infiniteP
 		height++;
 	}
     
-	infiniteParent.removeChild(ele)
-	parent.insertBefore(ele, parent.getChildElements()[index]);
+    //set values of parent back 
+    // parent.style.height = parentHeight;
+	// parent.scrollTop = parentScrollTop;
 
 	return height;
 }
@@ -78,9 +83,9 @@ UIViewUtils.prototype.calculateWidthViewSlow = function(view, ele){
 	var parent = ele.parentElement;
     var parentWidth = parent.offsetWidth;
     var parentScrollLeft = parent.scrollLeft;
-    parent.style.width = 10000;
+	parent.style.width = 10000;
     	
-    //get the height width much space
+	//get the height width much space
 	ele.style.display = 'inline-block';
     ele.style.width = 'auto';
     ele.style.height = 'auto';

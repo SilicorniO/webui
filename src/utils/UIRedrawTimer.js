@@ -17,15 +17,16 @@ UIRedrawTimer.prototype.timer = function(cb, timeMillis){
 		timeMillis = 20;
 	}
 
-	//start the timer if not started
-	if(!this.time){
-		this.timerLauncher(timeMillis, cb);
-	}
+	//check if it is running
+	var running = this.time != null;
 
 	//update the time
-	var waiting = !this.time;
-	this.time = (new Date()).getTime();
-	this.time += timeMillis;
+	this.time = (new Date()).getTime() + timeMillis;
+
+	//start the timer if not started
+	if(!running){
+		this.timerLauncher(timeMillis, cb);
+	}
 }
 
 UIRedrawTimer.prototype.timerLauncher = function(timeInMillis, cb){
@@ -35,11 +36,12 @@ UIRedrawTimer.prototype.timerLauncher = function(timeInMillis, cb){
 		var now = (new Date()).getTime();
 		if(now > this.time){
 
+			//clean the timer
+			this.time = null;
+
 			//redraw
 			cb();
 
-			//clean the timer
-			this.time = null;
 		}else{
 
 			//run timer again with rest of milliseconds

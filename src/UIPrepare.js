@@ -164,7 +164,7 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 * @param {UIConfiguration} coreConfig
 * @param {boolean} forceSizeLoaded
 **/
-UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig, forceSizeLoaded = false){
+UIPrepare.prototype.loadSizes = function(elements, coreConfig, forceSizeLoaded = false){
 	
 	for(var i=0; i<elements.length; i++){
 		var ele = elements[i];
@@ -179,11 +179,11 @@ UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig, forceSizeLoad
 			if(view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded) ){
 
 				if(view.sizeWidth=='sc' && !view.hasUIChildren()){
-					view.width = UIViewUtilsInstance.calculateWidthViewSlow(view, ele);
+					view.width = UIViewUtilsInstance.calculateWidthView(view, ele);
 				}
 				
 				if(view.sizeHeight=='sc' && !view.hasUIChildren()){
-					view.height = UIViewUtilsInstance.calculateHeightViewSlow(view, ele);
+					view.height = UIViewUtilsInstance.calculateHeightView(view, ele);
 				}
 				
 				//translate paddings and margins
@@ -194,66 +194,10 @@ UIPrepare.prototype.loadSizesSlow = function(elements, coreConfig, forceSizeLoad
 			
 			}
 			
-			this.loadSizesSlow(view.getChildElements(), coreConfig, forceSizeLoaded || !view.sizeLoaded);
+			this.loadSizes(view.getChildElements(), coreConfig, forceSizeLoaded || !view.sizeLoaded);
 		}
 		
 	}
-
-}
-
-/**
-* Load the sizes of all views and translate paddings and margins to dimens
-* @param views Array of views to load size
-**/
-UIPrepare.prototype.loadSizes = function(views, coreConfig){
-
-	//generate an infinite parent for calculations
-	var VIEW_SIZE_LIMIT = 100000;
-	var infiniteParent = document.createElement('div');
-	infiniteParent.style.display = 'inline-block';
-	infiniteParent.style.width = VIEW_SIZE_LIMIT;
-	infiniteParent.style.height = VIEW_SIZE_LIMIT;
-	infiniteParent.style.backgroundColor = "black";
-	infiniteParent.style.zIndex = -1;
-	var bodyEle = document.getElementById("screen");
-	bodyEle.appendChild(infiniteParent);
-	
-	var aViews = [];
-	for(var i=0; i<views.length; i++){
-		aViews.push(views[i]);
-	}
-	while(aViews.length>0){
-		var view = aViews[0];
-		aViews.splice(0, 1);
-		var ele = document.getElementById(view.id);
-
-		if(!view.sizeLoaded){
-		
-			if(view.sizeWidth=='sc' && view.children.length==0){
-				view.width = UIViewUtilsInstance.calculateWidthView(view, ele, i, infiniteParent);
-			}
-			
-			if(view.sizeHeight=='sc' && view.children.length==0){
-				view.height = UIViewUtilsInstance.calculateHeightView(view, ele, i, infiniteParent);
-			}
-			
-			//translate paddings and margins
-			view.applyDimens(coreConfig);
-
-			//mark the sizeLoaded flag of this view as true
-			view.sizeLoaded = true;
-		}
-			
-		if(view.children.length>0){
-			for(var i=0; i<view.children.length; i++){
-				aViews.push(view.children[i]);
-			}
-		}
-
-	}
-
-	//remove infinite parent
-	bodyEle.removeChild(infiniteParent);
 
 }
 

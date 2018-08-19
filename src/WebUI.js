@@ -201,7 +201,7 @@ WebUI.prototype.drawUIScreen = function(screen){
 	if (screen.hasToBeCalculated()) {
 
 		//load sizes of views
-		this.uiPrepare.loadSizesSlow(screen.getChildElements(), this.configuration, screenSizeChanged);
+		this.uiPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged);
 		
 		endCounterLog('loadSizes');
 		startCounter('orderViews');

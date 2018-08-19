@@ -10,9 +10,10 @@ function UIDraw(){
 * Apply positions for the views
 * @param {UIView} parentView to draw children
 * @param {boolean} viewColors flag to show or not colors in views
+* @param {boolean} parentGone flag to know if parent is not being displayed because is gone
 * @return int maximum Y positon of a children
 **/
-UIDraw.prototype.applyPositions = function(parentView, viewColors){
+UIDraw.prototype.applyPositions = function(parentView, viewColors, parentGone = false){
     
     var maxX = 0;
 	var maxY = 0;
@@ -52,13 +53,15 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
         }
 
         //hide view if visibility is gone
-        if (view.visibility == 'g' || parentView.visibility == 'g') {
+        if (view.visibility == 'g' || parentGone) {
             ele.style.display = "none";  
-        }
-        if (view.visibility == 'i' || parentView.visibility == 'i') {
-            ele.style.visibility = "hidden";
         } else {
-            ele.style.visibility = "visible";
+            ele.style.display = "inline-block";
+            if (view.visibility == 'i' || parentView.visibility == 'i') {
+                ele.style.visibility = "hidden";
+            } else {
+                ele.style.visibility = "visible";
+            }
         }
 		
         //set location
@@ -102,7 +105,7 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
             ele.style.backgroundColor = this.generateRandomViewColor();
         }
 		
-        var childrenSize = this.applyPositions(view, viewColors);
+        var childrenSize = this.applyPositions(view, viewColors, ele.style.display == "none");
         if(childrenSize.maxX>maxX){
             maxX = childrenSize.maxX;
         }
