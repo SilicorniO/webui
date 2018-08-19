@@ -19,6 +19,12 @@ function UIConfiguration(uiConf){
 	//view where to show the logs in screen
 	this.logsView = null;
 
+	//animations
+	this.animations = {
+		defaultTime: 0.3,
+		defaultOpacity: true
+	}
+
 	//if no configuration received we use default values
 	if(!uiConf){
 		return;
@@ -37,6 +43,16 @@ function UIConfiguration(uiConf){
 
 	if(uiConf['events']!=null){
 		this.events = uiConf['events'];
+	}
+
+	if (uiConf['animations'] != null) {
+		var animations = uiConf['animations'];
+		if (animations['defaultTime'] != null) {
+			this.animations.defaultTime = animations['defaultTime'];
+		}
+		if (animations['defaultOpacity'] != null) {
+			this.animations.defaultOpacity = animations['defaultOpacity'];
+		}
 	}
 
 	if(uiConf['timeRedraw']!=null && !isNaN(uiConf['timeRedraw'])){

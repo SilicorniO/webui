@@ -284,6 +284,10 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config, l
 
 		//create the view and add it to the list of views
 		var view = new UIView(element, parent, screen, lastViewId, config.attribute, config.attributes);
+		if (view) {
+			//initialize opacity to 0 to show it when it has the position
+			element.style.opacity = '0';
+		}
 
 		//if it is an image we prepare to refresh when image is loaded
 		if(element.tagName!=null && element.tagName.toLowerCase()=="img"){

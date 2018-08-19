@@ -13,7 +13,7 @@ function UIDraw(){
 * @param {boolean} parentGone flag to know if parent is not being displayed because is gone
 * @return int maximum Y positon of a children
 **/
-UIDraw.prototype.applyPositions = function(parentView, viewColors, parentGone = false){
+UIDraw.prototype.applyPositions = function(parentView, viewColors){
     
     var maxX = 0;
 	var maxY = 0;
@@ -23,7 +23,7 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors, parentGone = 
     var paddingTop = 0;
     var paddingBottom = 0;
 
-	parentView.forEachChild((function(view, index){
+	parentView.forEachChild((function(view){
 		var ele = view.element;
 		
         //initialize paddings
@@ -50,18 +50,6 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors, parentGone = 
         ele.style.margin = "auto";
         if(ele.childElementCount>0){
             ele.style.padding = "0px";
-        }
-
-        //hide view if visibility is gone
-        if (view.visibility == 'g' || parentGone) {
-            ele.style.display = "none";  
-        } else {
-            ele.style.display = "inline-block";
-            if (view.visibility == 'i' || parentView.visibility == 'i') {
-                ele.style.visibility = "hidden";
-            } else {
-                ele.style.visibility = "visible";
-            }
         }
 		
         //set location
@@ -105,7 +93,7 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors, parentGone = 
             ele.style.backgroundColor = this.generateRandomViewColor();
         }
 		
-        var childrenSize = this.applyPositions(view, viewColors, ele.style.display == "none");
+        var childrenSize = this.applyPositions(view, viewColors);
         if(childrenSize.maxX>maxX){
             maxX = childrenSize.maxX;
         }
@@ -115,6 +103,40 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors, parentGone = 
 	}).bind(this));
 	
 	return {maxX: maxX, maxY: maxY};
+	
+}
+
+/**
+* Apply visibility for the views
+* @param {UIView} view to change visibility
+* @param {UIView} parentView to know visibility of the parent
+* @param {UIConfiguration} configuration to know time of animations
+* @param {boolean} forceGone flag to know if parent is not being displayed because is gone
+**/
+UIDraw.prototype.applyVisibility = function(view, parentView, configuration, forceGone = false){
+    var ele = view.element;
+
+    //hide view if visibility is gone
+    if (view.visibility == 'g' || forceGone) {
+        ele.style.display = "none";  
+        ele.style.opacity = '0';
+    } else {
+        ele.style.display = "inline-block";
+        if (view.visibility == 'i' || (parentView && parentView.visibility == 'i') ) {
+            // ele.style.visibility = "hidden";
+            ele.style.opacity = '0';
+        } else {
+            // ele.style.visibility = "visible";
+            ele.style.opacity = '1';
+        }
+    }
+    if (configuration.animations.defaultOpacity) {
+        ele.style.transition = "opacity " + configuration.animations.defaultTime + "s ease 0s";
+    }
+
+	view.forEachChild((function(childView){
+		this.applyVisibility(childView, view, configuration, ele.style.display == "none");
+	}).bind(this));
 	
 }
     

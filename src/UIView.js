@@ -125,9 +125,6 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 
 UIView.prototype.init = function(lastViewId, attributeMain, attributes) {
 
-	//initialize visibility with css
-	// this.updateVisibilityWithCss();
-
 	//initialize
 	this.readUI(this.element, this.parent, lastViewId? lastViewId : "", attributeMain, attributes);
 
@@ -268,18 +265,6 @@ UIView.prototype.setVisibility = function(visibility) {
 		this.sizeLoaded = false;
 	}
 	this.visibility = visibility;
-}
-
-UIView.prototype.updateVisibilityWithCss = function() {
-	if (this.element.style.display == 'none') {
-		this.setVisibility('g');
-	} else {
-		if (this.element.style.visibility == 'hidden') {
-			this.setVisibility('i');
-		} else {
-			this.setVisibility('v');
-		}
-	}
 }
 
 UIView.prototype.hasToBeCalculated = function() {

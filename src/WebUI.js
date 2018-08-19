@@ -261,6 +261,7 @@ WebUI.prototype.drawUIScreen = function(screen){
 				
 	//apply position and sizes
 	var childrenSizes = this.uiDraw.applyPositions(screen, this.configuration.viewColors, !screen.hasToBeCalculated());
+	this.uiDraw.applyVisibility(screen, null, this.configuration, !screen.hasToBeCalculated());
 	
 	//resize screen if necessary
 	this.uiDraw.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY);
