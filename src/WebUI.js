@@ -108,7 +108,6 @@ function WebUI(){
 	//window resize event
 	this.resize = (function() {
 		this.configuration.refreshScreenSize();
-		this.clearUI();
 		this.redraw();
 	}).bind(this)
 }
