@@ -22,7 +22,7 @@ function UIConfiguration(uiConf){
 	//animations
 	this.animations = {
 		defaultTime: 0.3,
-		defaultOpacity: true
+		defaultOpacity: false
 	}
 
 	//if no configuration received we use default values

@@ -37,17 +37,16 @@ function WebUI(){
 	//redraw function
 	this.redraw = (function() {
 
+		//prepare nodes
+		var countNodesAdded = this.uiPrepare.addNodes(this.nodesAdded, this.screens, this.configuration);
+		var countNodesRemoved = this.uiPrepare.removeNodes(this.parentNodesRemoved);
+		var countNodesModified = this.uiPrepare.updateNodes(this.nodesUpdated, this.screens, this.configuration);
+		log("Nodes added: " + countNodesAdded + " - Nodes removed: " + countNodesRemoved + " - Nodes modified: " + countNodesModified);
+
 		this.redrawTimer.timer((function(){
 
-			log(" -- Redraw -- ");
-
-			//prepare nodes
-			var countNodesAdded = this.uiPrepare.addNodes(this.nodesAdded, this.screens, this.configuration);
-			var countNodesRemoved = this.uiPrepare.removeNodes(this.parentNodesRemoved);
-			var countNodesModified = this.uiPrepare.updateNodes(this.nodesUpdated, this.screens, this.configuration);
-			log("Nodes added: " + countNodesAdded + " - Nodes removed: " + countNodesRemoved + " - Nodes modified: " + countNodesModified);
-
 			//draw
+			log(" -- Redraw -- ");
 			this.drawScreens();
 
 		}).bind(this), this.configuration.timeRedraw);
@@ -94,29 +93,8 @@ WebUI.prototype.start = function(configuration){
 
 WebUI.prototype.listenDomEvents = function(){
 	
+	//get the body element
 	var bodyElement = document.getElementsByTagName('BODY')[0];
-	// bodyElement.addEventListener("DOMNodeInserted", function (event) {
-	// 	self.nodesAdded.push(event.srcElement);
-	// 	self.redraw();
-	// }, false);
-
-	// bodyElement.addEventListener("DOMNodeInsertedIntoDocument", function (event) {
-	// 	log(event);
-	// }, false);
-
-	// bodyElement.addEventListener("DOMAttrModified", function (event) {
-	// 	log(event);
-	// }, false);
-
-	// bodyElement.addEventListener("DOMSubtreeModified", function (event) {
-	// 	log(event);
-	// }, false);
-
-	// bodyElement.addEventListener("DOMNodeRemoved", function (event) {
-	// 	// self.nodesRemoved.push(event.srcElement);
-	// 	self.parentNodesRemoved.push(event.relatedNode);
-	// 	self.redraw();
-	// }, false);
 
 	//add event listener for window resize
 	window.removeEventListener("resize", this.resize); 
