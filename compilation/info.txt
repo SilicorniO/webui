@@ -2,4 +2,4 @@ PRODUCTION:
 java -jar compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --generate_exports --export_local_property_definitions --js ../src/utils/UIRedrawTimer.js ../src/utils/UIViewUtils.js ../src/utils/UIUtils.js ../src/general/UILogFuncs.js ../src/general/UIGeneralFuncs.js ../src/UIConfiguration.js ../src/UIView.js ../src/UIPrepare.js ../src/UIDraw.js ../src/UICore.js ../src/WebUI.js > ../builds/webui-2.0.5.min.js
 
 DEBUG:
-java -jar compiler.jar --js ../src/utils/UIRedrawTimer.js ../src/utils/UIViewUtils.js ../src/utils/UIUtils.js ../src/general/UILogFuncs.js ../src/general/UIGeneralFuncs.js ../src/UIConfiguration.js ../src/UIView.js ../src/UIPrepare.js ../src/UIDraw.js ../src/UICore.js ../src/WebUI.js > ../builds/webui-2.0.5-dev.min.js
+java -jar compiler.jar --debug --formatting=PRETTY_PRINT --js ../src/utils/UIRedrawTimer.js ../src/utils/UIViewUtils.js ../src/utils/UIUtils.js ../src/general/UILogFuncs.js ../src/general/UIGeneralFuncs.js ../src/UIConfiguration.js ../src/UIView.js ../src/UIPrepare.js ../src/UIDraw.js ../src/UICore.js ../src/WebUI.js > ../builds/webui-2.0.5-dev.min.js

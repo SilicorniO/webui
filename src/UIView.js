@@ -334,6 +334,12 @@ UIView.prototype.forEachChild = function(cb){
 UIView.prototype.getPreviousView = function() {
 
 	var previousView = null;
+
+	//if it is an screen there is not a previous view
+	if (this.parent == null) {
+		return null;
+	}
+
 	var childNodes = this.parent.element.childNodes;
 	for(var i=0; i<childNodes.length; i++){
 		var child = childNodes[i].ui;

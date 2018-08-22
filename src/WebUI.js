@@ -20,6 +20,7 @@ function WebUI(){
 
 	//ids of nodes changed
 	this.nodesAdded = [];
+	this.nodesUpdated = [];
 	this.parentNodesRemoved = [];
 
 	//controllers
@@ -64,7 +65,7 @@ function WebUI(){
 				}
 			}
 
-			//when a node is added we have to check the relationship with the rest of views
+			//when a node is removed we have to check the relationship of the parent
 			while(this.parentNodesRemoved.length>0){
 				
 				//get first node and remove from list
@@ -97,6 +98,37 @@ function WebUI(){
 
 				}
 				refreshParent(parentNode);				
+			}
+
+			//when a node is removed we have to check the relationship of the parent
+			var nodeIdsUpdated = [];
+			while(this.nodesUpdated.length>0){
+				
+				//get first node and remove from list
+				var node = this.nodesUpdated[0];
+				this.nodesUpdated.splice(0,1);
+
+				//check this id has not been already updated
+				if (!node.ui || !nodeIdsUpdated.includes(node.ui.id)) {
+
+					//try to generate the UI view
+					delete node.ui;
+					view = this.uiPrepare.generateUIViews(node, this.configuration, this.screens);
+						
+					//update parent to re-calculate it
+					if (view) {
+
+						//save the id
+						nodeIdsUpdated.push(view.id);
+
+						//prepare parent for re-calculations
+						var parent = view.parent;
+						if (parent) {
+							parent.childrenInOrder = false;
+							parent.sizeLoaded = false;
+						}
+					}
+				}
 			}
 
 			//draw
@@ -146,22 +178,76 @@ WebUI.prototype.start = function(configuration){
 
 WebUI.prototype.listenDomEvents = function(){
 	
-	var self = this;
-	
-	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeInserted", function (event) {
-		self.nodesAdded.push(event.srcElement);
-		self.redraw();
-	}, false);
-	
-	document.getElementsByTagName('BODY')[0].addEventListener("DOMNodeRemoved", function (event) {
-		// self.nodesRemoved.push(event.srcElement);
-		self.parentNodesRemoved.push(event.relatedNode);
-		self.redraw();
-	}, false);
+	var bodyElement = document.getElementsByTagName('BODY')[0];
+	// bodyElement.addEventListener("DOMNodeInserted", function (event) {
+	// 	self.nodesAdded.push(event.srcElement);
+	// 	self.redraw();
+	// }, false);
+
+	// bodyElement.addEventListener("DOMNodeInsertedIntoDocument", function (event) {
+	// 	log(event);
+	// }, false);
+
+	// bodyElement.addEventListener("DOMAttrModified", function (event) {
+	// 	log(event);
+	// }, false);
+
+	// bodyElement.addEventListener("DOMSubtreeModified", function (event) {
+	// 	log(event);
+	// }, false);
+
+	// bodyElement.addEventListener("DOMNodeRemoved", function (event) {
+	// 	// self.nodesRemoved.push(event.srcElement);
+	// 	self.parentNodesRemoved.push(event.relatedNode);
+	// 	self.redraw();
+	// }, false);
 
 	//add event listener for window resize
 	window.removeEventListener("resize", this.resize); 
 	window.addEventListener("resize", this.resize);
+
+	// Options for the observer (which mutations to observe)
+	var config = { attributes: true, childList: true, subtree: true };
+
+	// Callback function to execute when mutations are observed
+	var callback = (function(mutationsList) {
+		for(var mutation of mutationsList) {
+			if (mutation.type == 'childList') {
+
+				for(var i=0; i<mutation.addedNodes.length; i++) {
+					this.nodesAdded.push(mutation.addedNodes[i]);
+				}
+				for(var i=0; i<mutation.removedNodes.length; i++) {
+					this.parentNodesRemoved.push(mutation.target);
+				}
+				this.redraw();
+			}
+			else if (mutation.type == 'attributes') {
+				if (mutation.attributeName == 'data-ui') {
+					console.log(mutation);
+					console.log(this.configuration.attribute);
+					console.log(this.configuration.attributes);
+				}
+				var attributeName = mutation.attributeName;
+				if (attributeName == 'id' || 
+					attributeName == this.configuration.attribute ||
+					this.configuration.attributes.includes(attributeName)) {
+					this.nodesUpdated.push(mutation.target);
+					this.redraw();
+				}
+				if (attributeName == 'style' && mutation.target.style.position == 'relative') {
+					console.log('mutation style relative: ' + mutation.target.id);
+				}
+				
+			}
+		}
+	}).bind(this);
+
+	// Create an observer instance linked to the callback function
+	var observer = new MutationObserver(callback);
+
+	// Start observing the target node for configured mutations
+	observer.observe(bodyElement, config);
 	
 }
 

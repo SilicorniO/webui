@@ -385,7 +385,7 @@ UICore.prototype.applySizeContentVer = function(view){
 	
 	}else if(view.bottom>=0){
 		
-		var ele = document.getElementById(view.id);
+		var ele = view.element;
 		ele.style.width = view.width + 'px';
 		view.heightValue = ele.offsetHeight;
 		
