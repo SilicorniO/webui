@@ -5,11 +5,10 @@
 * @param element where to read data
 * @param {UIView=} parent to assign to the view created
 * @param {UIView=} screen to assign to the view created
-* @param {string=} lastViewId with the identifier of the view before
 * @param {string=} attributeMain with the name of the attribute to read
 * @param {Array<string>=} attributes with the name of the attributes to read as secondary
 **/
-function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
+function UIView(element, parent, screen, attributeMain, attributes){
 
 	this.id = element.id;
 	this.element = element;
@@ -96,7 +95,7 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this.childrenInOrder = false;
 
 	//----- INIT -----
-	this.init(lastViewId, attributeMain, attributes);
+	this.init(attributeMain, attributes);
 
 	//----- Public methods -----
 	this['setWidth'] = this.setWidth;
@@ -123,10 +122,10 @@ function UIView(element, parent, screen, lastViewId, attributeMain, attributes){
 	this['animateNextRefresh'] = this.animateNextRefresh;
 }
 
-UIView.prototype.init = function(lastViewId, attributeMain, attributes) {
+UIView.prototype.init = function(attributeMain, attributes) {
 
 	//initialize
-	this.readUI(this.element, this.parent, lastViewId? lastViewId : "", attributeMain, attributes);
+	this.readUI(this.element, this.parent, attributeMain, attributes);
 
 	//set this instance into the element
 	this.element.ui = this;
@@ -398,12 +397,11 @@ UIView.prototype.toString = function(){
 * Create a view object reading the HTML of the element 
 * @param element where to read data
 * @param parent to assign to the view created
-* @param lastViewId with the identifier of the view before
 * @param attributeMain with the name of the attribute to read
 * @param attributes with the name of the attributes to read as secondary
 * @return View generated
 **/
-UIView.prototype.readUI = function(element, parent, lastViewId, attributeMain, attributes){
+UIView.prototype.readUI = function(element, parent, attributeMain, attributes){
 	
 	//read main attributes
 	var aValues = UIUtilsInstance.readAttributes(element.getAttribute(attributeMain));
@@ -424,13 +422,6 @@ UIView.prototype.readUI = function(element, parent, lastViewId, attributeMain, a
 		
 		var attr = aValues[i].attr;
 		var value = aValues[i].value;
-		
-		// //check if value is a reference to the parent
-		// if(value=='p'){
-		// 	value = parentId;
-		// }else if(value=='l'){
-		// 	value = lastViewId;
-		// }
 					
 		if(attr=='w'){
 			this.setWidth(value);	

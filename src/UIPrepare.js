@@ -263,10 +263,9 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
  * @param {UIView} parent 
  * @param {UIView} screen 
  * @param {UIConfiguration} config 
- * @param {string=} lastViewId the identifier of the last child added with the same parent, used for attribute 'l'
  * @return {UIView} generated view
  */
-UIPrepare.prototype.generateUIView = function(element, parent, screen, config, lastViewId){
+UIPrepare.prototype.generateUIView = function(element, parent, screen, config){
 	
 	//check if has already ui
 	if(element.ui){
@@ -283,7 +282,7 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config, l
 		}
 
 		//create the view and add it to the list of views
-		var view = new UIView(element, parent, screen, lastViewId, config.attribute, config.attributes);
+		var view = new UIView(element, parent, screen, config.attribute, config.attributes);
 		if (view) {
 			//initialize opacity to 0 to show it when it has the position
 			element.style.opacity = '0';
@@ -313,10 +312,9 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config, l
  * @param {UIConfiguration} config 
  * @param {Array<UIView>} aScreens Array of screens where all screens generated are returned
  * @param {*=} parentElement 
- * @param {string=} lastViewId 
  * @return {UIView} generated view
  */
-UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parentElement, lastViewId){
+UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parentElement){
 
 	//initialize array of screens if it is necessary
 	if(!aScreens){
@@ -341,7 +339,7 @@ UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parent
 	}
 
 	//genetate view of this element
-	var view = this.generateUIView(element, parent, screen, config, lastViewId);
+	var view = this.generateUIView(element, parent, screen, config);
 
 	//add the view as a screen if there is not parent
 	if(view && !parent){
@@ -366,5 +364,173 @@ UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parent
 
 	//return the view
 	return view;
+
+}
+
+/**
+ * Add the received nodes to the UI
+ * @param {any} nodesAdded 
+ * @param {array<UIView>} screens 
+ * @param {UIConfiguration} configuration 
+ * @return {number} Count of added nodes
+ */
+UIPrepare.prototype.addNodes = function(nodesAdded, screens, configuration) {
+
+	//counter to know how many nodes were added
+	var countNodesAdded = 0;
+	
+	//when a node is added we have to check the relationship with the rest of views
+	while(nodesAdded.length>0){
+		countNodesAdded += 1;
+		
+		//get first node and remove from list
+		var node = nodesAdded[0];
+		nodesAdded.splice(0,1);
+
+		//1. Search and add UI elements from this node. Adding newscreens to the list
+		this.generateUIViews(node, configuration, screens);
+
+		//get the parent if has one
+		var parentElement = node.parentNode;
+		if(parentElement && parentElement.ui){
+			var parentView = parentElement.ui;
+
+			//2. Order views in parent
+			parentView.childrenInOrder = false;
+
+			//3. Check if parent has size content, to mark it as modified
+			if(parentView.sizeWidth=='sc' || parentView.sizeHeight=='sc'){
+				parentView.sizeLoaded = false;
+			}
+
+		}
+
+	}
+
+	return countNodesAdded;
+}
+
+/**
+ * Update the received nodes because some childre were removed
+ * @param {any} parentNodesRemoved 
+ * @param {array<UIView>} screens 
+ * @param {UIConfiguration} configuration 
+ * @return {number} Count of modified nodes
+ */
+UIPrepare.prototype.removeNodes = function(parentNodesRemoved) {
+
+	//counter to know how many nodes were added
+	var countNodesRemoved = 0;
+	
+	//when a node is removed we have to check the relationship of the parent
+	while(parentNodesRemoved.length>0){
+		countNodesRemoved += 1;
+		
+		//get first node and remove from list
+		var parentNode = parentNodesRemoved[0];
+		parentNodesRemoved.splice(0,1);
+
+		//search the parent view with UI interface
+		var refreshParent = function(node) {
+
+			//check it has UI
+			if(node && node.ui){
+				var view = node.ui;
+
+				//2. Order views in parent
+				view.childrenInOrder = false;
+
+				//3. Check if parent has size content, to mark it as modified
+				if(view.sizeWidth=='sc' || view.sizeHeight=='sc'){
+					view.sizeLoaded = false;
+				}
+				return;
+			} else {
+
+				//search UI in parent
+				var parentNode = node.parentNode;
+				if (parentNode) {
+					refreshParent(parentNode);
+				}
+			}
+
+		}
+		refreshParent(parentNode);				
+	}
+
+	return countNodesRemoved;
+}
+
+/**
+ * Update the received nodes because some childre were removed
+ * @param {any} parentNodesRemoved 
+ * @param {array<UIView>} screens 
+ * @param {UIConfiguration} configuration 
+ * @return {number} Count of modified nodes
+ */
+UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration) {
+
+	//counter to know how many nodes were added
+	var countNodesModified = 0;
+	
+	//when a node is removed we have to check the relationship of the parent
+	var nodeIdsUpdated = [];
+	while(nodesUpdated.length>0){
+		
+		//get first node and remove from list
+		var node = nodesUpdated[0];
+		nodesUpdated.splice(0,1);
+
+		//check this id has not been already updated
+		var view = node.ui;
+		if (!view || !nodeIdsUpdated.includes(view.id)) {
+			countNodesModified += 1;
+
+			//try to generate the UI view
+			if (!view) {
+				view = this.generateUIViews(node, configuration, screens);
+			} else {
+				if (node.id != view.id) {
+					view.id = node.id;
+				}
+				view.clean();
+				view.readUI(view.element, view.parent, "", configuration.attribute, configuration.attributeNames);
+				view.sizeLoaded = false;
+				view.childrenInOrder = false;
+			}
+
+			//connect view with children
+			view.forEachChild( function (child) {
+				
+				//search if the view was in the list of screens to delete it
+				if (child.parent == null) {
+					var screenIndex = screens.indexOf(child);
+					if (screenIndex > -1) {
+						screens.splice(screenIndex, 1);
+					}
+				}
+
+				//assign the parent
+				child.parent = view;
+
+			});
+				
+			//update parent to re-calculate it
+			if (view) {
+
+				//save the id
+				nodeIdsUpdated.push(view.id);
+
+				//prepare parent for re-calculations
+				var parent = view.parent;
+				if (parent) {
+					parent.childrenInOrder = false;
+					parent.sizeLoaded = false;
+				}
+			}
+		}
+	}
+
+	return countNodesModified;
 
 }

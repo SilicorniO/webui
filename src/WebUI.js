@@ -39,97 +39,13 @@ function WebUI(){
 
 		this.redrawTimer.timer((function(){
 
-			//when a node is added we have to check the relationship with the rest of views
-			while(this.nodesAdded.length>0){
-				
-				//get first node and remove from list
-				var node = this.nodesAdded[0];
-				this.nodesAdded.splice(0,1);
+			log(" -- Redraw -- ");
 
-				//1. Search and add UI elements from this node. Adding newscreens to the list
-				this.uiPrepare.generateUIViews(node, this.configuration, this.screens);
-
-				//get the parent if has one
-				var parentElement = node.parentNode;
-				if(parentElement && parentElement.ui){
-					var parentView = parentElement.ui;
-
-					//2. Order views in parent
-					parentView.childrenInOrder = false;
-
-					//3. Check if parent has size content, to mark it as modified
-					if(parentView.sizeWidth=='sc' || parentView.sizeHeight=='sc'){
-						parentView.sizeLoaded = false;
-					}
-
-				}
-			}
-
-			//when a node is removed we have to check the relationship of the parent
-			while(this.parentNodesRemoved.length>0){
-				
-				//get first node and remove from list
-				var parentNode = this.parentNodesRemoved[0];
-				this.parentNodesRemoved.splice(0,1);
-
-				//search the parent view with UI interface
-				var refreshParent = function(node) {
-
-					//check it has UI
-					if(node && node.ui){
-						var view = node.ui;
-	
-						//2. Order views in parent
-						view.childrenInOrder = false;
-	
-						//3. Check if parent has size content, to mark it as modified
-						if(view.sizeWidth=='sc' || view.sizeHeight=='sc'){
-							view.sizeLoaded = false;
-						}
-						return;
-					} else {
-
-						//search UI in parent
-						var parentNode = node.parentNode;
-						if (parentNode) {
-							refreshParent(parentNode);
-						}
-					}
-
-				}
-				refreshParent(parentNode);				
-			}
-
-			//when a node is removed we have to check the relationship of the parent
-			var nodeIdsUpdated = [];
-			while(this.nodesUpdated.length>0){
-				
-				//get first node and remove from list
-				var node = this.nodesUpdated[0];
-				this.nodesUpdated.splice(0,1);
-
-				//check this id has not been already updated
-				if (!node.ui || !nodeIdsUpdated.includes(node.ui.id)) {
-
-					//try to generate the UI view
-					delete node.ui;
-					view = this.uiPrepare.generateUIViews(node, this.configuration, this.screens);
-						
-					//update parent to re-calculate it
-					if (view) {
-
-						//save the id
-						nodeIdsUpdated.push(view.id);
-
-						//prepare parent for re-calculations
-						var parent = view.parent;
-						if (parent) {
-							parent.childrenInOrder = false;
-							parent.sizeLoaded = false;
-						}
-					}
-				}
-			}
+			//prepare nodes
+			var countNodesAdded = this.uiPrepare.addNodes(this.nodesAdded, this.screens, this.configuration);
+			var countNodesRemoved = this.uiPrepare.removeNodes(this.parentNodesRemoved);
+			var countNodesModified = this.uiPrepare.updateNodes(this.nodesUpdated, this.screens, this.configuration);
+			log("Nodes added: " + countNodesAdded + " - Nodes removed: " + countNodesRemoved + " - Nodes modified: " + countNodesModified);
 
 			//draw
 			this.drawScreens();
@@ -223,20 +139,12 @@ WebUI.prototype.listenDomEvents = function(){
 				this.redraw();
 			}
 			else if (mutation.type == 'attributes') {
-				if (mutation.attributeName == 'data-ui') {
-					console.log(mutation);
-					console.log(this.configuration.attribute);
-					console.log(this.configuration.attributes);
-				}
 				var attributeName = mutation.attributeName;
 				if (attributeName == 'id' || 
 					attributeName == this.configuration.attribute ||
 					this.configuration.attributes.includes(attributeName)) {
 					this.nodesUpdated.push(mutation.target);
 					this.redraw();
-				}
-				if (attributeName == 'style' && mutation.target.style.position == 'relative') {
-					console.log('mutation style relative: ' + mutation.target.id);
 				}
 				
 			}
@@ -290,7 +198,7 @@ WebUI.prototype.refresh = function(){
 WebUI.prototype.drawScreens = function(){
     
 	//start genral counter
-	startCounter('all');
+	startCounter('drawScreens');
 
 	//prepare all dom from body for the first time
 	if(this.screens.length==0){
@@ -305,9 +213,21 @@ WebUI.prototype.drawScreens = function(){
 		this.drawUIScreen(this.screens[i]);
 	}
 
+	log("Time drawing screens: " + endCounter('drawScreens'));
 }
 
 WebUI.prototype.drawUIScreen = function(screen){
+
+	//timers variables
+	var timerLoadSizes = 0;
+	var timerOrderViews = 0;
+	var timerPrepare = 0;
+	var timerCore = 0;
+	var timerDraw = 0;
+	var timerAll = 0;
+
+	//start genral counter
+	startCounter('all');
 
 	//---- PREPARE -----
 	startCounter('prepare');
@@ -323,15 +243,14 @@ WebUI.prototype.drawUIScreen = function(screen){
 
 		//load sizes of views
 		this.uiPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged);
-		
-		endCounterLog('loadSizes');
-		startCounter('orderViews');
+		timerLoadSizes = endCounter('loadSizes');
 		
 		//order views
+		startCounter('orderViews');
 		this.uiPrepare.orderViews(screen);
-		
-		endCounterLog('orderViews');
-		endCounterLog('prepare');
+		timerOrderViews = endCounter('orderViews');
+
+		timerPrepare = endCounter('prepare');
 		
 		//---- CORE -----
 		startCounter('core');
@@ -339,7 +258,7 @@ WebUI.prototype.drawUIScreen = function(screen){
 		//assign position and sizes to screen
 		this.uiCore.calculateScreen(screen);
 		
-		endCounterLog('core');
+		timerCore = endCounter('core');
 	}
 				
 	//---- DRAW -----
@@ -352,13 +271,16 @@ WebUI.prototype.drawUIScreen = function(screen){
 	//resize screen if necessary
 	this.uiDraw.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY);
 
-	endCounterLog('draw');
+	timerDraw = endCounter('draw');
 
 	//call to listener with end event
 	this.configuration.sendEndEvent();
 	
 	//end counter
-	endCounterLog('all');
+	timerAll = endCounter('all');
+
+	log("[" + screen.id + "] All: " + timerAll + "ms - Prepare: " + timerPrepare + "ms - Core: " + timerCore + "ms - Draw: " + timerDraw + 
+			"ms - LoadSizes: " + timerLoadSizes + "ms - OrderViews: " + timerOrderViews + "ms");
 }
 
 var WebUIInstance = new WebUI();
