@@ -400,7 +400,7 @@ UIPrepare.prototype.addNodes = function(nodesAdded, screens, configuration) {
 
 			//3. Check if parent has size content, to mark it as modified
 			if(parentView.sizeWidth=='sc' || parentView.sizeHeight=='sc'){
-				parentView.sizeLoaded = false;
+				parentView.cleanSizeLoaded();
 			}
 
 		}
@@ -442,7 +442,7 @@ UIPrepare.prototype.removeNodes = function(parentNodesRemoved) {
 
 				//3. Check if parent has size content, to mark it as modified
 				if(view.sizeWidth=='sc' || view.sizeHeight=='sc'){
-					view.sizeLoaded = false;
+					view.cleanSizeLoaded();
 				}
 				return;
 			} else {
@@ -493,8 +493,8 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 				if (node.id != view.id) {
 					view.id = node.id;
 				}
-				view.clean();
-				view.readUI(view.element, view.parent, "", configuration.attribute, configuration.attributeNames);
+				view.cleanUI();
+				view.readUI(view.element, configuration.attribute, configuration.attributes);
 				view.sizeLoaded = false;
 				view.childrenInOrder = false;
 			}
@@ -525,7 +525,7 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 				var parent = view.parent;
 				if (parent) {
 					parent.childrenInOrder = false;
-					parent.sizeLoaded = false;
+					parent.cleanSizeLoaded();
 				}
 			}
 		}

@@ -125,7 +125,7 @@ function UIView(element, parent, screen, attributeMain, attributes){
 UIView.prototype.init = function(attributeMain, attributes) {
 
 	//initialize
-	this.readUI(this.element, this.parent, attributeMain, attributes);
+	this.readUI(this.element, attributeMain, attributes);
 
 	//set this instance into the element
 	this.element.ui = this;
@@ -266,6 +266,18 @@ UIView.prototype.setVisibility = function(visibility) {
 	this.visibility = visibility;
 }
 
+UIView.prototype.cleanSizeLoaded = function() {
+
+	//clean the sizeLoaded of this view
+	this.sizeLoaded = false;
+
+	//if it has parent and the size depend of children we clean it too
+	if (this.parent != null && 
+		(this.parent.sizeHeight == 'sc' || this.parent.sizeWidth == 'sc') ) {
+		this.parent.cleanSizeLoaded();
+	}
+}
+
 UIView.prototype.hasToBeCalculated = function() {
 	return this.visibility != 'g';
 }
@@ -390,6 +402,43 @@ UIView.prototype.clean = function(){
 	this.height = 0;
 };
 
+UIView.prototype.cleanUI = function() {
+	
+	this.leftLeft = '';
+	this.leftRight = '';
+	this.rightRight = '';
+	this.rightLeft = '';
+	this.topTop = '';
+	this.topBottom = '';
+	this.bottomBottom = '';
+	this.bottomTop = '';
+	
+	this.sizeWidth = 'sc'; //size_content
+	this.sizeHeight = 'sc'; //size_content
+
+	this.widthValue = 0;
+	this.heightValue = 0;
+
+	this.percentWidthPos = 0;
+	this.percentHeightPos = 0;
+
+	this.scrollVertical = false;
+	this.scrollHorizontal = false;
+
+	this.gravityHor = 'n';
+	this.gravityVer = 'n';
+
+	this.marginLeftDimen = "0";
+	this.marginTopDimen = "0";
+	this.marginRightDimen = "0";
+	this.marginBottomDimen = "0";
+
+	this.paddingLeftDimen = "0";
+	this.paddingTopDimen = "0";
+	this.paddingRightDimen = "0";
+	this.paddingBottomDimen = "0";
+}
+
 UIView.prototype.applyDimens = function(coreConfig){
 	
 	this.paddingLeft = coreConfig.getDimen(this.paddingLeftDimen);
@@ -415,12 +464,11 @@ UIView.prototype.toString = function(){
 /**
 * Create a view object reading the HTML of the element 
 * @param element where to read data
-* @param parent to assign to the view created
 * @param attributeMain with the name of the attribute to read
 * @param attributes with the name of the attributes to read as secondary
 * @return View generated
 **/
-UIView.prototype.readUI = function(element, parent, attributeMain, attributes){
+UIView.prototype.readUI = function(element, attributeMain, attributes){
 	
 	//read main attributes
 	var aValues = UIUtilsInstance.readAttributes(element.getAttribute(attributeMain));
@@ -432,9 +480,6 @@ UIView.prototype.readUI = function(element, parent, attributeMain, attributes){
 	if(aValues.length==0){
 		return;
 	}
-
-	//set parent id as empty if it is not received
-	var parentId = parent? parent.id : '';
 		
 	//set the ui values
 	for(var i=0; i<aValues.length; i++){
@@ -534,6 +579,8 @@ UIView.prototype.readUI = function(element, parent, attributeMain, attributes){
 		
 		}else if(attr=='v'){
 			this.setVisibility(value);
+		} else {
+			logW("Attribute unknown: " + attr + " in view " + this.id);
 		}
 	}
 	

@@ -34,10 +34,10 @@ UICore.prototype.calculateScreen = function(screen){
     }while(viewsRestored.length>0);
 }
 
-UICore.prototype.calculateViewsHor = function(views, parentView, arrayViews, indexes, height, viewsRestored){
+UICore.prototype.calculateViewsHor = function(views, parentView, arrayViews, indexes, width, viewsRestored){
 	for(var i=0; i<views.length; i++){
 		if (views[i].hasToBeCalculated()) {
-			this.calculateViewHor(views[i], parentView, arrayViews, indexes, height, viewsRestored);
+			this.calculateViewHor(views[i], parentView, arrayViews, indexes, width, viewsRestored);
 		}
 	}
 }
