@@ -271,7 +271,26 @@ UIView.prototype.hasToBeCalculated = function() {
 }
 
 UIView.prototype.animateNextRefresh = function(animationDuration) {
+	// this.animationDurations.push(animationDuration);
+
+	//animate all views from parent
+	if (this.parent) {
+		this.parent.animateDependencies(animationDuration);
+	} else {
+		this.animateDependencies(animationDuration);
+	}
+}
+
+UIView.prototype.animateDependencies = function(animationDuration) {
+
+	//animate this
 	this.animationDurations.push(animationDuration);
+	
+	//animate children
+	this.forEachChild(function(child) {
+		child.animateDependencies(animationDuration);
+	});
+
 }
 			
 UIView.prototype.getReferences = function(){ return [this.leftLeft, this.leftRight, this.rightRight, this.rightLeft, this.topTop, this.topBottom, this.bottomBottom, this.bottomTop];};

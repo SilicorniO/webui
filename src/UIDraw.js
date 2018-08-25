@@ -51,6 +51,20 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
         if(ele.childElementCount>0){
             ele.style.padding = "0px";
         }
+
+        //apply animation
+        if (view.animationDurations.length > 0) {
+            ele.style.transition = "all " + view.animationDurations[0] + "s ease 0s";
+            ele.ui.animationDurations.splice(0, 1);
+
+            //remove transition after the end of the animation
+            var endTranstion = function (event) {
+                log(event);
+                ele.style.transition = '';
+                ele.removeEventListener("transitionend", endTranstion)
+            };
+            ele.addEventListener("transitionend", endTranstion);
+        }
 		
         //set location
         var left = parseInt(view.left, 10);
@@ -66,20 +80,6 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
 			ele.style.height = height + "px";
         }
         ele.style.position = "absolute";
-
-        //apply animation
-        if (view.animationDurations.length > 0) {
-            ele.style.transition = "all " + view.animationDurations[0] + "s ease 0s";
-            ele.ui.animationDurations.splice(0, 1);
-
-            //remove transition after the end of the animation
-            var endTranstion = function (event) {
-                log(event);
-                ele.style.transition = '';
-                ele.removeEventListener("transitionend", endTranstion)
-            };
-            ele.addEventListener("transitionend", endTranstion);
-        }
         
         if(view.left+view.width>maxX){
             maxX = view.left+view.width;
@@ -117,22 +117,25 @@ UIDraw.prototype.applyVisibility = function(view, parentView, configuration, for
     var ele = view.element;
 
     //hide view if visibility is gone
+    var opacityOld = parseInt(ele.style.opacity, 10);
+    var opacityNow = opacityOld;
     if (view.visibility == 'g' || forceGone) {
         ele.style.display = "none";  
-        ele.style.opacity = '0';
+        opacityNow = 0;
     } else {
         ele.style.display = "inline-block";
         if (view.visibility == 'i' || (parentView && parentView.visibility == 'i') ) {
             // ele.style.visibility = "hidden";
-            ele.style.opacity = '0';
+            opacityNow = 0;
         } else {
             // ele.style.visibility = "visible";
-            ele.style.opacity = '1';
+            opacityNow = 1;
         }
     }
-    if (configuration.animations.defaultOpacity) {
+    if (configuration.animations.defaultOpacity && opacityNow != opacityOld) {
         ele.style.transition = "opacity " + configuration.animations.defaultTime + "s ease 0s";
     }
+    ele.style.opacity = opacityNow;
 
 	view.forEachChild((function(childView){
 		this.applyVisibility(childView, view, configuration, ele.style.display == "none");
