@@ -214,10 +214,10 @@ WebUI.prototype.drawUIScreen = function(screen){
 	//call to listener with start event
 	this.configuration.sendStartEvent();
 
-	//update the size of the screen
-	var screenSizeChanged = this.uiPrepare.loadSizeScreen(screen);
-	
 	if (screen.hasToBeCalculated()) {
+
+		//update the size of the screen
+		var screenSizeChanged = this.uiPrepare.loadSizeScreen(screen);
 
 		//load sizes of views
 		this.uiPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged);

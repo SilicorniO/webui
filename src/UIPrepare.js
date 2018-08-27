@@ -215,6 +215,11 @@ UIPrepare.prototype.loadSizeScreen = function(screen){
 	var ele = screen.element;
 	ele.style.position = 'absolute';
 
+	//show view if it is not visible
+	if (ele.style.display == "none") {
+		ele.style.display = "inline-block";
+	}
+
 	//apply width and height if they are defined
 	if(screen.sizeWidth!="sc"){
 		

@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html height="100%">
+<html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="../src/utils/UIRedrawTimer.js"></script>
@@ -14,19 +13,15 @@
     <script type="text/javascript" src="../src/UICore.js"></script>
     <script type="text/javascript" src="../src/WebUI.js"></script>
 </head>
-<body id="body" style="margin:0">
+<body style="margin:0">
     
-    <div id="main" ui="fw;fh">
-    
-        <div id="layer1" ui="fw;fh;">
-            <div id="layer1sub" ui="fw;h:150">
-                <span id="layer1SubText" ui="">test DOCTYPE HTML</span>
-            </div>
+    <div ui="fw;fh" id="screen">
+        <div ui="pb:10;pr:10" id="parent">
+            <div id="someLines" ui="w:300">Text in some lines</div>
+            <div id="center" ui="ab:l;gh:c">Text center in parent</div>
+            <div id="right" ui="ab:l;r:p">Text at right of parent without size</div>
+            <div id="full width" ui="ab:l;l:p;r:p">Text full width</div>
         </div>
-            
-        <div id="layer2" class="popup" ui="fw;fh;v:v">
-        </div>
-        
     </div>
 
     <script>
@@ -35,7 +30,7 @@
         showLogs: true,
         viewLogs: 'logs'
     });
-    
+
     </script>
     
 </body>

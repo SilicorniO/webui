@@ -23,6 +23,11 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
     var paddingTop = 0;
     var paddingBottom = 0;
 
+    //apply view color if activated 
+    if(viewColors){
+        parentView.element.style.backgroundColor = this.generateRandomViewColor();
+    }
+
 	parentView.forEachChild((function(view){
 		var ele = view.element;
 		
@@ -88,11 +93,6 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
 			maxY = view.top+view.height;
 		}
         
-        //apply view color if activated 
-        if(viewColors){
-            ele.style.backgroundColor = this.generateRandomViewColor();
-        }
-		
         var childrenSize = this.applyPositions(view, viewColors);
         if(childrenSize.maxX>maxX){
             maxX = childrenSize.maxX;

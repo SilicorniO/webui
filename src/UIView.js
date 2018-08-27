@@ -387,20 +387,27 @@ UIView.prototype.getPreviousView = function() {
 } 
 		
 UIView.prototype.clean = function(){
-	
-	this.leftChanged = false;
-	this.topChanged = false;
-	this.rightChanged = false;
-	this.bottomChanged = false;
-	
-	this.left = 0;
-	this.top = 0;
-	this.right = 0;
-	this.bottom = 0;
-
-	this.width = 0;
-	this.height = 0;
+	this.cleanHor();
+	this.cleanVer();
 };
+
+UIView.prototype.cleanHor = function(){
+	this.leftChanged = false;
+	this.rightChanged = false;
+
+	this.left = 0;
+	this.right = 0;
+	this.width = 0;
+}
+
+UIView.prototype.cleanVer = function(){
+	this.topChanged = false;
+	this.bottomChanged = false;
+
+	this.top = 0;
+	this.bottom = 0;
+	this.height = 0;
+}
 
 UIView.prototype.cleanUI = function() {
 	
@@ -601,7 +608,7 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 			break;
 		}
 	}
-	if (!refsHor) {
+	if (!refsHor && this.gravityHor!='c') {
 		this.setLeft('p');
 	}
 
@@ -613,7 +620,7 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 			break;
 		}
 	}
-	if (!refsVer) {
+	if (!refsVer && this.gravityVer!='c') {
 		this.setTop('p');
 	}
 
