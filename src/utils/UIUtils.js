@@ -35,3 +35,36 @@ UIUtils.prototype.readAttributes = function(text){
 	//return array of attr-values
 	return aAttributes;
 }
+
+/**
+ * From the given node get the previous UIScreen if there was one
+ * @param {*} node
+ * @return {UIView} previous screen
+ */
+UIUtils.prototype.getPreviousUIScreen = function(node) {
+	var prevView = this.getPreviousUIView(node);
+	if (prevView != null && prevView.screen) {
+		return prevView.screen;
+	} else {
+		return prevView;
+	}
+}
+
+/**
+ * From the given node get the previous UIView if there was one
+ * @param {*} node 
+ * @return {UIView} previous UIView
+ */
+UIUtils.prototype.getPreviousUIView = function(node) {
+
+	if (node.ui) {
+		return node.ui;
+	}
+
+	if (node.parentNode) {
+		return this.getPreviousUIView(node.parentNode);
+	} else {
+		return null;
+	}
+
+}

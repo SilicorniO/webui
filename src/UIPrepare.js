@@ -311,10 +311,11 @@ UIPrepare.prototype.generateUIView = function(element, parent, screen, config){
  * @param {*} element Node element to start to search
  * @param {UIConfiguration} config 
  * @param {Array<UIView>} aScreens Array of screens where all screens generated are returned
+ * @param {UIView} parentScreen of this view 
  * @param {*=} parentElement 
  * @return {UIView} generated view
  */
-UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parentElement){
+UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parentScreen, parentElement){
 
 	//initialize array of screens if it is necessary
 	if(!aScreens){
@@ -343,7 +344,16 @@ UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parent
 
 	//add the view as a screen if there is not parent
 	if(view && !parent){
-		aScreens.push(view);
+
+		//calculate the position where to add the screen
+		var index = aScreens.length;
+		if (parentScreen) {
+			index = aScreens.indexOf(parentScreen);
+		}
+
+		//add the screen in the selected position
+		aScreens.splice(index, 0, view);
+		parentScreen = view;
 
 		//set the position as relative because the children will be absolute
 		element.style.position = "relative";
@@ -354,7 +364,7 @@ UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parent
 	for(var i=0; i<element.childNodes.length; i++){
 		var childElement = element.childNodes[i];
 
-		var childView = this.generateUIViews(childElement, config, aScreens, element, lastChildId);
+		var childView = this.generateUIViews(childElement, config, aScreens, parentScreen, element);
 
 		//update the identifier of the last child if it is a ui node
 		if(childView){
@@ -387,8 +397,11 @@ UIPrepare.prototype.addNodes = function(nodesAdded, screens, configuration) {
 		var node = nodesAdded[0];
 		nodesAdded.splice(0,1);
 
+		//get the previous screen 
+		var parentScreen = UIUtilsInstance.getPreviousUIScreen(node);
+
 		//1. Search and add UI elements from this node. Adding newscreens to the list
-		this.generateUIViews(node, configuration, screens);
+		this.generateUIViews(node, configuration, screens, parentScreen);
 
 		//get the parent if has one
 		var parentElement = node.parentNode;
@@ -488,7 +501,11 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 
 			//try to generate the UI view
 			if (!view) {
-				view = this.generateUIViews(node, configuration, screens);
+
+				//get the previous screen 
+				var parentScreen = UIUtilsInstance.getPreviousUIScreen(node);
+
+				view = this.generateUIViews(node, configuration, screens, parentScreen);
 			} else {
 				if (node.id != view.id) {
 					view.id = node.id;

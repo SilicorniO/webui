@@ -181,7 +181,7 @@ WebUI.prototype.drawScreens = function(){
 	//prepare all dom from body for the first time
 	if(this.screens.length==0){
 		var bodyElement = document.getElementsByTagName("BODY")[0];
-		this.uiPrepare.generateUIViews(bodyElement, this.configuration, this.screens);
+		this.uiPrepare.generateUIViews(bodyElement, this.configuration, this.screens, null);
 	}
 	
 	//draw all screens
