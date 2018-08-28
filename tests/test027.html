@@ -15,27 +15,19 @@
 </head>
 <body style="margin:0">
     
-        <div id="screen" ui="s;w:100%">
-            <div id="item1" ui="ab:l">Item list 1</div>
-            <div id="item2" ui="ab:l">Item list 2</div>
-            <div id="item3" ui="ab:l">Item list 3</div>
-            <div id="item4" ui="ab:l">Item list 4</div>
-            <div id="item5" ui="ab:l">Item list 5</div>
-            <div id="item6" ui="abe:l">Item list 6</div>
+    <div ui="fw;fh" id="screen">
+        <div ui="w:50%;p:20" id="parent">
+            <span ui="fw">full width with padding</span>
         </div>
-    
+    </div>
+
     <script>
     WebUI.start({
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs',
-        dimens: {
-            ms: 10, 	//margin small
-            mm: 20, 	//margin medium
-            mb: 100 	//margin big
-        },
+        viewLogs: 'logs'
     });
-    
+
     </script>
     
 </body>

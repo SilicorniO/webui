@@ -45,12 +45,20 @@ UICore.prototype.calculateViewsHor = function(views, parentView, arrayViews, ind
 UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, indexes, width, viewsRestored){
 		
 	//eval references to try to calculate the width
+	var numDependencies = 0;
 	var references = view.getReferencesHor();
 	for(var n=0; n<references.length; n++){
 		var dependency = this.calculateViewDependency(view, references[n], parentView);
 		if(dependency.length>0){
 			this.evalDependenceHor(view, parentView, width, n, arrayViews[indexes[dependency]]);
+			numDependencies += 1;
 		}
+	}
+
+	//set left parent if there is not horizontal dependencies
+	if (numDependencies == 0 && view.gravityHor != 'c') {
+		view.left = 0;
+		view.leftChanged = true;
 	}
 	
 	//calculate width
@@ -150,6 +158,12 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 			this.evalDependenceVer(view, parentView, height, n, arrayViews[indexes[dependency]]);
 		}
 	}
+
+	//set top parent if there is not vertical dependencies
+	if (!view.topChanged && !view.bottomChanged && view.gravityVer != 'c') {
+		view.top = 0;
+		view.topChanged = true;
+	}
 	
 	//calculate height
 	if(view.sizeHeight=='s'){
@@ -231,8 +245,15 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 }
 
 UICore.prototype.assignSizeHor = function(view, width){
-	if(view.right>width && width>0){
-		view.right = width;	
+
+	//if parent has size we force the space to the parent
+	if (width>0) {
+		if(view.right>width){
+			view.right = width;	
+		}
+		if(view.left<0) {
+			view.left = 0;
+		}
 	}
 	view.width = view.right - view.left;
 }
@@ -362,10 +383,10 @@ UICore.prototype.applySizeContentHor = function(view){
 		
 	//if the size depends of children, calculate the position of children
 	if(view.rightChanged){
-		if (view.right > 0) {
+		// if (view.right > 0) {
 			view.left = view.right - view.widthValue;
 			view.leftChanged = true;
-		}
+		// }
 	
 	}else if (view.leftChanged) {
 		view.right = view.left + view.widthValue;
@@ -410,27 +431,52 @@ UICore.prototype.applySizeContentVer = function(view){
 **/
 UICore.prototype.applySizeChildrenHor = function(view, arrayViews, indexes, viewsRestored){
 	
+	var minX = 0;
 	var maxX = 0;
 	view.forEachChild(function(child, index){
-		if(child.right > maxX && child.width > 0){
-			maxX = child.right;
+		if (child.width > 0) {
+			if(child.right > maxX) {
+				maxX = child.right;
+			} else if(child.left < minX) {
+				minX = child.left;
+			}
 		}
 	});
+	var widthChildren = maxX - minX;
+
+	//if no size it is becase there is any child with fixed size, so we get the bigger child
+	if (widthChildren == 0) {
+		view.forEachChild(function(child){
+			if(child.widthValue > widthChildren){
+				widthChildren = child.widthValue;
+			}
+		});
+	} else if (minX < 0) {
+		//move all the children to positive values
+		view.forEachChild(function(child, index){
+			if (child.leftChanged && child.rightChanged && child.width) {
+				child.left += -minX;
+				child.right += -minX;
+			}
+		});
+	}
+
 	if(view.rightChanged){
-		view.left = view.right - maxX - view.paddingLeft;
+		view.left = view.right - widthChildren - view.paddingLeft;
 		view.leftChanged = true;
 	}else{
-		view.right = view.left + maxX + view.paddingRight;
+		view.right = view.left + widthChildren + view.paddingRight;
 		view.rightChanged = true;
 		view.leftChanged = true;
 	}
+	view.width = view.right - view.left;
 	
 	//apply width of children if they were waiting to have the parent size
 	//this is used for r:p and parent has no size defined
 	view.forEachChild((child) => {
 		if (!child.leftChanged || !child.rightChanged || child.width<=0) {
 			child.cleanHor();
-			this.calculateViewHor(child, view, arrayViews, indexes, maxX, viewsRestored);
+			this.calculateViewHor(child, view, arrayViews, indexes, widthChildren, viewsRestored);
 		}
 	});
 
@@ -448,6 +494,16 @@ UICore.prototype.applySizeChildrenVer = function(view, arrayViews, indexes, view
 			maxY = child.bottom;
 		}
 	});
+
+	//if no size it is becase there is any child with fixed size, so we get the bigger child
+	if (maxY == 0) {
+		view.forEachChild(function(child){
+			if(child.heightValue > maxY){
+				maxY = child.heightValue;
+			}
+		});
+	}
+
 	if(view.bottomChanged){
 		view.top = view.bottom - maxY - view.paddingTop;
 		view.topChanged = true;
@@ -455,6 +511,7 @@ UICore.prototype.applySizeChildrenVer = function(view, arrayViews, indexes, view
 		view.bottom = view.top + maxY + view.paddingBottom;
 		view.bottomChanged = true;
 	}
+	view.height = view.bottom - view.top;
 	
 	//apply height of children if they were waiting to have the parent size
 	//this is used for b:p and parent has no size defined
@@ -538,8 +595,8 @@ UICore.prototype.assignGravityHor = function(view, width){
 			view.left = view.right - view.width;
 		}else if(view.gravityHor=='c' && width > 0){
 			var viewWidth = view.width > 0 ? view.width : view.widthValue;
-			view.left = (width - viewWidth) / 2;
-			view.right = view.left + viewWidth;
+			view.left = Math.max(0, (width - viewWidth) / 2);
+			view.right = Math.min(width, view.left + viewWidth);
 			view.leftChanged = true;
 			view.rightChanged = true;
 			view.width = view.right - view.left;
@@ -655,6 +712,7 @@ UICore.prototype.evalDependenceHor = function(view, parentView, width, iReferenc
 				view.right = width;
 			}else{
 				view.right = 0;
+				break;
 			}
 		}else{
 			view.right = viewDependency.rightChanged? viewDependency.right : viewDependency.left + viewDependency.width;

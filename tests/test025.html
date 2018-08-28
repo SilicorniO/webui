@@ -15,27 +15,22 @@
 </head>
 <body style="margin:0">
     
-        <div id="screen" ui="s;w:100%">
-            <div id="item1" ui="ab:l">Item list 1</div>
-            <div id="item2" ui="ab:l">Item list 2</div>
-            <div id="item3" ui="ab:l">Item list 3</div>
-            <div id="item4" ui="ab:l">Item list 4</div>
-            <div id="item5" ui="ab:l">Item list 5</div>
-            <div id="item6" ui="abe:l">Item list 6</div>
+    <div ui="fw" id="screen">
+        <div ui="pb:10;pr:10" id="parent">
+            <div id="center" ui="ar:l;gv:c">Text center in parent</div>
+            <div id="bottom" ui="l:l;b:p">Text at bottom of parent without size</div>
+            <div id="sizeparent" ui="ar:l;t:p;b:p">Text height parent</div>
+            <div id="fh" ui="ar:l;fh">Text full height</div>
         </div>
-    
+    </div>
+
     <script>
     WebUI.start({
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs',
-        dimens: {
-            ms: 10, 	//margin small
-            mm: 20, 	//margin medium
-            mb: 100 	//margin big
-        },
+        viewLogs: 'logs'
     });
-    
+
     </script>
     
 </body>
