@@ -44,8 +44,8 @@ function UIView(element, parent, screen, attributeMain, attributes){
 	this.scrollVertical = false;
 	this.scrollHorizontal = false;
 
-	this.gravityHor = 'n';
-	this.gravityVer = 'n';
+	this.centerHor = false;
+	this.centerVer = false;
 
 	this.marginLeftDimen = "0";
 	this.marginTopDimen = "0";
@@ -100,24 +100,32 @@ function UIView(element, parent, screen, attributeMain, attributes){
 	//----- Public methods -----
 	this['setWidth'] = this.setWidth;
 	this['setHeight'] = this.setHeight;
+	
 	this['setLeft'] = this.setLeft;
 	this['setRight'] = this.setRight;
 	this['setTop'] = this.setTop;
 	this['setBottom'] = this.setBottom;
+
 	this['setAtLeft'] = this.setAtLeft;
 	this['setAtRight'] = this.setAtRight;
 	this['setAtTop'] = this.setAtTop;
 	this['setAtBottom'] = this.setAtBottom;
+	
+	this['setCenterHorizontal'] = this.setCenterHorizontal;
+	this['setCenterVertical'] = this.setCenterVertical;
+
 	this['setMarginLeft'] = this.setMarginLeft;
 	this['setMarginRight'] = this.setMarginRight;
 	this['setMarginTop'] = this.setMarginTop;
 	this['setMarginBottom'] = this.setMarginBottom;
 	this['setMargins'] = this.setMargins;
+	
 	this['setPaddingLeft'] = this.setPaddingLeft;
 	this['setPaddingRight'] = this.setPaddingRight;
 	this['setPaddingTop'] = this.setPaddingTop;
 	this['setPaddingBottom'] = this.setPaddingBottom;
 	this['setPaddings'] = this.setPaddings;
+	
 	this['setVisibility'] = this.setVisibility;
 	this['animateNextRefresh'] = this.animateNextRefresh;
 }
@@ -203,12 +211,12 @@ UIView.prototype.setAtBottom = function(id){
 		
 UIView.prototype.setScrollVertical = function(id){this.scrollVertical = id};
 UIView.prototype.setScrollHorizontal = function(id){this.scrollHorizontal = id};
-		
-UIView.prototype.setGravityHorizontal = function(gravity){ this.gravityHor = gravity};
-UIView.prototype.setGravityVertical = function(gravity){ this.gravityVer = gravity};
-UIView.prototype.setGravity = function(gravityHor, gravityVer){ 
-	this.gravityHor = gravityHor,
-	this.gravityVer = gravityVer
+
+UIView.prototype.setCenterVertical = function(value){
+	this.centerVer = value
+}
+UIView.prototype.setCenterHorizontal = function(value){
+	this.centerHor = value
 }
 		
 UIView.prototype.setMarginLeft = function(margin){
@@ -432,8 +440,8 @@ UIView.prototype.cleanUI = function() {
 	this.scrollVertical = false;
 	this.scrollHorizontal = false;
 
-	this.gravityHor = 'n';
-	this.gravityVer = 'n';
+	this.centerHor = false;
+	this.centerVer = false;
 
 	this.marginLeftDimen = "0";
 	this.marginTopDimen = "0";
@@ -564,15 +572,14 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 			}else if(pValues.length==4){
 				this.setPaddings(pValues[0], pValues[1], pValues[2], pValues[3]);
 			}
-		}else if(attr=='gh'){
-			this.setGravityHorizontal(value);
-		}else if(attr=='gv'){
-			this.setGravityVertical(value);
-		}else if(attr=='g'){
-			var gValues = value.split(',');
-			if(gValues.length==2){
-				this.setGravity(gValues[0], gValues[1]);
-			}
+		} else if (attr == 'cv') {
+			this.setCenterVertical(true);
+		} else if (attr == 'ch') {
+			this.setCenterHorizontal(true);
+		} else if (attr == 'c') {
+			this.setCenterVertical(true);
+			this.setCenterHorizontal(true);
+
 		}else if(attr=='cui'){
 			if(value=='n'){
 				this.childrenUI = false;
@@ -608,7 +615,7 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 			break;
 		}
 	}
-	if (!refsHor && this.gravityHor!='c') {
+	if (!refsHor && !this.centerHor) {
 		this.setLeft('p');
 	}
 
@@ -620,7 +627,7 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 			break;
 		}
 	}
-	if (!refsVer && this.gravityVer!='c') {
+	if (!refsVer && !this.centerVer) {
 		this.setTop('p');
 	}
 

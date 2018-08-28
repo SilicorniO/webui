@@ -221,9 +221,9 @@ You can define the position of your webui-view with short commands inside the "u
  * pt - Padding top: (X) Add space inside the view at the top where X is the number of pixels.
  * pb - Padding bottom: (X) Add space inside the view at the bottom where X is the number of pixels.
  * p - Padding: (X / X,Y,W,Z) Add space inside the view at all directions. The order is: Left, Top, Right, Bottom. X, Y, W, Z are the number of pixels.
- * gh - Gravity horizontal: ("n") to not set gravity. ("l") to set the left side of the view at the left of the parent. ("r") to set the right side of the view at the right of the parent. ("c") to show the view in the center of the parent.
- * gv - Gravity vertical: ("n") to not set gravity. ("t") to set the top side of the view at the top of the parent. ("b") to set the bottom side of the view at the bottom of the parent. ("c") to show the view in the center of the parent.
- * g - Gravity: (X, Y) where X is the gravity horizontal and Y is the gravity vertical.
+ * ch - Center horizontal: Set the view in the center of the parent horizontally.
+ * cv - Center vertical: Set the view in the center of the parent vertically.
+ * c - Center: Set the view in the center of the parent.
  * cui - Children ui: ("n") If you don't want to process the children of the view although they have "ui" attribute.
  * sv - Scroll vertical: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
  * sh - Scroll horizontal: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
@@ -305,6 +305,8 @@ The functions at the moment are:
 * setAtRight(id)
 * setAtTop(id)
 * setAtBottom(id)
+* setCenterHorizontal(boolean)
+* setCenterVertical(boolean)
 * setMarginLeft(margin)
 * setMarginRight(margin)
 * setMarginTop(margin)

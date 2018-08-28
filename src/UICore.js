@@ -56,7 +56,7 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 	}
 
 	//set left parent if there is not horizontal dependencies
-	if (numDependencies == 0 && view.gravityHor != 'c') {
+	if (numDependencies == 0 && !view.centerHor) {
 		view.left = 0;
 		view.leftChanged = true;
 	}
@@ -84,7 +84,7 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 		this.assignSizeHor(view, width);
 		
 		//check gravity
-		this.assignGravityHor(view, width);
+		this.assignCenterHor(view, width);
 	
 		//if there are children we eval them with width restrictions
 		if(view.childrenOrderHor.length>0){
@@ -124,7 +124,7 @@ UICore.prototype.calculateViewHor = function(view, parentView, arrayViews, index
 		this.assignSizeHor(view, width);
 						
 		//check gravity
-		this.assignGravityHor(view, width);
+		this.assignCenterHor(view, width);
 				
 	}
 	
@@ -162,7 +162,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 	}
 
 	//set top parent if there is not vertical dependencies
-	if (numDependencies == 0 && view.gravityVer != 'c') {
+	if (numDependencies == 0 && !view.centerVer) {
 		view.top = 0;
 		view.topChanged = true;
 	}
@@ -190,7 +190,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 		this.assignSizeVer(view, height);
 		
 		//check gravity
-		this.assignGravityVer(view, height);
+		this.assignCenterVer(view, height);
 	
 		//if there are children we eval them with width restrictions
 		if(view.childrenOrderVer.length>0){
@@ -231,7 +231,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 		this.assignSizeVer(view, height);
 		
 		//check gravity
-		this.assignGravityVer(view, height);
+		this.assignCenterVer(view, height);
 	}
 			
 	//check if size of children if bigger than container to add vertical scroll
@@ -423,7 +423,7 @@ UICore.prototype.applySizeContentVer = function(view){
 		view.bottom = view.top + view.heightValue;		
 		view.bottomChanged = true;
 	
-	} else if (view.gravityVer == 'c') {
+	} else if (view.centerVer) {
 		var ele = view.element;
 		ele.style.width = view.width + 'px';
 		view.heightValue = ele.offsetHeight;
@@ -602,24 +602,16 @@ UICore.prototype.applyPercentVer = function(view, parentView, height){
 * @param view View to get and change values
 * @param width int
 **/
-UICore.prototype.assignGravityHor = function(view, width){
+UICore.prototype.assignCenterHor = function(view, width){
 	
 	//horizontal
-	if(view.gravityHor!='n'){
-		if(view.gravityHor=='l'){
-			view.left = 0;
-			view.leftChanged = true;
-		}else if(view.gravityHor=='r' && width > 0){
-			view.right = width;
-			view.left = view.right - view.width;
-		}else if(view.gravityHor=='c' && width > 0){
-			var viewWidth = view.width > 0 ? view.width : view.widthValue;
-			view.left = Math.max(0, (width - viewWidth) / 2);
-			view.right = Math.min(width, view.left + viewWidth);
-			view.leftChanged = true;
-			view.rightChanged = true;
-			view.width = view.right - view.left;
-		}
+	if(view.centerHor && width > 0){
+		var viewWidth = view.width > 0 ? view.width : view.widthValue;
+		view.left = Math.max(0, (width - viewWidth) / 2);
+		view.right = Math.min(width, view.left + viewWidth);
+		view.leftChanged = true;
+		view.rightChanged = true;
+		view.width = view.right - view.left;
 	}
 	
 }
@@ -629,24 +621,16 @@ UICore.prototype.assignGravityHor = function(view, width){
 * @param view View to get and change values
 * @param height int
 **/
-UICore.prototype.assignGravityVer = function(view, height){
+UICore.prototype.assignCenterVer = function(view, height){
 	
 	//horizontal
-	if(view.gravityVer!='n'){
-		if(view.gravityVer=='t'){
-			view.top = 0;
-			view.topChanged = true;
-		}else if(view.gravityVer=='b' && height > 0){
-			view.bottom = height;
-			view.top = view.bottom - view.height;
-		}else if(view.gravityVer=='c' && height > 0){
-			var viewHeight = view.height > 0 ? view.height : view.heightValue;
-			view.top = Math.max(0, (height - viewHeight) / 2);
-			view.bottom = Math.min(height, view.top + viewHeight);
-			view.topChanged = true;
-			view.bottomChanged = true;
-			view.height = view.bottom - view.top;
-		}
+	if(view.centerVer && height > 0){
+		var viewHeight = view.height > 0 ? view.height : view.heightValue;
+		view.top = Math.max(0, (height - viewHeight) / 2);
+		view.bottom = Math.min(height, view.top + viewHeight);
+		view.topChanged = true;
+		view.bottomChanged = true;
+		view.height = view.bottom - view.top;
 	}
 	
 }
