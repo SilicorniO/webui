@@ -151,16 +151,18 @@ UICore.prototype.calculateViewsVer = function(views, parentView, arrayViews, ind
 UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, indexes, height, viewsRestored){
     
 	//eval references to try to calculate the height
+	var numDependencies = 0;
 	var references = view.getReferencesVer();
 	for(var n=0; n<references.length; n++){
 		var dependency = this.calculateViewDependency(view, references[n], parentView);
 		if(dependency.length>0){
 			this.evalDependenceVer(view, parentView, height, n, arrayViews[indexes[dependency]]);
+			numDependencies += 1;
 		}
 	}
 
 	//set top parent if there is not vertical dependencies
-	if (!view.topChanged && !view.bottomChanged && view.gravityVer != 'c') {
+	if (numDependencies == 0 && view.gravityVer != 'c') {
 		view.top = 0;
 		view.topChanged = true;
 	}
@@ -247,7 +249,7 @@ UICore.prototype.calculateViewVer = function(view, parentView, arrayViews, index
 UICore.prototype.assignSizeHor = function(view, width){
 
 	//if parent has size we force the space to the parent
-	if (width>0) {
+	if (width > 0) {
 		if(view.right>width){
 			view.right = width;	
 		}
@@ -259,8 +261,15 @@ UICore.prototype.assignSizeHor = function(view, width){
 }
 
 UICore.prototype.assignSizeVer = function(view, height){
-	if(view.bottom>height && height>0){
-		view.bottom = height;
+
+	//if parent has size we force the space to the parent
+	if (height > 0) {
+		if (view.bottom>height){
+			view.bottom = height;
+		}
+		if (view.top < 0) {
+			view.top = 0;
+		}
 	}
 	view.height = view.bottom - view.top;
 }
@@ -383,10 +392,8 @@ UICore.prototype.applySizeContentHor = function(view){
 		
 	//if the size depends of children, calculate the position of children
 	if(view.rightChanged){
-		// if (view.right > 0) {
-			view.left = view.right - view.widthValue;
-			view.leftChanged = true;
-		// }
+		view.left = view.right - view.widthValue;
+		view.leftChanged = true;
 	
 	}else if (view.leftChanged) {
 		view.right = view.left + view.widthValue;
@@ -404,10 +411,8 @@ UICore.prototype.applySizeContentVer = function(view){
 	
 	//if the size depends of children, calculate the position of children
 	if(view.bottomChanged){
-		if (view.bottom > 0) {
-			view.top = view.bottom - view.heightValue;
-			view.topChanged = true;
-		}
+		view.top = view.bottom - view.heightValue;
+		view.topChanged = true;
 	
 	} else if (view.topChanged) {
 		
@@ -453,8 +458,8 @@ UICore.prototype.applySizeChildrenHor = function(view, arrayViews, indexes, view
 		});
 	} else if (minX < 0) {
 		//move all the children to positive values
-		view.forEachChild(function(child, index){
-			if (child.leftChanged && child.rightChanged && child.width) {
+		view.forEachChild(function(child){
+			if (child.leftChanged && child.rightChanged && child.width > 0) {
 				child.left += -minX;
 				child.right += -minX;
 			}
@@ -488,27 +493,41 @@ UICore.prototype.applySizeChildrenHor = function(view, arrayViews, indexes, view
 **/
 UICore.prototype.applySizeChildrenVer = function(view, arrayViews, indexes, viewsRestored){
 	
+	var minY = 0;
 	var maxY = 0;
 	view.forEachChild(function(child){
-		if(child.bottom > maxY && child.height > 0){
-			maxY = child.bottom;
+		if (child.height > 0) {
+			if(child.bottom > maxY) {
+				maxY = child.bottom;
+			} else if(child.top < minY) {
+				minY = child.top;
+			}
 		}
 	});
+	var heightChildren = maxY - minY;
 
 	//if no size it is becase there is any child with fixed size, so we get the bigger child
-	if (maxY == 0) {
+	if (heightChildren == 0) {
 		view.forEachChild(function(child){
-			if(child.heightValue > maxY){
-				maxY = child.heightValue;
+			if(child.heightValue > heightChildren){
+				heightChildren = child.heightValue;
+			}
+		});
+	} else if (minY < 0) {
+		//move all the children to positive values
+		view.forEachChild(function(child){
+			if (child.topChanged && child.bottomChanged && child.height > 0) {
+				child.left += -minY;
+				child.right += -minY;
 			}
 		});
 	}
 
 	if(view.bottomChanged){
-		view.top = view.bottom - maxY - view.paddingTop;
+		view.top = view.bottom - heightChildren - view.paddingTop;
 		view.topChanged = true;
 	}else{
-		view.bottom = view.top + maxY + view.paddingBottom;
+		view.bottom = view.top + heightChildren + view.paddingBottom;
 		view.bottomChanged = true;
 	}
 	view.height = view.bottom - view.top;
@@ -519,7 +538,7 @@ UICore.prototype.applySizeChildrenVer = function(view, arrayViews, indexes, view
 	view.forEachChild((child) => {
 		if (!child.topChanged || !child.bottomChanged || child.height<=0) {
 			child.cleanVer();
-			this.calculateViewVer(child, view, arrayViews, indexes, maxY, viewsRestored);
+			this.calculateViewVer(child, view, arrayViews, indexes, heightChildren, viewsRestored);
 		}
 	});
 			
@@ -622,8 +641,8 @@ UICore.prototype.assignGravityVer = function(view, height){
 			view.top = view.bottom - view.height;
 		}else if(view.gravityVer=='c' && height > 0){
 			var viewHeight = view.height > 0 ? view.height : view.heightValue;
-			view.top = (height - viewHeight) / 2;
-			view.bottom = view.top + viewHeight;
+			view.top = Math.max(0, (height - viewHeight) / 2);
+			view.bottom = Math.min(height, view.top + viewHeight);
 			view.topChanged = true;
 			view.bottomChanged = true;
 			view.height = view.bottom - view.top;
@@ -759,6 +778,7 @@ UICore.prototype.evalDependenceVer = function(view, parentView, height, iReferen
 				view.bottom = height;
 			}else{
 				view.bottom = 0;
+				break;
 			}
 		}else{
 			view.bottom = viewDependency.bottomChanged? viewDependency.bottom : viewDependency.top + viewDependency.height;
