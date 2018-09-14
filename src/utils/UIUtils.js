@@ -41,12 +41,11 @@ UIUtils.prototype.readAttributes = function(text){
  * @param {*} node
  * @return {UIView} previous screen
  */
-UIUtils.prototype.getPreviousUIScreen = function(node) {
-	var prevView = this.getPreviousUIView(node);
-	if (prevView != null && prevView.screen) {
-		return prevView.screen;
+UIUtils.prototype.getPreviousUIScreen = function(nodeUI) {
+	if (nodeUI != null && nodeUI.screen) {
+		return nodeUI.screen;
 	} else {
-		return prevView;
+		return nodeUI;
 	}
 }
 

@@ -119,6 +119,7 @@ WebUI.prototype.listenDomEvents = function(){
 			else if (mutation.type == 'attributes') {
 				var attributeName = mutation.attributeName;
 				if (attributeName == 'id' || 
+					attributeName == 'class' || 
 					attributeName == this.configuration.attribute ||
 					this.configuration.attributes.includes(attributeName)) {
 					this.nodesUpdated.push(mutation.target);

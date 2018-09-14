@@ -402,26 +402,37 @@ UIPrepare.prototype.addNodes = function(nodesAdded, screens, configuration) {
 		var node = nodesAdded[0];
 		nodesAdded.splice(0,1);
 
-		//get the previous screen 
-		var parentScreen = UIUtilsInstance.getPreviousUIScreen(node);
+		//get the previous view and screen
+		var previousUIView = UIUtilsInstance.getPreviousUIView(node);
+		var previousUIScreen = UIUtilsInstance.getPreviousUIScreen(previousUIView);
+		
+		// var parentScreen = UIUtilsInstance.getPreviousUIScreen(node);
 
 		//1. Search and add UI elements from this node. Adding newscreens to the list
-		this.generateUIViews(node, configuration, screens, parentScreen);
+		this.generateUIViews(node, configuration, screens, previousUIScreen);
 
-		//get the parent if has one
-		var parentElement = node.parentNode;
-		if(parentElement && parentElement.ui){
-			var parentView = parentElement.ui;
-
-			//2. Order views in parent
-			parentView.childrenInOrder = false;
-
-			//3. Check if parent has size content, to mark it as modified
-			if(parentView.sizeWidth=='sc' || parentView.sizeHeight=='sc'){
-				parentView.cleanSizeLoaded();
-			}
-
+		if (previousUIView) {
+			previousUIView.childrenInOrder = false;
+			previousUIView.cleanSizeLoaded();
 		}
+		if (previousUIScreen) {
+			previousUIScreen.cleanSizeLoaded();
+		}
+
+		// //get the parent if has one
+		// var parentElement = node.parentNode;
+		// if(parentElement && parentElement.ui){
+		// 	var parentView = parentElement.ui;
+
+		// 	//2. Order views in parent
+		// 	parentView.childrenInOrder = false;
+
+		// 	//3. Check if parent has size content, to mark it as modified
+		// 	if(parentView.sizeWidth=='sc' || parentView.sizeHeight=='sc'){
+		// 		parentView.cleanSizeLoaded();
+		// 	}
+
+		// }
 
 	}
 
@@ -521,24 +532,24 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 				view.childrenInOrder = false;
 			}
 
-			//connect view with children
-			view.forEachChild( function (child) {
-				
-				//search if the view was in the list of screens to delete it
-				if (child.parent == null) {
-					var screenIndex = screens.indexOf(child);
-					if (screenIndex > -1) {
-						screens.splice(screenIndex, 1);
-					}
-				}
-
-				//assign the parent
-				child.parent = view;
-
-			});
-				
 			//update parent to re-calculate it
 			if (view) {
+
+				//connect view with children
+				view.forEachChild( function (child) {
+					
+					//search if the view was in the list of screens to delete it
+					if (child.parent == null) {
+						var screenIndex = screens.indexOf(child);
+						if (screenIndex > -1) {
+							screens.splice(screenIndex, 1);
+						}
+					}
+
+					//assign the parent
+					child.parent = view;
+
+				});
 
 				//save the id
 				nodeIdsUpdated.push(view.id);
@@ -550,6 +561,14 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 					parent.cleanSizeLoaded();
 				}
 			}
+
+			//mark parent screen for recalculations
+			var previousUIView = UIUtilsInstance.getPreviousUIView(node);
+			var previousUIScreen = UIUtilsInstance.getPreviousUIScreen(previousUIView);
+			if (previousUIScreen) {
+				previousUIScreen.cleanSizeLoaded();
+			}
+
 		}
 	}
 
