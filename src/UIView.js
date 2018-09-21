@@ -593,7 +593,8 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 		
 		}else if(attr=='v'){
 			this.setVisibility(value);
-		} else {
+		
+		} else if(attr.length > 0) {
 			logW("Attribute unknown: " + attr + " in view " + this.id);
 		}
 	}

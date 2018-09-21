@@ -101,7 +101,7 @@ WebUI.prototype.listenDomEvents = function(){
 	window.addEventListener("resize", this.resize);
 
 	// Options for the observer (which mutations to observe)
-	var config = { attributes: true, childList: true, subtree: true };
+	var config = { characterData: true, attributes: true, childList: true, subtree: true };
 
 	// Callback function to execute when mutations are observed
 	var callback = (function(mutationsList) {
@@ -126,6 +126,11 @@ WebUI.prototype.listenDomEvents = function(){
 					this.redraw();
 				}
 				
+			} else if (mutation.type == 'characterData') {
+				if (mutation.target.parentNode) {
+					this.nodesUpdated.push(mutation.target.parentNode);
+				}
+				this.redraw();
 			}
 		}
 	}).bind(this);
