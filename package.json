@@ -21,10 +21,13 @@
   },
   "homepage": "https://github.com/SilicorniO/webui#readme",
   "devDependencies": {
+    "@types/lodash": "^4.14.149",
     "babel-core": "6.26.3",
     "babel-loader": "8.0.6",
     "babel-polyfill": "6.26.0",
     "babel-preset-es2015": "6.24.1",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.9.0"
