@@ -67,3 +67,5 @@ UIUtils.prototype.getPreviousUIView = function(node) {
 	}
 
 }
+
+export default UIUtils = new UIUtils()

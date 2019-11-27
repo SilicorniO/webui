@@ -1,3 +1,5 @@
+import UILog from "./general/UILog"
+import UIViewUtils from "./utils/UIViewUtils"
 
 /**
  * @constructor
@@ -12,8 +14,8 @@ function UICore(scrollWidth){
 UICore.prototype.calculateScreen = function(screen){
 	
 	//generate list of views and indexes for quick access
-	var arrayViews = UIViewUtilsInstance.generateArrayViews(screen);
-	var indexes = UIViewUtilsInstance.generateIndexes(arrayViews);
+	var arrayViews = UIViewUtils.generateArrayViews(screen);
+	var indexes = UIViewUtils.generateIndexes(arrayViews);
     
     var viewsRestored;
 	
@@ -694,7 +696,7 @@ UICore.prototype.assignMarginsVer = function(view){
 UICore.prototype.evalDependenceHor = function(view, parentView, width, iReference, viewDependency){
 	
 	if(viewDependency==null){
-		logE("The view '" + view.id + "' has a wrong reference");
+		UILog.logE("The view '" + view.id + "' has a wrong reference");
 		return;
 	}
 	
@@ -740,7 +742,7 @@ UICore.prototype.evalDependenceHor = function(view, parentView, width, iReferenc
 UICore.prototype.evalDependenceVer = function(view, parentView, height, iReference, viewDependency){
 	
 	if(viewDependency==null){
-		logE("The view '" + view.id + "' has a wrong reference");
+		UILog.logE("The view '" + view.id + "' has a wrong reference");
 		return;
 	}
 	
@@ -796,3 +798,5 @@ UICore.prototype.calculateViewDependency = function(view, viewDependency, parent
 	}
 
 }
+
+export default UICore

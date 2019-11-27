@@ -1,0 +1,6 @@
+
+# npm libraries
+node_modules
+
+# build folder
+build/

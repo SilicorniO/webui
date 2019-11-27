@@ -1,0 +1,35 @@
+{
+  "name": "com.silicornio.webui",
+  "version": "3.0.0",
+  "description": "Easier way to set the position of the views/tags in a website.  Built with basic Javascript, it should be working in most of browsers.",
+  "private": true,
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SilicorniO/webui.git"
+  },
+  "author": "Javier@Silicornio",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/SilicorniO/webui/issues"
+  },
+  "homepage": "https://github.com/SilicorniO/webui#readme",
+  "devDependencies": {
+    "babel-core": "6.26.3",
+    "babel-loader": "8.0.6",
+    "babel-polyfill": "6.26.0",
+    "babel-preset-es2015": "6.24.1",
+    "webpack": "4.41.2",
+    "webpack-cli": "3.3.10",
+    "webpack-dev-server": "3.9.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  }
+}

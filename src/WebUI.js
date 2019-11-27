@@ -1,7 +1,10 @@
-
-//Static classess
-var UIViewUtilsInstance = new UIViewUtils();
-var UIUtilsInstance = new UIUtils();
+import UIPrepare from "./UIPrepare"
+import UIDraw from "./UIDraw"
+import UIRedrawTimer from "./utils/UIRedrawTimer"
+import UIConfiguration from "./UIConfiguration"
+import UICore from "./UICore"
+import { getScrollWidth, startCounter, endCounter } from "./general/UIGeneralFuncs"
+import UILog from "./general/UILog"
 
 /**  
  * @constructor
@@ -41,12 +44,12 @@ function WebUI(){
 		var countNodesAdded = this.uiPrepare.addNodes(this.nodesAdded, this.screens, this.configuration);
 		var countNodesRemoved = this.uiPrepare.removeNodes(this.parentNodesRemoved);
 		var countNodesModified = this.uiPrepare.updateNodes(this.nodesUpdated, this.screens, this.configuration);
-		log("Nodes added: " + countNodesAdded + " - Nodes removed: " + countNodesRemoved + " - Nodes modified: " + countNodesModified);
+		UILog.log("Nodes added: " + countNodesAdded + " - Nodes removed: " + countNodesRemoved + " - Nodes modified: " + countNodesModified);
 
 		this.redrawTimer.timer((function(){
 
 			//draw
-			log(" -- Redraw -- ");
+			UILog.log(" -- Redraw -- ");
 			this.drawScreens();
 
 		}).bind(this), this.configuration.timeRedraw);
@@ -77,8 +80,8 @@ WebUI.prototype.start = function(configuration){
 	this.configuration = new UIConfiguration(configuration);
 	
 	//apply global values for logs
-	uiShowLogs = this.configuration.showLogs;
-	uiViewLogs = this.configuration.logsView;
+	UILog.uiShowLogs = this.configuration.showLogs;
+	UILog.uiViewLogs = this.configuration.logsView;
 	
 	//prepare core with the configuration
 	this.uiCore = new UICore(this.scrollWidth);
@@ -197,7 +200,7 @@ WebUI.prototype.drawScreens = function(){
 		this.drawUIScreen(this.screens[i]);
 	}
 
-	log("Time drawing screens: " + endCounter('drawScreens'));
+	UILog.log("Time drawing screens: " + endCounter('drawScreens'));
 }
 
 WebUI.prototype.drawUIScreen = function(screen){
@@ -263,11 +266,8 @@ WebUI.prototype.drawUIScreen = function(screen){
 	//end counter
 	timerAll = endCounter('all');
 
-	log("[" + screen.id + "] All: " + timerAll + "ms - Prepare: " + timerPrepare + "ms - Core: " + timerCore + "ms - Draw: " + timerDraw + 
+	UILog.log("[" + screen.id + "] All: " + timerAll + "ms - Prepare: " + timerPrepare + "ms - Core: " + timerCore + "ms - Draw: " + timerDraw + 
 			"ms - LoadSizes: " + timerLoadSizes + "ms - OrderViews: " + timerOrderViews + "ms");
 }
 
-var WebUIInstance = new WebUI();
-window['WebUI'] = WebUIInstance;
-window['WebUI']['start'] = WebUIInstance.start;
-window['WebUI']['refresh'] = WebUIInstance.refresh;
+export default WebUI

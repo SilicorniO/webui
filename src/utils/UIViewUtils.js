@@ -206,3 +206,5 @@ UIViewUtils.prototype.getViewsWithDependencyForView = function(view, hor, ver){
 	return dependencyViews;
 
 }
+
+export default UIViewUtils = new UIViewUtils()

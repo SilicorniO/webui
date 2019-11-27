@@ -1,3 +1,7 @@
+import UIView from "./UIView"
+import UILog from "./general/UILog"
+import UIViewUtils from "./utils/UIViewUtils";
+import UIUtils from "./utils/UIUtils"
 
 /** 
  * @constructor
@@ -105,7 +109,7 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 	});
 	
 	//array of references of views to search them faster
-	var indexes = UIViewUtilsInstance.generateIndexes(childElements);
+	var indexes = UIViewUtils.generateIndexes(childElements);
 	
 	//search dependencies until we have all children with them
 	var allViewsSet;
@@ -147,7 +151,7 @@ UIPrepare.prototype.orderViewsSameParent = function(parent, hor){
 	}while(!allViewsSet && numViewsSet>0);
 	
 	if(numViewsSet==0 && parent.hasUIChildren() && views0dependencies<childElements.length){
-		logE("Check cycle references in " + (hor? "horizontal" : "vertical")  + " for parent " + parent.id);
+		UILog.logE("Check cycle references in " + (hor? "horizontal" : "vertical")  + " for parent " + parent.id);
 	}
 	
 	//sort views after setting order num
@@ -179,11 +183,11 @@ UIPrepare.prototype.loadSizes = function(elements, coreConfig, forceSizeLoaded =
 			if(view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded) ){
 
 				if(view.sizeWidth=='sc' && !view.hasUIChildren()){
-					view.widthValue = UIViewUtilsInstance.calculateWidthView(view, ele);
+					view.widthValue = UIViewUtils.calculateWidthView(view, ele);
 				}
 				
 				if(view.sizeHeight=='sc' && !view.hasUIChildren()){
-					view.heightValue = UIViewUtilsInstance.calculateHeightView(view, ele);
+					view.heightValue = UIViewUtils.calculateHeightView(view, ele);
 				}
 				
 				//translate paddings and margins
@@ -403,10 +407,10 @@ UIPrepare.prototype.addNodes = function(nodesAdded, screens, configuration) {
 		nodesAdded.splice(0,1);
 
 		//get the previous view and screen
-		var previousUIView = UIUtilsInstance.getPreviousUIView(node);
-		var previousUIScreen = UIUtilsInstance.getPreviousUIScreen(previousUIView);
+		var previousUIView = UIUtils.getPreviousUIView(node);
+		var previousUIScreen = UIUtils.getPreviousUIScreen(previousUIView);
 		
-		// var parentScreen = UIUtilsInstance.getPreviousUIScreen(node);
+		// var parentScreen = UIUtils.getPreviousUIScreen(node);
 
 		//1. Search and add UI elements from this node. Adding newscreens to the list
 		this.generateUIViews(node, configuration, screens, previousUIScreen);
@@ -519,7 +523,7 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 			if (!view) {
 
 				//get the previous screen 
-				var parentScreen = UIUtilsInstance.getPreviousUIScreen(node);
+				var parentScreen = UIUtils.getPreviousUIScreen(node);
 
 				view = this.generateUIViews(node, configuration, screens, parentScreen);
 			} else {
@@ -563,8 +567,8 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 			}
 
 			//mark parent screen for recalculations
-			var previousUIView = UIUtilsInstance.getPreviousUIView(node);
-			var previousUIScreen = UIUtilsInstance.getPreviousUIScreen(previousUIView);
+			var previousUIView = UIUtils.getPreviousUIView(node);
+			var previousUIScreen = UIUtils.getPreviousUIScreen(previousUIView);
 			if (previousUIScreen) {
 				previousUIScreen.cleanSizeLoaded();
 			}
@@ -575,3 +579,5 @@ UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration)
 	return countNodesModified;
 
 }
+
+export default UIPrepare

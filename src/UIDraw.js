@@ -1,3 +1,4 @@
+import UILog from "./general/UILog"
 
 /** 
  * @constructor
@@ -64,7 +65,7 @@ UIDraw.prototype.applyPositions = function(parentView, viewColors){
 
             //remove transition after the end of the animation
             var endTranstion = function (event) {
-                log(event);
+                UILog.log(event);
                 ele.style.transition = '';
                 ele.removeEventListener("transitionend", endTranstion)
             };
@@ -177,3 +178,5 @@ UIDraw.prototype.applySizeScreen = function(screenView, width, height){
     }
 	
 }
+
+export default UIDraw

@@ -1,9 +1,11 @@
+import UILog from "./UILog"
+
 /**
 * Get scrollbar width. 
 * FROM: http://www.alexandre-gomes.com/?p=115
 * @return Integer scrollbar width
 **/
-function getScrollWidth () {  
+export function getScrollWidth() {  
     var inner = document.createElement('p');  
     inner.style.width = "100%";  
     inner.style.height = "200px";  
@@ -29,36 +31,20 @@ function getScrollWidth () {
     return (w1 - w2);  
 };
 
-/**
-* Call to clean of all views
-* @param {UIView} view clean and its children
-**/
-function cleanViews(view){
-    
-    //clean the view
-    view.clean();
-    
-    //call to children
-	view.forEachChild(function(child, index){
-		cleanViews(child);
-	});
-	
-}
-
 //----- COUNTERS -----
 
 var counters = {};
 
-function startCounter(name){
+export function startCounter(name){
     var now = new Date().getTime();
 	counters[name] = now;
 }
 
-function endCounter(name){
+export function endCounter(name){
     var now = new Date().getTime();
 	return (now - counters[name]);
 }
 
-function endCounterLog(name){
-	log('Counter[' + name + ']: ' + endCounter(name) + 'ms');
+export function endCounterLog(name){
+	UILog.log('Counter[' + name + ']: ' + endCounter(name) + 'ms');
 }

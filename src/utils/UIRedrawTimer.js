@@ -50,3 +50,5 @@ UIRedrawTimer.prototype.timerLauncher = function(timeInMillis, cb){
 
 	}).bind(this), timeInMillis)
 }
+
+export default UIRedrawTimer

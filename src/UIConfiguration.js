@@ -1,3 +1,4 @@
+import UILog from "./general/UILog"
 
 /**
  * @constructor
@@ -89,8 +90,8 @@ UIConfiguration.prototype.refreshScreenSize = function(){
 	var widthScreen = window.innerWidth;
 	var heightScreen = window.innerHeight;
 	
-	log('screen-width: ' + widthScreen);
-	log('screen-height: ' + heightScreen);
+	UILog.log('screen-width: ' + widthScreen);
+	UILog.log('screen-height: ' + heightScreen);
 	
 	if(this.screenModes){
 		for(var i=0; i<this.screenModes.length; i++){
@@ -105,7 +106,7 @@ UIConfiguration.prototype.refreshScreenSize = function(){
 				(!screenMode['heightEnd'] || screenMode['heightEnd']==0 || screenMode['heightEnd']<heightScreen) 
 			){
 				aAttributes.push(screenMode['attribute']);
-				log('SHOWING ATTRIBUTE: ' + screenMode['attribute']);
+				UILog.log('SHOWING ATTRIBUTE: ' + screenMode['attribute']);
 				//add dimens of this screen mode overriding existing
 				if(screenMode['dimens']){
 					var dimenKeys = Object.keys(screenMode['dimens']);
@@ -129,7 +130,7 @@ UIConfiguration.prototype.getDimen = function(name){
 	}else if(name && !isNaN(parseInt(name, 10))){
 		return parseInt(name, 10);
 	}else{
-		logE('The dimension "' + name + '" is not valid or it is not defined');
+		UILog.logE('The dimension "' + name + '" is not valid or it is not defined');
 		return 0;
 	}
 
@@ -151,3 +152,5 @@ UIConfiguration.prototype.sendEndEvent = function() {
 		});
 	}
 }
+
+export default UIConfiguration

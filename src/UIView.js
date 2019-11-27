@@ -1,3 +1,5 @@
+import UILog from "./general/UILog"
+import UIUtils from "./utils/UIUtils";
 
 /**
 * Create a view object reading the HTML of the element 
@@ -486,9 +488,9 @@ UIView.prototype.toString = function(){
 UIView.prototype.readUI = function(element, attributeMain, attributes){
 	
 	//read main attributes
-	var aValues = UIUtilsInstance.readAttributes(element.getAttribute(attributeMain));
+	var aValues = UIUtils.readAttributes(element.getAttribute(attributeMain));
 	for(var i=0; i<attributes.length; i++){
-		aValues = aValues.concat(UIUtilsInstance.readAttributes(element.getAttribute(attributes[i])));
+		aValues = aValues.concat(UIUtils.readAttributes(element.getAttribute(attributes[i])));
 	}
 	
 	//check if we have attributes
@@ -595,7 +597,7 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 			this.setVisibility(value);
 		
 		} else if(attr.length > 0) {
-			logW("Attribute unknown: " + attr + " in view " + this.id);
+			UILog.logW("Attribute unknown: " + attr + " in view " + this.id);
 		}
 	}
 	
@@ -638,5 +640,5 @@ UIView.prototype.readUI = function(element, attributeMain, attributes){
 	
 }
 
-
+export default UIView
 
