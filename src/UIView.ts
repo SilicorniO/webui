@@ -1,10 +1,14 @@
 import UILog from "./general/UILog"
 import UIUtils from "./utils/UIUtils"
+import UIHTMLElement from "./UIHTMLElement"
+import { UIConfiguration } from "./UIConfiguration"
 
 export default class UIView {
 
+	public static readonly UI_TAG: string = "ui"
+
 	id: string
-	element: HTMLElement
+	element: UIHTMLElement
 	parent: UIView
 	screen: UIView
 
@@ -106,7 +110,7 @@ export default class UIView {
 	){
 
 		this.id = element.id
-		this.element = element
+		this.element = UIHTMLElement.get(element)
 		this.parent = parent
 		this.screen = screen
 
@@ -272,7 +276,7 @@ export default class UIView {
 		this.visibility = visibility;
 	}
 
-	private cleanSizeLoaded() {
+	public cleanSizeLoaded() {
 
 		//clean the sizeLoaded of this view
 		this.sizeLoaded = false;
@@ -284,7 +288,7 @@ export default class UIView {
 		}
 	}
 
-	private hasToBeCalculated() {
+	public hasToBeCalculated(): boolean {
 		return this.visibility != 'g';
 	}
 
@@ -337,7 +341,8 @@ export default class UIView {
 	public hasUIChildren(): boolean {
 		var children = this.element.childNodes;
 		for(var i=0; i<children.length; i++){
-			if(children[i].ui){
+			const uiChild = UIHTMLElement.get(children[i])
+			if(uiChild != null){
 				return true
 			}
 		}
@@ -349,8 +354,8 @@ export default class UIView {
 	 * Get the children elements (childNodes)
 	 * @return {Array<*>} Array of elements
 	*/
-	public getChildElements(){
-		return this.element.childNodes;
+	public getChildElements(): UIHTMLElement[] {
+		return UIHTMLElement.getAll(this.element.childNodes)
 	}
 
 	/**
@@ -358,7 +363,7 @@ export default class UIView {
 	 * @param cb 
 	 */
 	public forEachChild(cb: (child: UIView, i: number) => void){
-		var children = this.element.childNodes;
+		var children = UIHTMLElement.getAll(this.element.childNodes)
 		for(var i=0; i<children.length; i++){
 			var child = children[i].ui;
 			if(child){
@@ -367,23 +372,35 @@ export default class UIView {
 		}
 	}
 
-	private getPreviousView() {
+	public getUIChildren(): UIView[] {
+		var children = UIHTMLElement.getAll(this.element.childNodes)
+		const uiChildren: UIView[] = []
+		for (const child of children) {
+			const uiElement = UIHTMLElement.get(child)
+			if (uiElement != null) {
+				uiChildren.push(uiElement.ui)
+			}
+		}
+		return uiChildren
+	}
 
-		var previousView = null;
+	public getPreviousView(): UIView | null {
+
+		let previousView: UIView | null = null;
 
 		//if it is an screen there is not a previous view
 		if (this.parent == null) {
 			return null;
 		}
 
-		var childNodes = this.parent.element.childNodes;
+		const childNodes = this.parent.element.childNodes;
 		for(var i=0; i<childNodes.length; i++){
-			var child = childNodes[i].ui;
-			if (child) {
+			var child = UIHTMLElement.get(childNodes[i]);
+			if (child != null) {
 				if (child.id == this.id) {
-					return previousView;
-				} else if (child.hasToBeCalculated()){
-					previousView = child;
+					return previousView
+				} else if (child.ui.hasToBeCalculated()){
+					previousView = child.ui
 				}
 			}
 		}
@@ -392,12 +409,12 @@ export default class UIView {
 		return null;
 	} 
 			
-	private clean(){
+	public clean(){
 		this.cleanHor();
 		this.cleanVer();
 	};
 
-	private cleanHor(){
+	public cleanHor(){
 		this.leftChanged = false;
 		this.rightChanged = false;
 
@@ -406,7 +423,7 @@ export default class UIView {
 		this.width = 0;
 	}
 
-	private cleanVer(){
+	public cleanVer(){
 		this.topChanged = false;
 		this.bottomChanged = false;
 
@@ -415,7 +432,7 @@ export default class UIView {
 		this.height = 0;
 	}
 
-	private cleanUI() {
+	public cleanUI() {
 		
 		this.leftLeft = '';
 		this.leftRight = '';
@@ -452,7 +469,7 @@ export default class UIView {
 		this.paddingBottomDimen = "0";
 	}
 
-	private applyDimens(coreConfig){
+	public applyDimens(coreConfig: UIConfiguration){
 		
 		this.paddingLeft = coreConfig.getDimen(this.paddingLeftDimen);
 		this.paddingRight = coreConfig.getDimen(this.paddingRightDimen);
@@ -481,11 +498,11 @@ export default class UIView {
 	* @param attributes with the name of the attributes to read as secondary
 	* @return View generated
 	**/
-	private readUI(
+	public readUI(
 		element: HTMLElement,
 		attributeMain: string,
 		attributes: string[],
-	){
+	): UIView {
 		
 		//read main attributes
 		var aValues = UIUtils.readAttributes(element.getAttribute(attributeMain));

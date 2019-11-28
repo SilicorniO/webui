@@ -2,6 +2,8 @@ import UIView from "./UIView"
 import UILog from "./general/UILog"
 import UIViewUtils from "./utils/UIViewUtils";
 import UIUtils from "./utils/UIUtils"
+import { UIConfiguration, UIConfigurationDataAnimations } from "./UIConfiguration";
+import UIHTMLElement from "./UIHTMLElement";
 
 export default class UIPrepare {
 
@@ -27,7 +29,7 @@ export default class UIPrepare {
 	* Order the children of the parent view received
 	* @param {UIView} parent View to order the childrens
 	**/
-	private orderViews(parent: UIView){
+	public orderViews(parent: UIView){
 
 		if(!parent.childrenInOrder){
 
@@ -61,9 +63,6 @@ export default class UIPrepare {
 	* @return Array of views from params, in order
 	**/
 	private orderViewsSameParent(parent: UIView, hor: boolean) {
-
-		//get the elements of the parent for performance
-		const childElements = parent.getChildElements();
 
 		//prepare array to save the list of views
 		const views: UIView[] = [];
@@ -111,9 +110,12 @@ export default class UIPrepare {
 			//save last child for references
 			lastChild = child;
 		});
+
+		//get the elements of the parent for performance
+		const childElements = parent.getChildElements();
 		
 		//array of references of views to search them faster
-		var indexes = UIViewUtils.generateIndexes(childElements);
+		var indexes = UIViewUtils.generateIndexes(UIHTMLElement.convertToUIView(childElements))
 		
 		//search dependencies until we have all children with them
 		let allViewsSet: boolean = true;
@@ -124,7 +126,7 @@ export default class UIPrepare {
 			numViewsSet = 0;
 			
 			//for each view check dependencies
-			parent.forEachChild(function(child, index){
+			parent.forEachChild((child, index) => {
 				if(child.orderNum==-1){
 					var dependencies = hor? child.dependenciesHor : child.dependenciesVer;
 					var sumDependencies = 0;
@@ -172,8 +174,8 @@ export default class UIPrepare {
 	* @param {UIConfiguration} coreConfig
 	* @param {boolean} forceSizeLoaded
 	**/
-	private loadSizes(
-		elements: HTMLElement[],
+	public loadSizes(
+		elements: UIHTMLElement[],
 		coreConfig: UIConfiguration,
 		forceSizeLoaded: boolean = false,
 	){
@@ -218,7 +220,7 @@ export default class UIPrepare {
 	* @param {UIView} screen View with screen value (body)
 	* @return {boolean} flag to know if screen changed
 	**/
-	UIPrepare.prototype.loadSizeScreen = function(screen){
+	public loadSizeScreen(screen: UIView): boolean {
 
 		//flag looking for changes
 		var sizeChanged = false;
@@ -282,7 +284,12 @@ export default class UIPrepare {
 	 * @param {UIConfiguration} config 
 	 * @return {UIView} generated view
 	 */
-	UIPrepare.prototype.generateUIView = function(element, parent, screen, config){
+	private generateUIView(
+		element: UIHTMLElement,
+		parent: UIView,
+		screen: UIView,
+		config: UIConfiguration,
+	): UIView {
 		
 		//check if has already ui
 		if(element.ui){
@@ -310,7 +317,7 @@ export default class UIPrepare {
 				element.onload = (function(){
 	
 					//mark this view for reload
-					element.sizeLoaded = false;
+					element.ui.sizeLoaded = false;
 					this.refreshFunc();
 					
 				}).bind(this);
@@ -332,7 +339,13 @@ export default class UIPrepare {
 	 * @param {*=} parentElement 
 	 * @return {UIView} generated view
 	 */
-	UIPrepare.prototype.generateUIViews = function(element, config, aScreens, parentScreen, parentElement){
+	public generateUIViews(
+		element: UIHTMLElement,
+		config: UIConfiguration,
+		aScreens: UIView[],
+		parentScreen: UIView,
+		parentElement?: UIHTMLElement,
+	): UIView {
 
 		//initialize array of screens if it is necessary
 		if(!aScreens){
@@ -340,19 +353,13 @@ export default class UIPrepare {
 		}
 
 		//get the parent and the screen
-		var parent = null;
-		var screen = null;
+		var parent: UIView | null = null;
+		var screen: UIView | null = null;
 		if(parentElement==null){
-			parentElement = element.parentNode;
-
-			//calculate the lastViewId
-			var previousElement = element.previousSibling;
-			if(previousElement!=null && previousElement.id){
-				lastViewId = previousElement.id
-			}
+			parentElement = UIHTMLElement.get(element.parentNode) || undefined
 		}
-		if(parentElement!=null && parentElement.ui){
-			parent = element.parentNode.ui;
+		if( parentElement != null){
+			parent = parentElement.ui;
 			screen = parent.screen? parent.screen : parent;
 		}
 
@@ -379,13 +386,15 @@ export default class UIPrepare {
 		//call to all children
 		var lastChildId = view? view.id : ""; //start with parent
 		for(var i=0; i<element.childNodes.length; i++){
-			var childElement = element.childNodes[i];
+			var childElement = UIHTMLElement.get(element.childNodes[i])
 
-			var childView = this.generateUIViews(childElement, config, aScreens, parentScreen, element);
+			if (childElement != null) {
+				var childView = this.generateUIViews(childElement, config, aScreens, parentScreen, element);
 
-			//update the identifier of the last child if it is a ui node
-			if(childView){
-				lastChildId = childView.id;
+				//update the identifier of the last child if it is a ui node
+				if(childView){
+					lastChildId = childView.id;
+				}
 			}
 		}
 
@@ -401,7 +410,11 @@ export default class UIPrepare {
 	 * @param {UIConfiguration} configuration 
 	 * @return {number} Count of added nodes
 	 */
-	UIPrepare.prototype.addNodes = function(nodesAdded, screens, configuration) {
+	public addNodes(
+		nodesAdded: UIHTMLElement[],
+		screens: UIView[],
+		configuration: UIConfiguration,
+	): number {
 
 		//counter to know how many nodes were added
 		var countNodesAdded = 0;
@@ -458,7 +471,7 @@ export default class UIPrepare {
 	 * @param {UIConfiguration} configuration 
 	 * @return {number} Count of modified nodes
 	 */
-	UIPrepare.prototype.removeNodes = function(parentNodesRemoved) {
+	public removeNodes(parentNodesRemoved: UIHTMLElement[]): number {
 
 		//counter to know how many nodes were added
 		var countNodesRemoved = 0;
@@ -472,7 +485,7 @@ export default class UIPrepare {
 			parentNodesRemoved.splice(0,1);
 
 			//search the parent view with UI interface
-			var refreshParent = function(node) {
+			var refreshParent = (node: UIHTMLElement) =>{
 
 				//check it has UI
 				if(node && node.ui){
@@ -489,7 +502,7 @@ export default class UIPrepare {
 				} else {
 
 					//search UI in parent
-					var parentNode = node.parentNode;
+					var parentNode = UIHTMLElement.get(node.parentNode)
 					if (parentNode) {
 						refreshParent(parentNode);
 					}
@@ -509,17 +522,21 @@ export default class UIPrepare {
 	 * @param {UIConfiguration} configuration 
 	 * @return {number} Count of modified nodes
 	 */
-	UIPrepare.prototype.updateNodes = function(nodesUpdated, screens, configuration) {
+	public updateNodes(
+		nodesUpdated: UIHTMLElement[],
+		screens: UIView[],
+		configuration: UIConfiguration,
+	) {
 
 		//counter to know how many nodes were added
-		var countNodesModified = 0;
+		let countNodesModified = 0;
 		
 		//when a node is removed we have to check the relationship of the parent
-		var nodeIdsUpdated = [];
+		const nodeIdsUpdated: string[] = [];
 		while(nodesUpdated.length>0){
 			
 			//get first node and remove from list
-			var node = nodesUpdated[0];
+			const node = nodesUpdated[0];
 			nodesUpdated.splice(0,1);
 
 			//check this id has not been already updated
@@ -531,14 +548,14 @@ export default class UIPrepare {
 				if (!view) {
 
 					//get the previous screen 
-					var parentScreen = UIUtils.getPreviousUIScreen(node);
+					var parentScreen = UIUtils.getPreviousUIScreen(node.ui);
 
 					view = this.generateUIViews(node, configuration, screens, parentScreen);
 				} else {
 					if (node.id != view.id) {
 						view.id = node.id;
 					}
-					view.cleanUI();
+					view.cleanUI()
 					view.readUI(view.element, configuration.attribute, configuration.attributes);
 					view.sizeLoaded = false;
 					view.childrenInOrder = false;

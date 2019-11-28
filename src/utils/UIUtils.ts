@@ -1,26 +1,28 @@
+import UIView from "../UIView";
+import UIHTMLElement from "../UIHTMLElement";
 
 /** 
  * @constructor
 */
-export class UIUtils {
+export default class UIUtils {
 
 	/**
 	* Read the list of attributes received in a text
 	* @param text String with the text to parse
 	* @return array of objects with key and value
 	**/
-	public static readAttributes(text: string) {
+	public static readAttributes(text: string): { [key: string]: string }[] {
 		
 		//check text is not null
 		if(text==null){
-			return new Array();
+			return [];
 		}
 		
 		//split the text
 		var aValues = text.replace(' ', '').split(';');
 		
 		//for each value read the value and key adding it to an array
-		var aAttributes = new Array();
+		var aAttributes: { [key: string]: string }[] = [];
 		for(var i=0; i<aValues.length; i++){
 			var aValue = aValues[i].split(':');
 			if(aValue.length==2){
@@ -39,7 +41,7 @@ export class UIUtils {
 	 * @param {*} node
 	 * @return {UIView} previous screen
 	 */
-	public static getPreviousUIScreen(nodeUI) {
+	public static getPreviousUIScreen(nodeUI: UIView): UIView {
 		if (nodeUI != null && nodeUI.screen) {
 			return nodeUI.screen;
 		} else {
@@ -52,7 +54,7 @@ export class UIUtils {
 	 * @param {*} node 
 	 * @return {UIView} previous UIView
 	 */
-	public static getPreviousUIView(node) {
+	public static getPreviousUIView(node: UIHTMLElement): UIView {
 
 		if (node.ui) {
 			return node.ui;
@@ -63,7 +65,6 @@ export class UIUtils {
 		} else {
 			return null;
 		}
-
 	}
 
 }

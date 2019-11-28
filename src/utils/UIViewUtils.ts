@@ -1,4 +1,5 @@
 import UIView from "../UIView";
+import UIHTMLElement from "../UIHTMLElement";
 
 /** 
  * @constructor
@@ -14,8 +15,8 @@ export default class UIViewUtils {
 	public static calculateWidthView(
 		view: UIView,
 		ele: HTMLElement,
-		index: number,
-		infiniteParent: HTMLElement,
+		index?: number,
+		infiniteParent?: HTMLElement,
 	){
 		
 		//prepare parent to give the son a lot of space for calculation
@@ -52,8 +53,8 @@ export default class UIViewUtils {
 	public static calculateHeightView(
 		view: UIView,
 		ele: HTMLElement,
-		index: number,
-		infiniteParent: HTMLElement,
+		index?: number,
+		infiniteParent?: HTMLElement,
 	){
 			
 		//prepare parent to give the son a lot of space for calculation
@@ -90,9 +91,9 @@ export default class UIViewUtils {
 				
 		//prepare parent to give the son a lot of space for calculation
 		var parent = ele.parentElement;
-		var parentWidth = parent.offsetWidth;
+		var parentWidth = "" + parent.offsetWidth;
 		var parentScrollLeft = parent.scrollLeft;
-		parent.style.width = 10000;
+		parent.style.width = "10000";
 			
 		//get the height width much space
 		ele.style.display = 'inline-block';
@@ -101,7 +102,7 @@ export default class UIViewUtils {
 		var width = ele.offsetWidth;
 		
 		//increment for text calculations error
-		if(width>0){
+		if (width > 0){
 			width++;
 		}
 		
@@ -124,9 +125,9 @@ export default class UIViewUtils {
 			
 		//prepare parent to give the son a lot of space for calculation
 		var parent = ele.parentElement;
-		var parentHeight = parent.offsetHeight;
+		var parentHeight = "" + parent.offsetHeight;
 		var parentScrollTop = parent.scrollTop;
-		parent.style.height = 10000;
+		parent.style.height = "10000";
 				
 		//get the width height much space
 		ele.style.display = 'inline-block';
@@ -146,9 +147,9 @@ export default class UIViewUtils {
 		return height;
 	}
 
-	//generate list of indexes
+	// generate list of indexes
 	public static generateIndexes(
-		elements: HTMLElement[],
+		elements: UIView[],
 	): { [key: string]: number } {
 			
 		var indexes: { [key: string]: number } = {}
@@ -170,10 +171,10 @@ export default class UIViewUtils {
 	**/
 	public static generateArrayViews(
 		view: UIView,
-		aViews: UIView[],
+		aViews?: UIView[],
 	): UIView[] {
 		
-		if(aViews==null){
+		if(aViews == null){
 			aViews = new Array();
 		}
 		
@@ -181,9 +182,9 @@ export default class UIViewUtils {
 		aViews.push(view);
 		
 		//add the children
-		view.forEachChild(((child: UIView, _index: number) => {
+		view.forEachChild((child: UIView, _index: number) => {
 			this.generateArrayViews(child, aViews);
-		}).bind(this));
+		})
 		
 		return aViews;
 	}
