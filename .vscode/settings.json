@@ -1,4 +1,7 @@
 {
-    "eslint.enable": true,
-    "eslint.lintTask.enable": true
+    "eslint.autoFixOnSave": true,
+    "eslint.validate": [
+        "javascript",
+        { "language": "typescript", "autoFix": true },
+    ]
 }

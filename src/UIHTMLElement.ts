@@ -1,10 +1,16 @@
-import UIView from "./UIView";
+import UIView from "./UIView"
 
 export default class UIHTMLElement extends HTMLElement {
     public ui: UIView
 
     private constructor() {
         super()
+    }
+
+    public static convert(element: HTMLElement, view: UIView): UIHTMLElement {
+        const uiElement = element as UIHTMLElement
+        uiElement.ui = view
+        return uiElement
     }
 
     public static get(element: HTMLElement | Node | ChildNode): UIHTMLElement | null {
@@ -26,7 +32,7 @@ export default class UIHTMLElement extends HTMLElement {
                 }
             }
         } else {
-            (elements as NodeListOf<ChildNode>).forEach( (node) => {
+            ;(elements as NodeListOf<ChildNode>).forEach(node => {
                 const uiElement = UIHTMLElement.get(node)
                 if (uiElement != null) {
                     uiElements.push(uiElement)
