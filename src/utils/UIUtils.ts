@@ -54,13 +54,14 @@ export default class UIUtils {
 	 * @param {*} node 
 	 * @return {UIView} previous UIView
 	 */
-	public static getPreviousUIView(node: UIHTMLElement): UIView {
+	public static getPreviousUIView(node: Node): UIView {
 
-		if (node.ui) {
-			return node.ui;
+		const uiNode = UIHTMLElement.get(node)
+		if (uiNode != null) {
+			return uiNode.ui;
 		}
 
-		if (node.parentNode) {
+		if (node.parentNode != null) {
 			return this.getPreviousUIView(node.parentNode);
 		} else {
 			return null;

@@ -11,7 +11,7 @@ import UIGeneralFuncs from "./general/UIGeneralFuncs"
 /**  
  * @constructor
 */
-export default class WebUI{
+export default class WebUI {
 
 	/** Configuration saved **/
 	private uiConfiguration: UIConfiguration = new UIConfiguration()
@@ -113,10 +113,16 @@ export default class WebUI{
 				if (mutation.type == 'childList') {
 
 					for(var i=0; i<mutation.addedNodes.length; i++) {
-						this.nodesAdded.push(UIHTMLElement.get(mutation.addedNodes[i]))
+						const nodeUi = UIHTMLElement.get(mutation.addedNodes[i])
+						if (nodeUi != null) {
+							this.nodesAdded.push(nodeUi)
+						}
 					}
 					for(var i=0; i<mutation.removedNodes.length; i++) {
-						this.parentNodesRemoved.push(UIHTMLElement.get(mutation.target))
+						const nodeUi = UIHTMLElement.get(UIHTMLElement.get(mutation.target))
+						if (nodeUi != null) {
+							this.parentNodesRemoved.push(nodeUi)
+						}
 					}
 					this.redraw();
 				}
@@ -132,7 +138,10 @@ export default class WebUI{
 					
 				} else if (mutation.type == 'characterData') {
 					if (mutation.target.parentNode) {
-						this.nodesUpdated.push(UIHTMLElement.get(mutation.target.parentNode))
+						const nodeUi = UIHTMLElement.get(mutation.target.parentNode)
+						if (nodeUi != null) {
+							this.nodesUpdated.push(nodeUi)
+						}
 					}
 					this.redraw();
 				}
@@ -153,7 +162,7 @@ export default class WebUI{
 		var clearUI = (element: HTMLElement) => {
 			const uiElement = UIHTMLElement.get(element)
 			if (uiElement != null) {
-				delete element.ui
+				delete (element as any).ui
 				var viewChildNodes = element.childNodes;
 				if (viewChildNodes) {
 					for (var i = 0; i < viewChildNodes.length ; i++) {

@@ -1,3 +1,4 @@
+import UIView from "../UIView";
 
 enum UILogType {
 	INFO, WARNING, ERROR, DEBUG
@@ -26,7 +27,7 @@ export default class UILog {
 
 	public static logIView(prefix: string, view: UIView) {
 		UILog.logI("[" + prefix + "] " + view.toString());
-		view.forEachChild((child, index) => {
+		view.forEachChild((child, _index) => {
 			UILog.logIView(prefix, child)
 		});
 	}

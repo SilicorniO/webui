@@ -2,7 +2,7 @@ import UIView from "./UIView"
 import UILog from "./general/UILog"
 import UIViewUtils from "./utils/UIViewUtils";
 import UIUtils from "./utils/UIUtils"
-import { UIConfiguration, UIConfigurationDataAnimations } from "./UIConfiguration";
+import UIConfiguration from "./UIConfiguration";
 import UIHTMLElement from "./UIHTMLElement";
 
 export default class UIPrepare {
@@ -420,7 +420,7 @@ export default class UIPrepare {
 		var countNodesAdded = 0;
 		
 		//when a node is added we have to check the relationship with the rest of views
-		while(nodesAdded.length>0){
+		while (nodesAdded.length>0){
 			countNodesAdded += 1;
 			
 			//get first node and remove from list

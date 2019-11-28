@@ -1,7 +1,7 @@
 import UILog from "./general/UILog"
 import UIUtils from "./utils/UIUtils"
 import UIHTMLElement from "./UIHTMLElement"
-import { UIConfiguration } from "./UIConfiguration"
+import UIConfiguration from "./UIConfiguration"
 
 export default class UIView {
 
@@ -483,7 +483,7 @@ export default class UIView {
 		
 	};
 			
-	private toString(){
+	public toString(){
 		return "[" + this.id + "]: ll:" + this.leftLeft + ", lr:" + this.leftRight + ", rr:" + this.rightRight + ", rl:" + this.rightLeft + 
 			", tt:" + this.topTop + ",tb: " + this.topBottom + ", bb:" + this.bottomBottom + ", bt:" + this.bottomTop + ", ml:" + this.marginLeft + 
 			", mr:" + this.marginRight + ", mt:" + this.marginTop + ",mb: " + this.marginBottom + ", pl:" + this.paddingLeft + ", pr:" + this.paddingRight + 

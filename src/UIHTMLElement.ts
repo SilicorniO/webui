@@ -9,7 +9,7 @@ export default class UIHTMLElement extends HTMLElement {
 
     public static get(element: HTMLElement | Node | ChildNode): UIHTMLElement | null {
         // check element has ui parameter
-        if (element[UIView.UI_TAG] == null) {
+        if ((element as any)[UIView.UI_TAG] == null) {
             return null
         }
 
