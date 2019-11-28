@@ -1,5 +1,5 @@
-import UIView from "../UIView"
-import UIHTMLElement from "../UIHTMLElement"
+import UIView from "../../model/UIView"
+import UIHTMLElement from "../../model/UIHTMLElement"
 
 /**
  * @constructor

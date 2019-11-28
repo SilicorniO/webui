@@ -1,5 +1,4 @@
-import UIView from "../UIView"
-import UIHTMLElement from "../UIHTMLElement"
+import UIView from "../../model/UIView"
 
 /**
  * @constructor
@@ -184,7 +183,10 @@ export default class UIViewUtils {
         //get the views of the parent
         var viewId = view.id
         view.parent.forEachChild(function(parentChild, index) {
-            if ((hor && parentChild.dependenciesHor.includes(viewId)) || (ver && parentChild.dependenciesVer.includes(viewId))) {
+            if (
+                (hor && parentChild.dependenciesHor.includes(viewId)) ||
+                (ver && parentChild.dependenciesVer.includes(viewId))
+            ) {
                 dependencyViews.push(parentChild)
             }
         })

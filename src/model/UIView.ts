@@ -1,7 +1,7 @@
-import UILog from "./general/UILog"
-import UIUtils from "./utils/UIUtils"
+import Log from "../utils/log/Log"
+import UIUtils from "../utils/ui/UIUtils"
 import UIHTMLElement from "./UIHTMLElement"
-import UIConfiguration from "./UIConfiguration"
+import UIConfiguration from "../UIConfiguration"
 
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
@@ -293,7 +293,16 @@ export default class UIView {
     }
 
     private getReferences() {
-        return [this.leftLeft, this.leftRight, this.rightRight, this.rightLeft, this.topTop, this.topBottom, this.bottomBottom, this.bottomTop]
+        return [
+            this.leftLeft,
+            this.leftRight,
+            this.rightRight,
+            this.rightLeft,
+            this.topTop,
+            this.topBottom,
+            this.bottomBottom,
+            this.bottomTop,
+        ]
     }
 
     public getReferencesHor() {
@@ -649,7 +658,7 @@ export default class UIView {
             } else if (attr == "v") {
                 this.setVisibility(value)
             } else if (attr.length > 0) {
-                UILog.logW("Attribute unknown: " + attr + " in view " + this.id)
+                Log.logW("Attribute unknown: " + attr + " in view " + this.id)
             }
         }
 

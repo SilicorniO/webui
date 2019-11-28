@@ -1,8 +1,8 @@
-import UILog from "./general/UILog"
-import UIView from "./UIView"
-import UIConfiguration from "./UIConfiguration"
+import Log from "../log/Log"
+import UIView from "../../model/UIView"
+import UIConfiguration from "../../UIConfiguration"
 
-export interface UIDrawPosition {
+export interface UIViewDrawPosition {
     maxX: number
     maxY: number
 }
@@ -10,14 +10,14 @@ export interface UIDrawPosition {
 /**
  * @constructor
  */
-export default class UIDraw {
+export default class UIViewDrawUtils {
     /**
      * Apply positions for the views
      * @param {UIView} parentView to draw children
      * @param {boolean} viewColors flag to show or not colors in views
      * @return int maximum Y positon of a children
      **/
-    public applyPositions(parentView: UIView, viewColors: boolean): UIDrawPosition {
+    public static applyPositions(parentView: UIView, viewColors: boolean): UIViewDrawPosition {
         var maxX = 0
         var maxY = 0
 
@@ -68,7 +68,7 @@ export default class UIDraw {
 
                 //remove transition after the end of the animation
                 var endTranstion = (event: any) => {
-                    UILog.log(event)
+                    Log.log(event)
                     ele.style.transition = ""
                     ele.removeEventListener("transitionend", endTranstion)
                 }
@@ -119,7 +119,12 @@ export default class UIDraw {
      * @param {UIConfiguration} configuration to know time of animations
      * @param {boolean} forceGone flag to know if parent is not being displayed because is gone
      **/
-    public applyVisibility(view: UIView, parentView: UIView, configuration: UIConfiguration, forceGone: boolean = false) {
+    public static applyVisibility(
+        view: UIView,
+        parentView: UIView,
+        configuration: UIConfiguration,
+        forceGone: boolean = false,
+    ) {
         var ele = view.element
 
         //hide view if visibility is gone
@@ -148,7 +153,7 @@ export default class UIDraw {
         })
     }
 
-    private generateRandomViewColor() {
+    private static generateRandomViewColor() {
         var r = parseInt("" + Math.random() * 255, 10)
         var g = parseInt("" + Math.random() * 255, 10)
         var b = parseInt("" + Math.random() * 255, 10)
@@ -161,7 +166,7 @@ export default class UIDraw {
      * @param width int minimum width for the screen
      * @param height int minimum height for the screen
      **/
-    public applySizeScreen(screenView: UIView, width: number, height: number) {
+    public static applySizeScreen(screenView: UIView, width: number, height: number) {
         var ele = document.getElementById(screenView.id)
         if (screenView.id != "s" && ele != null) {
             if (screenView.sizeWidth == "s") {

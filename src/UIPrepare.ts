@@ -1,9 +1,9 @@
-import UIView from "./UIView"
-import UILog from "./general/UILog"
-import UIViewUtils from "./utils/UIViewUtils"
-import UIUtils from "./utils/UIUtils"
+import UIView from "./model/UIView"
+import Log from "./utils/log/Log"
+import UIViewUtils from "./utils/uiview/UIViewUtils"
+import UIUtils from "./utils/ui/UIUtils"
 import UIConfiguration from "./UIConfiguration"
-import UIHTMLElement from "./UIHTMLElement"
+import UIHTMLElement from "./model/UIHTMLElement"
 
 export default class UIPrepare {
     //save the refresh function
@@ -153,7 +153,7 @@ export default class UIPrepare {
         } while (!allViewsSet && numViewsSet > 0)
 
         if (numViewsSet == 0 && parent.hasUIChildren() && views0dependencies < childElements.length) {
-            UILog.logE("Check cycle references in " + (hor ? "horizontal" : "vertical") + " for parent " + parent.id)
+            Log.logE("Check cycle references in " + (hor ? "horizontal" : "vertical") + " for parent " + parent.id)
         }
 
         //sort views after setting order num
@@ -313,7 +313,13 @@ export default class UIPrepare {
      * @param {*=} parentElement
      * @return {UIView} generated view
      */
-    public generateUIViews(element: HTMLElement, config: UIConfiguration, aScreens: UIView[], parentScreen: UIView, parentElement?: UIHTMLElement): UIView {
+    public generateUIViews(
+        element: HTMLElement,
+        config: UIConfiguration,
+        aScreens: UIView[],
+        parentScreen: UIView,
+        parentElement?: UIHTMLElement,
+    ): UIView {
         //initialize array of screens if it is necessary
         if (!aScreens) {
             aScreens = []
@@ -355,7 +361,13 @@ export default class UIPrepare {
             var childElement = element.childNodes[i]
 
             if (childElement != null) {
-                var childView = this.generateUIViews(childElement as HTMLElement, config, aScreens, parentScreen, view != null ? view.element : undefined)
+                var childView = this.generateUIViews(
+                    childElement as HTMLElement,
+                    config,
+                    aScreens,
+                    parentScreen,
+                    view != null ? view.element : undefined,
+                )
 
                 //update the identifier of the last child if it is a ui node
                 if (childView) {

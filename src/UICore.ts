@@ -1,6 +1,6 @@
-import UILog from "./general/UILog"
-import UIViewUtils from "./utils/UIViewUtils"
-import UIView from "./UIView"
+import Log from "./utils/log/Log"
+import UIViewUtils from "./utils/uiview/UIViewUtils"
+import UIView from "./model/UIView"
 
 export default class UICore {
     private scrollWidth: number
@@ -424,7 +424,12 @@ export default class UICore {
      * Calculate the left or the right with the size of the children if the sizeWidth is "sc"
      * @param view View to set the size
      **/
-    private applySizeChildrenHor(view: UIView, arrayViews: UIView[], indexes: { [key: string]: number }, viewsRestored: UIView[]) {
+    private applySizeChildrenHor(
+        view: UIView,
+        arrayViews: UIView[],
+        indexes: { [key: string]: number },
+        viewsRestored: UIView[],
+    ) {
         var minX = 0
         var maxX = 0
         view.forEachChild(function(child, index) {
@@ -479,7 +484,12 @@ export default class UICore {
      * Calculate the top or the bottom with the size of the children if the sizeWidth is "sc"
      * @param view View to set the size
      **/
-    private applySizeChildrenVer(view: UIView, arrayViews: UIView[], indexes: { [key: string]: number }, viewsRestored: UIView[]) {
+    private applySizeChildrenVer(
+        view: UIView,
+        arrayViews: UIView[],
+        indexes: { [key: string]: number },
+        viewsRestored: UIView[],
+    ) {
         var minY = 0
         var maxY = 0
         view.forEachChild(function(child) {
@@ -667,9 +677,15 @@ export default class UICore {
      * @param iReference index of reference to evaluate
      * @param viewDependency from wich get the value
      **/
-    private evalDependenceHor(view: UIView, parentView: UIView, width: number, iReference: number, viewDependency: UIView) {
+    private evalDependenceHor(
+        view: UIView,
+        parentView: UIView,
+        width: number,
+        iReference: number,
+        viewDependency: UIView,
+    ) {
         if (viewDependency == null) {
-            UILog.logE("The view '" + view.id + "' has a wrong reference")
+            Log.logE("The view '" + view.id + "' has a wrong reference")
             return
         }
 
@@ -681,7 +697,9 @@ export default class UICore {
                 view.leftChanged = true
                 break
             case 1: //leftRight
-                view.left = viewDependency.rightChanged ? viewDependency.right : viewDependency.left + viewDependency.width
+                view.left = viewDependency.rightChanged
+                    ? viewDependency.right
+                    : viewDependency.left + viewDependency.width
                 view.leftChanged = true
                 break
             case 2: //rightRight
@@ -693,7 +711,9 @@ export default class UICore {
                         break
                     }
                 } else {
-                    view.right = viewDependency.rightChanged ? viewDependency.right : viewDependency.left + viewDependency.width
+                    view.right = viewDependency.rightChanged
+                        ? viewDependency.right
+                        : viewDependency.left + viewDependency.width
                 }
                 view.rightChanged = true
                 break
@@ -711,9 +731,15 @@ export default class UICore {
      * @param iReference index of reference to evaluate
      * @param viewDependency from wich get the value
      **/
-    private evalDependenceVer(view: UIView, parentView: UIView, height: number, iReference: number, viewDependency: UIView) {
+    private evalDependenceVer(
+        view: UIView,
+        parentView: UIView,
+        height: number,
+        iReference: number,
+        viewDependency: UIView,
+    ) {
         if (viewDependency == null) {
-            UILog.logE("The view '" + view.id + "' has a wrong reference")
+            Log.logE("The view '" + view.id + "' has a wrong reference")
             return
         }
 
@@ -725,7 +751,9 @@ export default class UICore {
                 view.topChanged = true
                 break
             case 1: //topBottom
-                view.top = viewDependency.bottomChanged ? viewDependency.bottom : viewDependency.top + viewDependency.height
+                view.top = viewDependency.bottomChanged
+                    ? viewDependency.bottom
+                    : viewDependency.top + viewDependency.height
                 view.topChanged = true
                 break
 
@@ -738,7 +766,9 @@ export default class UICore {
                         break
                     }
                 } else {
-                    view.bottom = viewDependency.bottomChanged ? viewDependency.bottom : viewDependency.top + viewDependency.height
+                    view.bottom = viewDependency.bottomChanged
+                        ? viewDependency.bottom
+                        : viewDependency.top + viewDependency.height
                 }
                 view.bottomChanged = true
                 break

@@ -1,20 +1,19 @@
 import UIPrepare from "./UIPrepare"
-import UIDraw from "./UIDraw"
-import UIRedrawTimer from "./utils/UIRedrawTimer"
-import UIConfiguration, { UIConfigurationData } from "./UIConfiguration"
+import UIViewDrawUtils from "./utils/uiviewdraw/UIViewDrawUtils"
+import RedrawTimer from "./utils/redrawtimer/RedrawTimer"
+import UIConfiguration from "./UIConfiguration"
 import UICore from "./UICore"
-import UILog from "./general/UILog"
-import UIView from "./UIView"
-import UIHTMLElement from "./UIHTMLElement"
-import UIGeneralFuncs from "./general/UIGeneralFuncs"
+import Log from "./utils/log/Log"
+import UIView from "./model/UIView"
+import UIHTMLElement from "./model/UIHTMLElement"
+import UIConfigurationData from "./model/UIConfigurationData"
+import HtmlUtils from "./utils/html/HTMLUtils"
+import CounterUtils from "./utils/counter/CounterUtils"
 
 /**
  * @constructor
  */
 export default class WebUI {
-    /** Configuration saved **/
-    private uiConfiguration: UIConfiguration = new UIConfiguration()
-
     //size of scrollbars to use as padding when views have scrollbars visible
     private scrollWidth: number = 0
     private scrollHeight: number = 0
@@ -29,14 +28,13 @@ export default class WebUI {
 
     //controllers
     private uiPrepare: UIPrepare = new UIPrepare(this.refresh.bind(this))
-    private uiDraw: UIDraw = new UIDraw()
     private uiCore: UICore | null = null
 
     //configuration
     private configuration: UIConfiguration = new UIConfiguration()
 
     //timer for repainting
-    private redrawTimer: UIRedrawTimer = new UIRedrawTimer()
+    private redrawTimer: RedrawTimer = new RedrawTimer()
 
     //redraw function
     private redraw() {
@@ -44,11 +42,18 @@ export default class WebUI {
         var countNodesAdded = this.uiPrepare.addNodes(this.nodesAdded, this.screens, this.configuration)
         var countNodesRemoved = this.uiPrepare.removeNodes(this.parentNodesRemoved)
         var countNodesModified = this.uiPrepare.updateNodes(this.nodesUpdated, this.screens, this.configuration)
-        UILog.log("Nodes added: " + countNodesAdded + " - Nodes removed: " + countNodesRemoved + " - Nodes modified: " + countNodesModified)
+        Log.log(
+            "Nodes added: " +
+                countNodesAdded +
+                " - Nodes removed: " +
+                countNodesRemoved +
+                " - Nodes modified: " +
+                countNodesModified,
+        )
 
         this.redrawTimer.timer(() => {
             //draw
-            UILog.log(" -- Redraw -- ")
+            Log.log(" -- Redraw -- ")
             this.drawScreens()
         }, this.configuration.timeRedraw)
     }
@@ -69,15 +74,15 @@ export default class WebUI {
 
         //calculate the size of scrollbars
         if (this.scrollWidth == 0) {
-            this.scrollWidth = UIGeneralFuncs.getScrollWidth()
+            this.scrollWidth = HtmlUtils.getScrollWidth()
         }
 
         //save configuration
         this.configuration = new UIConfiguration(configuration)
 
         //apply global values for logs
-        UILog.uiShowLogs = this.configuration.showLogs
-        UILog.uiViewLogs = this.configuration.logsView
+        Log.uiShowLogs = this.configuration.showLogs
+        Log.uiViewLogs = this.configuration.logsView
 
         //prepare core with the configuration
         this.uiCore = new UICore(this.scrollWidth)
@@ -185,7 +190,7 @@ export default class WebUI {
      **/
     private drawScreens() {
         //start genral counter
-        UIGeneralFuncs.startCounter("drawScreens")
+        CounterUtils.startCounter("drawScreens")
 
         //prepare all dom from body for the first time
         if (this.screens.length == 0) {
@@ -199,7 +204,7 @@ export default class WebUI {
             this.drawUIScreen(this.screens[i])
         }
 
-        UILog.log("Time drawing screens: " + UIGeneralFuncs.endCounter("drawScreens"))
+        Log.log("Time drawing screens: " + CounterUtils.endCounter("drawScreens"))
     }
 
     private drawUIScreen(screen: UIView) {
@@ -212,11 +217,11 @@ export default class WebUI {
         var timerAll = 0
 
         //start genral counter
-        UIGeneralFuncs.startCounter("all")
+        CounterUtils.startCounter("all")
 
         //---- PREPARE -----
-        UIGeneralFuncs.startCounter("prepare")
-        UIGeneralFuncs.startCounter("loadSizes")
+        CounterUtils.startCounter("prepare")
+        CounterUtils.startCounter("loadSizes")
 
         //call to listener with start event
         this.configuration.sendStartEvent()
@@ -227,43 +232,43 @@ export default class WebUI {
 
             //load sizes of views
             this.uiPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged)
-            timerLoadSizes = UIGeneralFuncs.endCounter("loadSizes")
+            timerLoadSizes = CounterUtils.endCounter("loadSizes")
 
             //order views
-            UIGeneralFuncs.startCounter("orderViews")
+            CounterUtils.startCounter("orderViews")
             this.uiPrepare.orderViews(screen)
-            timerOrderViews = UIGeneralFuncs.endCounter("orderViews")
+            timerOrderViews = CounterUtils.endCounter("orderViews")
 
-            timerPrepare = UIGeneralFuncs.endCounter("prepare")
+            timerPrepare = CounterUtils.endCounter("prepare")
 
             //---- CORE -----
-            UIGeneralFuncs.startCounter("core")
+            CounterUtils.startCounter("core")
 
             //assign position and sizes to screen
             this.uiCore.calculateScreen(screen)
 
-            timerCore = UIGeneralFuncs.endCounter("core")
+            timerCore = CounterUtils.endCounter("core")
         }
 
         //---- DRAW -----
-        UIGeneralFuncs.startCounter("draw")
+        CounterUtils.startCounter("draw")
 
         //apply position and sizes
-        var childrenSizes = this.uiDraw.applyPositions(screen, this.configuration.viewColors)
-        this.uiDraw.applyVisibility(screen, null, this.configuration, !screen.hasToBeCalculated())
+        var childrenSizes = UIViewDrawUtils.applyPositions(screen, this.configuration.viewColors)
+        UIViewDrawUtils.applyVisibility(screen, null, this.configuration, !screen.hasToBeCalculated())
 
         //resize screen if necessary
-        this.uiDraw.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY)
+        UIViewDrawUtils.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY)
 
-        timerDraw = UIGeneralFuncs.endCounter("draw")
+        timerDraw = CounterUtils.endCounter("draw")
 
         //call to listener with end event
         this.configuration.sendEndEvent()
 
         //end counter
-        timerAll = UIGeneralFuncs.endCounter("all")
+        timerAll = CounterUtils.endCounter("all")
 
-        UILog.log(
+        Log.log(
             "[" +
                 screen.id +
                 "] All: " +

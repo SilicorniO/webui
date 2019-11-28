@@ -1,4 +1,4 @@
-export default class UIRedrawTimer {
+export default class RedrawTimer {
     private time: number | null = null
 
     /**

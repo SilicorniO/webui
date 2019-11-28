@@ -1,35 +1,9 @@
-import UILog from "./general/UILog"
-
-export interface UIDataEvent {
-    name: string
-    attributes?: string[]
-}
-
-export interface UIConfigurationDataScreenMode {
-    attribute?: string
-    widthStart?: number
-    widthEnd?: number
-    heightStart?: number
-    heightEnd?: number
-    dimens?: { [key: string]: number }
-}
-
-export interface UIConfigurationDataAnimations {
-    defaultTime?: number
-    defaultOpacity?: boolean
-}
-
-export interface UIConfigurationData {
-    viewColors?: boolean
-    showLogs?: boolean
-    viewLogs?: string
-    attribute?: string
-    animations?: UIConfigurationDataAnimations
-    dimens?: { [key: string]: number }
-    screenModes?: UIConfigurationDataScreenMode[]
-    timeRedraw?: number
-    events?: (event: UIDataEvent) => void
-}
+import Log from "./utils/log/Log"
+import UIConfigurationData, {
+    UIConfigurationDataScreenMode,
+    UIConfigurationDataAnimations,
+    UIDataEvent,
+} from "model/UIConfigurationData"
 
 export default class UIConfiguration {
     private static readonly ATTRIBUTE_DEFAULT = "ui"
@@ -134,8 +108,8 @@ export default class UIConfiguration {
         var widthScreen = window.innerWidth
         var heightScreen = window.innerHeight
 
-        UILog.log("screen-width: " + widthScreen)
-        UILog.log("screen-height: " + heightScreen)
+        Log.log("screen-width: " + widthScreen)
+        Log.log("screen-height: " + heightScreen)
 
         if (this.screenModes) {
             for (var i = 0; i < this.screenModes.length; i++) {
@@ -150,7 +124,7 @@ export default class UIConfiguration {
                     (!screenMode.heightEnd || screenMode.heightEnd == 0 || screenMode.heightEnd < heightScreen)
                 ) {
                     aAttributes.push(screenMode["attribute"])
-                    UILog.log("SHOWING ATTRIBUTE: " + screenMode["attribute"])
+                    Log.log("SHOWING ATTRIBUTE: " + screenMode["attribute"])
                     //add dimens of this screen mode overriding existing
                     if (screenMode.dimens) {
                         var dimenKeys = Object.keys(screenMode["dimens"])
@@ -173,7 +147,7 @@ export default class UIConfiguration {
         } else if (name && !isNaN(parseInt(name, 10))) {
             return parseInt(name, 10)
         } else {
-            UILog.logE("The dimension '" + name + "' is not valid or it is not defined")
+            Log.logE("The dimension '" + name + "' is not valid or it is not defined")
             return 0
         }
     }

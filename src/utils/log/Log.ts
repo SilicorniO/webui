@@ -1,57 +1,57 @@
-import UIView from "../UIView"
+import UIView from "../../model/UIView"
 
-enum UILogType {
+enum LogType {
     INFO,
     WARNING,
     ERROR,
     DEBUG,
 }
 
-export default class UILog {
+export default class Log {
     public static uiShowLogs = false
     public static uiViewLogs: any | null = null
 
     public static log(s: string) {
-        UILog.logShow(UILogType.DEBUG, s)
+        Log.logShow(LogType.DEBUG, s)
     }
 
     public static logW(s: string) {
-        UILog.logShow(UILogType.WARNING, s)
+        Log.logShow(LogType.WARNING, s)
     }
 
     public static logE(s: string) {
-        UILog.logShow(UILogType.ERROR, s)
+        Log.logShow(LogType.ERROR, s)
     }
 
     public static logI(s: string) {
-        UILog.logShow(UILogType.INFO, s)
+        Log.logShow(LogType.INFO, s)
     }
 
     public static logIView(prefix: string, view: UIView) {
-        UILog.logI("[" + prefix + "] " + view.toString())
+        Log.logI("[" + prefix + "] " + view.toString())
         view.forEachChild((child, _index) => {
-            UILog.logIView(prefix, child)
+            Log.logIView(prefix, child)
         })
     }
 
-    public static logShow(type: UILogType, text: string) {
-        if (!UILog.uiShowLogs) {
+    public static logShow(type: LogType, text: string) {
+        if (!Log.uiShowLogs) {
             return
         }
 
         //prepare log
         var log = text
         switch (type) {
-            case UILogType.DEBUG:
+            case LogType.DEBUG:
                 log = "DEBUG: " + log
                 break
-            case UILogType.WARNING:
+            case LogType.WARNING:
                 log = "WARNING: " + log
                 break
-            case UILogType.ERROR:
+            case LogType.ERROR:
                 log = "ERROR: " + log
                 break
-            case UILogType.INFO:
+            case LogType.INFO:
                 log = "INFO: " + log
                 break
         }
@@ -60,8 +60,8 @@ export default class UILog {
         console.log(log)
 
         //show in view if there is one
-        if (UILog.uiViewLogs) {
-            UILog.uiViewLogs.innerHTML += log + "<BR />"
+        if (Log.uiViewLogs) {
+            Log.uiViewLogs.innerHTML += log + "<BR />"
         }
     }
 }
