@@ -227,7 +227,7 @@ export default class UIView {
     }
 
     public setSize(axis: AXIS, value: string) {
-        if (value == "sc") {
+        if (value == UI_SIZE.SIZE_CONTENT) {
             this.attrs[axis].size = value
             this.attrsCalc[axis].sizeValue = 0
         } else if (String(value).indexOf("%") != -1) {
@@ -236,10 +236,10 @@ export default class UIView {
             if (indexPercent < value.length - 1) {
                 this.attrsCalc[axis].percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
             }
-            this.attrs[axis].size = "sp" //size_percent
+            this.attrs[axis].size = UI_SIZE.PERCENTAGE
         } else {
             this.attrsCalc[axis].sizeValue = parseInt(value, 10)
-            this.attrs[axis].size = "s" //sized
+            this.attrs[axis].size = UI_SIZE.SCREEN
         }
         this.sizeLoaded = false
     }

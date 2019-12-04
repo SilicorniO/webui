@@ -1,6 +1,6 @@
 import Log from "./utils/log/Log"
 import UIViewUtils from "./utils/uiview/UIViewUtils"
-import UIView, { AXIS, UI_VIEW_ID, UI_REF_LIST, UI_REF } from "./model/UIView"
+import UIView, { AXIS, UI_VIEW_ID, UI_REF_LIST, UI_REF, UI_SIZE } from "./model/UIView"
 
 export default class UICore {
     private scrollWidth: number
@@ -97,7 +97,7 @@ export default class UICore {
         if (view.attrs[axis].size == UI_VIEW_ID.SCREEN) {
             //fixed width
             this.applyFixedSize(axis, view)
-        } else if (view.attrs[axis].size == "sp") {
+        } else if (view.attrs[axis].size == UI_SIZE.PERCENTAGE) {
             //apply percent
             this.applyPercent(axis, view, parentView, width)
         }
@@ -376,13 +376,13 @@ export default class UICore {
 
         if (viewMarginStart != 0 && view.positions[axis].startChanged) {
             view.positions[axis].start += viewMarginStart
-            if (!view.positions[axis].endChanged || view.attrs[axis].size == "s") {
+            if (!view.positions[axis].endChanged || view.attrs[axis].size == UI_SIZE.SCREEN) {
                 view.positions[axis].end += viewMarginStart
             }
         }
         if (viewMarginEnd != 0 && view.positions[axis].endChanged) {
             view.positions[axis].end -= viewMarginEnd
-            if (!view.positions[axis].startChanged || view.attrs[axis].size == "s") {
+            if (!view.positions[axis].startChanged || view.attrs[axis].size == UI_SIZE.SCREEN) {
                 view.positions[axis].start -= viewMarginEnd
             }
         }

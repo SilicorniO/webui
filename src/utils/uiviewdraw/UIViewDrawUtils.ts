@@ -1,5 +1,5 @@
 import Log from "../log/Log"
-import UIView, { AXIS, UI_SIZE } from "../../model/UIView"
+import UIView, { AXIS, UI_SIZE, UI_VIEW_ID } from "../../model/UIView"
 import UIConfiguration from "../../UIConfiguration"
 
 export interface UIViewDrawPosition {
@@ -44,11 +44,11 @@ export default class UIViewDrawUtils {
             //get paddings
             if (ele.childElementCount == 0) {
                 var curStyle = window.getComputedStyle(ele)
-                if (view.attrs[AXIS.X].size == "sc") {
+                if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT) {
                     paddingLeft = parseInt(curStyle.paddingLeft, 10)
                     paddingRight = parseInt(curStyle.paddingRight, 10)
                 }
-                if (view.attrs[AXIS.Y].size == "sc") {
+                if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT) {
                     paddingTop = parseInt(curStyle.paddingTop, 10)
                     paddingBottom = parseInt(curStyle.paddingBottom, 10)
                 }
@@ -168,7 +168,7 @@ export default class UIViewDrawUtils {
      **/
     public static applySizeScreen(screenView: UIView, width: number, height: number) {
         var ele = document.getElementById(screenView.id)
-        if (screenView.id != "s" && ele != null) {
+        if (screenView.id != UI_VIEW_ID.SCREEN && ele != null) {
             if (screenView.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
                 ele.style.width = screenView.positions[AXIS.X].size + "px"
             } else if (screenView.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {

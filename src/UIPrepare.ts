@@ -233,10 +233,10 @@ export default class UIPrepare {
                 sizeChanged = true
             }
         }
-        if (screen.attrs[AXIS.Y].size != "sc") {
-            if (screen.attrs[AXIS.Y].size == "s") {
+        if (screen.attrs[AXIS.Y].size != UI_SIZE.SIZE_CONTENT) {
+            if (screen.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
                 ele.style.height = screen.attrsCalc[AXIS.Y].sizeValue + "px"
-            } else if (screen.attrs[AXIS.Y].size == "sp") {
+            } else if (screen.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
                 ele.style.height = screen.attrsCalc[AXIS.Y].sizeValue + "%"
             }
 
@@ -464,7 +464,10 @@ export default class UIPrepare {
                     view.childrenInOrder = false
 
                     //3. Check if parent has size content, to mark it as modified
-                    if (view.attrs[AXIS.X].size == "sc" || view.attrs[AXIS.Y].size == "sc") {
+                    if (
+                        view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT ||
+                        view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT
+                    ) {
                         view.cleanSizeLoaded()
                     }
                     return
