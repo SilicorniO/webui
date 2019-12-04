@@ -3,6 +3,111 @@ import UIUtils from "../utils/ui/UIUtils"
 import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
 
+export type UIViewId = UI_VIEW_ID | string
+
+export type UIVisibility = "v" | "i" | "g"
+
+export enum UI_VIEW_ID {
+    SCREEN = "s",
+    PARENT = "p",
+    LAST = "l",
+}
+
+export enum UI_REFERENCE {
+    START_START,
+    START_END,
+    END_END,
+    END_START,
+}
+
+export const UI_REFERENCE_LIST: UI_REFERENCE[] = [
+    UI_REFERENCE.START_START,
+    UI_REFERENCE.START_END,
+    UI_REFERENCE.END_END,
+    UI_REFERENCE.END_START,
+]
+
+export interface UIReference {
+    [UI_REFERENCE.START_START]: UIViewId
+    [UI_REFERENCE.START_END]: UIViewId
+    [UI_REFERENCE.END_END]: UIViewId
+    [UI_REFERENCE.END_START]: UIViewId
+}
+
+export enum UI_AXIS {
+    X,
+    Y,
+}
+
+export const UI_AXIS_LIST: UI_AXIS[] = [UI_AXIS.X, UI_AXIS.Y]
+
+export interface UIReferenceAxis {
+    [UI_AXIS.X]: UIReference
+    [UI_AXIS.Y]: UIReference
+}
+
+export enum UI_ATTR_AXIS {
+    SIZE,
+    PERCENT_POS,
+    SCROLL,
+    CENTER,
+    MARGIN_START,
+    MARGIN_END,
+    PADDING_START,
+    PADDING_END,
+}
+
+export enum UI_ATTR {
+    VISIBILITY,
+    ANIMATION_DURATIONS,
+}
+
+export interface UIAttrAxis {
+    [UI_ATTR_AXIS.SIZE]: string
+    [UI_ATTR_AXIS.SCROLL]: boolean
+    [UI_ATTR_AXIS.CENTER]: boolean
+    [UI_ATTR_AXIS.MARGIN_START]: string
+    [UI_ATTR_AXIS.MARGIN_END]: string
+    [UI_ATTR_AXIS.PADDING_START]: string
+    [UI_ATTR_AXIS.PADDING_END]: string
+}
+
+export interface UIAttr {
+    [UI_ATTR.VISIBILITY]: UIVisibility
+    [UI_ATTR.ANIMATION_DURATIONS]: number[]
+}
+
+export enum UI_POSITION {
+    SIZE,
+    START,
+    END,
+    START_CHANGED,
+    END_CHANGED,
+    SCROLL_APPLIED,
+    MARGIN_START,
+    MARGIN_END,
+    PADDING_START,
+    PADDING_END,
+}
+
+export interface UIPosition {
+    [UI_POSITION.SIZE]: number
+    [UI_POSITION.START]: number
+    [UI_POSITION.END]: number
+    [UI_POSITION.START_CHANGED]: boolean
+    [UI_POSITION.END_CHANGED]: boolean
+    [UI_POSITION.SCROLL_APPLIED]: boolean
+    [UI_POSITION.MARGIN_START]: number
+    [UI_POSITION.MARGIN_END]: number
+    [UI_POSITION.PADDING_START]: number
+    [UI_POSITION.PADDING_END]: number
+}
+
+export interface UIPositionAxis {
+    [UI_AXIS.X]: UIPosition
+    [UI_AXIS.Y]: UIPosition
+}
+
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
 
@@ -20,14 +125,20 @@ export default class UIView {
     dependenciesHor: string[] = []
     dependenciesVer: string[] = []
 
-    leftLeft: string = ""
-    leftRight: string = ""
-    rightRight: string = ""
-    rightLeft: string = ""
-    topTop: string = ""
-    topBottom: string = ""
-    bottomBottom: string = ""
-    bottomTop: string = ""
+    private references: UIReferenceAxis = {
+        [UI_AXIS.X]: {
+            [UI_REFERENCE.START_START]: "",
+            [UI_REFERENCE.START_END]: "",
+            [UI_REFERENCE.END_END]: "",
+            [UI_REFERENCE.END_START]: "",
+        },
+        [UI_AXIS.Y]: {
+            [UI_REFERENCE.START_START]: "",
+            [UI_REFERENCE.START_END]: "",
+            [UI_REFERENCE.END_END]: "",
+            [UI_REFERENCE.END_START]: "",
+        },
+    }
 
     sizeWidth: string = "sc"
     sizeHeight: string = "sc"
@@ -61,31 +172,32 @@ export default class UIView {
 
     //----- calculated -----
 
-    width: number = 0
-    height: number = 0
-
-    left: number = 0
-    top: number = 0
-    right: number = 0
-    bottom: number = 0
-
-    leftChanged: boolean = false
-    topChanged: boolean = false
-    rightChanged: boolean = false
-    bottomChanged: boolean = false
-
-    scrollVerticalApplied: boolean = false
-    scrollHorizontalApplied: boolean = false
-
-    marginLeft: number = 0
-    marginTop: number = 0
-    marginRight: number = 0
-    marginBottom: number = 0
-
-    paddingLeft: number = 0
-    paddingTop: number = 0
-    paddingRight: number = 0
-    paddingBottom: number = 0
+    public positions: UIPositionAxis = {
+        [UI_AXIS.X]: {
+            [UI_POSITION.SIZE]: 0,
+            [UI_POSITION.START]: 0,
+            [UI_POSITION.END]: 0,
+            [UI_POSITION.START_CHANGED]: false,
+            [UI_POSITION.END_CHANGED]: false,
+            [UI_POSITION.SCROLL_APPLIED]: false,
+            [UI_POSITION.MARGIN_START]: 0,
+            [UI_POSITION.MARGIN_END]: 0,
+            [UI_POSITION.PADDING_START]: 0,
+            [UI_POSITION.PADDING_END]: 0,
+        },
+        [UI_AXIS.Y]: {
+            [UI_POSITION.SIZE]: 0,
+            [UI_POSITION.START]: 0,
+            [UI_POSITION.END]: 0,
+            [UI_POSITION.START_CHANGED]: false,
+            [UI_POSITION.END_CHANGED]: false,
+            [UI_POSITION.SCROLL_APPLIED]: false,
+            [UI_POSITION.MARGIN_START]: 0,
+            [UI_POSITION.MARGIN_END]: 0,
+            [UI_POSITION.PADDING_START]: 0,
+            [UI_POSITION.PADDING_END]: 0,
+        },
+    }
 
     //----- Flags for changes -----
     sizeLoaded: boolean = false
@@ -155,38 +267,18 @@ export default class UIView {
         this.sizeLoaded = false
     }
 
-    public setLeft(id: string) {
-        this.leftLeft = id
+    // ----- REFERENCES -----
+
+    public setReference(axis: UI_AXIS, ref: UI_REFERENCE, id: string) {
+        this.references[axis][ref] = id
         this.sizeLoaded = false
     }
-    public setRight(id: string) {
-        this.rightRight = id
-        this.sizeLoaded = false
+
+    public getReference(axis: UI_AXIS): UIReference {
+        return this.references[axis]
     }
-    public setTop(id: string) {
-        this.topTop = id
-        this.sizeLoaded = false
-    }
-    public setBottom(id: string) {
-        this.bottomBottom = id
-        this.sizeLoaded = false
-    }
-    public setAtLeft(id: string) {
-        this.rightLeft = id
-        this.sizeLoaded = false
-    }
-    public setAtRight(id: string) {
-        this.leftRight = id
-        this.sizeLoaded = false
-    }
-    public setAtTop(id: string) {
-        this.bottomTop = id
-        this.sizeLoaded = false
-    }
-    public setAtBottom(id: string) {
-        this.topBottom = id
-        this.sizeLoaded = false
-    }
+
+    // ----- SCROLL -----
 
     private setScrollVertical(value: boolean) {
         this.scrollVertical = value
@@ -195,6 +287,8 @@ export default class UIView {
         this.scrollHorizontal = value
     }
 
+    // ----- CENTER -----
+
     public setCenterVertical(value: boolean) {
         this.centerVer = value
     }
@@ -202,22 +296,32 @@ export default class UIView {
         this.centerHor = value
     }
 
+    // ----- MARGIN ------
+
+    public setMargin(margin: string) {
+        this.setMargins(margin, margin, margin, margin)
+    }
+
     public setMarginLeft(margin: string) {
         this.marginLeftDimen = margin
         this.sizeLoaded = false
     }
+
     public setMarginTop(margin: string) {
         this.marginTopDimen = margin
         this.sizeLoaded = false
     }
+
     public setMarginRight(margin: string) {
         this.marginRightDimen = margin
         this.sizeLoaded = false
     }
+
     public setMarginBottom(margin: string) {
         this.marginBottomDimen = margin
         this.sizeLoaded = false
     }
+
     public setMargins(marginLeft: string, marginTop: string, marginRight: string, marginBottom: string) {
         this.marginLeftDimen = marginLeft
         this.marginTopDimen = marginTop
@@ -226,22 +330,32 @@ export default class UIView {
         this.sizeLoaded = false
     }
 
+    // ----- PADDING -----
+
+    public setPadding(padding: string) {
+        this.setPaddings(padding, padding, padding, padding)
+    }
+
     public setPaddingLeft(padding: string) {
         this.paddingLeftDimen = padding
         this.sizeLoaded = false
     }
+
     public setPaddingTop(padding: string) {
         this.paddingTopDimen = padding
         this.sizeLoaded = false
     }
+
     public setPaddingRight(padding: string) {
         this.paddingRightDimen = padding
         this.sizeLoaded = false
     }
+
     public setPaddingBottom(padding: string) {
         this.paddingBottomDimen = padding
         this.sizeLoaded = false
     }
+
     public setPaddings(paddingLeft: string, paddingTop: string, paddingRight: string, paddingBottom: string) {
         this.paddingLeftDimen = paddingLeft
         this.paddingTopDimen = paddingTop
@@ -249,6 +363,8 @@ export default class UIView {
         this.paddingBottomDimen = paddingBottom
         this.sizeLoaded = false
     }
+
+    // ----- VISIBILITY -----
 
     public setVisibility(visibility: string) {
         if (visibility != "g" && this.visibility == "g") {
@@ -290,56 +406,6 @@ export default class UIView {
         this.forEachChild((child: UIView) => {
             child.animateDependencies(animationDuration)
         })
-    }
-
-    private getReferences() {
-        return [
-            this.leftLeft,
-            this.leftRight,
-            this.rightRight,
-            this.rightLeft,
-            this.topTop,
-            this.topBottom,
-            this.bottomBottom,
-            this.bottomTop,
-        ]
-    }
-
-    public getReferencesHor() {
-        return [this.leftLeft, this.leftRight, this.rightRight, this.rightLeft]
-    }
-
-    public getReferencesVer() {
-        return [this.topTop, this.topBottom, this.bottomBottom, this.bottomTop]
-    }
-
-    private setReference(i: number, value: string) {
-        switch (i) {
-            case 0:
-                this.leftLeft = value
-                break
-            case 1:
-                this.leftRight = value
-                break
-            case 2:
-                this.rightRight = value
-                break
-            case 3:
-                this.rightLeft = value
-                break
-            case 4:
-                this.topTop = value
-                break
-            case 5:
-                this.topBottom = value
-                break
-            case 6:
-                this.bottomBottom = value
-                break
-            case 7:
-                this.bottomTop = value
-                break
-        }
     }
 
     /**
@@ -416,38 +482,36 @@ export default class UIView {
         return null
     }
 
-    public clean() {
-        this.cleanHor()
-        this.cleanVer()
+    public cleanAllAxis() {
+        for (const axis of UI_AXIS_LIST) {
+            this.clean(axis)
+        }
     }
 
-    public cleanHor() {
-        this.leftChanged = false
-        this.rightChanged = false
+    public clean(axis: UI_AXIS) {
+        this.positions[axis][UI_POSITION.START_CHANGED] = false
+        this.positions[axis][UI_POSITION.END_CHANGED] = false
 
-        this.left = 0
-        this.right = 0
-        this.width = 0
-    }
-
-    public cleanVer() {
-        this.topChanged = false
-        this.bottomChanged = false
-
-        this.top = 0
-        this.bottom = 0
-        this.height = 0
+        this.positions[axis][UI_POSITION.START] = 0
+        this.positions[axis][UI_POSITION.END] = 0
+        this.positions[axis][UI_POSITION.SIZE] = 0
     }
 
     public cleanUI() {
-        this.leftLeft = ""
-        this.leftRight = ""
-        this.rightRight = ""
-        this.rightLeft = ""
-        this.topTop = ""
-        this.topBottom = ""
-        this.bottomBottom = ""
-        this.bottomTop = ""
+        this.references = {
+            [UI_AXIS.X]: {
+                [UI_REFERENCE.START_START]: "",
+                [UI_REFERENCE.START_END]: "",
+                [UI_REFERENCE.END_END]: "",
+                [UI_REFERENCE.END_START]: "",
+            },
+            [UI_AXIS.Y]: {
+                [UI_REFERENCE.START_START]: "",
+                [UI_REFERENCE.START_END]: "",
+                [UI_REFERENCE.END_END]: "",
+                [UI_REFERENCE.END_START]: "",
+            },
+        }
 
         this.sizeWidth = "sc" //size_content
         this.sizeHeight = "sc" //size_content
@@ -476,15 +540,15 @@ export default class UIView {
     }
 
     public applyDimens(coreConfig: UIConfiguration) {
-        this.paddingLeft = coreConfig.getDimen(this.paddingLeftDimen)
-        this.paddingRight = coreConfig.getDimen(this.paddingRightDimen)
-        this.paddingTop = coreConfig.getDimen(this.paddingTopDimen)
-        this.paddingBottom = coreConfig.getDimen(this.paddingBottomDimen)
+        this.positions[UI_AXIS.X][UI_POSITION.PADDING_START] = coreConfig.getDimen(this.paddingLeftDimen)
+        this.positions[UI_AXIS.X][UI_POSITION.PADDING_END] = coreConfig.getDimen(this.paddingRightDimen)
+        this.positions[UI_AXIS.Y][UI_POSITION.PADDING_START] = coreConfig.getDimen(this.paddingTopDimen)
+        this.positions[UI_AXIS.Y][UI_POSITION.PADDING_END] = coreConfig.getDimen(this.paddingBottomDimen)
 
-        this.marginLeft = coreConfig.getDimen(this.marginLeftDimen)
-        this.marginRight = coreConfig.getDimen(this.marginRightDimen)
-        this.marginTop = coreConfig.getDimen(this.marginTopDimen)
-        this.marginBottom = coreConfig.getDimen(this.marginBottomDimen)
+        this.positions[UI_AXIS.X][UI_POSITION.MARGIN_START] = coreConfig.getDimen(this.marginLeftDimen)
+        this.positions[UI_AXIS.X][UI_POSITION.MARGIN_END] = coreConfig.getDimen(this.marginRightDimen)
+        this.positions[UI_AXIS.Y][UI_POSITION.MARGIN_START] = coreConfig.getDimen(this.marginTopDimen)
+        this.positions[UI_AXIS.Y][UI_POSITION.MARGIN_END] = coreConfig.getDimen(this.marginBottomDimen)
     }
 
     public toString() {
@@ -492,41 +556,41 @@ export default class UIView {
             "[" +
             this.id +
             "]: ll:" +
-            this.leftLeft +
+            this.references[UI_AXIS.X][UI_REFERENCE.START_START] +
             ", lr:" +
-            this.leftRight +
+            this.references[UI_AXIS.X][UI_REFERENCE.START_END] +
             ", rr:" +
-            this.rightRight +
+            this.references[UI_AXIS.X][UI_REFERENCE.END_END] +
             ", rl:" +
-            this.rightLeft +
+            this.references[UI_AXIS.X][UI_REFERENCE.END_START] +
             ", tt:" +
-            this.topTop +
+            this.references[UI_AXIS.Y][UI_REFERENCE.START_START] +
             ",tb: " +
-            this.topBottom +
+            this.references[UI_AXIS.Y][UI_REFERENCE.START_END] +
             ", bb:" +
-            this.bottomBottom +
+            this.references[UI_AXIS.Y][UI_REFERENCE.END_END] +
             ", bt:" +
-            this.bottomTop +
+            this.references[UI_AXIS.Y][UI_REFERENCE.END_START] +
             ", ml:" +
-            this.marginLeft +
+            this.positions[UI_AXIS.X][UI_POSITION.MARGIN_START] +
             ", mr:" +
-            this.marginRight +
+            this.positions[UI_AXIS.X][UI_POSITION.MARGIN_END] +
             ", mt:" +
-            this.marginTop +
+            this.positions[UI_AXIS.Y][UI_POSITION.MARGIN_START] +
             ",mb: " +
-            this.marginBottom +
+            this.positions[UI_AXIS.Y][UI_POSITION.MARGIN_END] +
             ", pl:" +
-            this.paddingLeft +
+            this.positions[UI_AXIS.X][UI_POSITION.PADDING_START] +
             ", pr:" +
-            this.paddingRight +
+            this.positions[UI_AXIS.X][UI_POSITION.PADDING_END] +
             ", pt:" +
-            this.paddingTop +
+            this.positions[UI_AXIS.Y][UI_POSITION.PADDING_START] +
             ", pb:" +
-            this.paddingBottom +
+            this.positions[UI_AXIS.Y][UI_POSITION.PADDING_END] +
             ", w:" +
-            this.width +
+            this.positions[UI_AXIS.X][UI_POSITION.SIZE] +
             ", h:" +
-            this.height +
+            this.positions[UI_AXIS.Y][UI_POSITION.SIZE] +
             ", sh:" +
             this.sizeWidth +
             ", sh:" +
@@ -534,13 +598,13 @@ export default class UIView {
             ", pId:" +
             (this.parent ? this.parent.id : "") +
             ", l:" +
-            this.left +
+            this.positions[UI_AXIS.X][UI_POSITION.START] +
             ", r:" +
-            this.right +
+            this.positions[UI_AXIS.X][UI_POSITION.END] +
             ", t:" +
-            this.top +
+            this.positions[UI_AXIS.Y][UI_POSITION.START] +
             ", b:" +
-            this.bottom
+            this.positions[UI_AXIS.Y][UI_POSITION.END]
         )
     }
 
@@ -577,37 +641,37 @@ export default class UIView {
             } else if (attr == "fh") {
                 this.setHeight("100%")
             } else if (attr == "l") {
-                this.setLeft(value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.START_START, value)
             } else if (attr == "r") {
-                this.setRight(value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.END_END, value)
             } else if (attr == "t") {
-                this.setTop(value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.START_START, value)
             } else if (attr == "b") {
-                this.setBottom(value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.END_END, value)
             } else if (attr == "al") {
-                this.setAtLeft(value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.END_START, value)
             } else if (attr == "ale") {
-                this.setAtLeft(value)
-                this.setTop(value)
-                this.setBottom(value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.END_START, value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.START_START, value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.END_END, value)
             } else if (attr == "ar") {
-                this.setAtRight(value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.START_END, value)
             } else if (attr == "are") {
-                this.setAtRight(value)
-                this.setTop(value)
-                this.setBottom(value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.START_END, value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.START_START, value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.END_END, value)
             } else if (attr == "at") {
-                this.setAtTop(value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.END_START, value)
             } else if (attr == "ate") {
-                this.setAtTop(value)
-                this.setLeft(value)
-                this.setRight(value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.END_START, value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.START_START, value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.END_END, value)
             } else if (attr == "ab") {
-                this.setAtBottom(value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.START_END, value)
             } else if (attr == "abe") {
-                this.setAtBottom(value)
-                this.setLeft(value)
-                this.setRight(value)
+                this.setReference(UI_AXIS.Y, UI_REFERENCE.START_END, value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.START_START, value)
+                this.setReference(UI_AXIS.X, UI_REFERENCE.END_END, value)
             } else if (attr == "ml") {
                 this.setMarginLeft(value)
             } else if (attr == "mr") {
@@ -671,32 +735,29 @@ export default class UIView {
         // 		break;
         // 	}
         // }
-        var refsHor = false
-        var referencesHor = this.getReferencesHor()
-        for (var i = 0; i < referencesHor.length; i++) {
-            if (referencesHor[i].length > 0) {
-                refsHor = true
-                break
-            }
-        }
-        if (!refsHor && !this.centerHor) {
-            this.setLeft("p")
+        const referencesXEmpty = UIView.isReferenceEmpty(this.getReference(UI_AXIS.X))
+        if (referencesXEmpty && !this.centerHor) {
+            this.setReference(UI_AXIS.X, UI_REFERENCE.START_START, UI_VIEW_ID.PARENT)
         }
 
-        var refsVer = false
-        var referencesVer = this.getReferencesVer()
-        for (var i = 0; i < referencesVer.length; i++) {
-            if (referencesVer[i].length > 0) {
-                refsVer = true
-                break
-            }
-        }
-        if (!refsVer && !this.centerVer) {
-            this.setTop("p")
+        const referencesYEmpty = UIView.isReferenceEmpty(this.getReference(UI_AXIS.Y))
+        if (referencesYEmpty && !this.centerVer) {
+            this.setReference(UI_AXIS.Y, UI_REFERENCE.START_START, UI_VIEW_ID.PARENT)
         }
 
         // if(!refs){
         // 	this.setTop(parentId);
         // }
+    }
+
+    private static isReferenceEmpty(reference: UIReference): boolean {
+        for (const id of UI_REFERENCE_LIST) {
+            if (reference[id].length > 0) {
+                return false
+            }
+        }
+
+        // not found
+        return true
     }
 }

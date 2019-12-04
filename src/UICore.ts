@@ -1,6 +1,6 @@
 import Log from "./utils/log/Log"
 import UIViewUtils from "./utils/uiview/UIViewUtils"
-import UIView from "./model/UIView"
+import UIView, { UI_AXIS, UI_VIEW_ID, UI_REFERENCE_LIST, UI_REFERENCE, UI_POSITION } from "./model/UIView"
 
 export default class UICore {
     private scrollWidth: number
@@ -26,16 +26,33 @@ export default class UICore {
 
             //clean all views except the screen
             for (var i = 1; i < arrayViews.length; i++) {
-                arrayViews[i].clean()
+                arrayViews[i].cleanAllAxis()
             }
 
             //calculate views
-            this.calculateViewsHor(screen.childrenOrderHor, screen, arrayViews, indexes, screen.width, viewsRestored)
-            this.calculateViewsVer(screen.childrenOrderVer, screen, arrayViews, indexes, screen.height, viewsRestored)
+            this.calculateViews(
+                UI_AXIS.X,
+                screen.childrenOrderHor,
+                screen,
+                arrayViews,
+                indexes,
+                screen.width,
+                viewsRestored,
+            )
+            this.calculateViews(
+                UI_AXIS.Y,
+                screen.childrenOrderVer,
+                screen,
+                arrayViews,
+                indexes,
+                screen.height,
+                viewsRestored,
+            )
         } while (viewsRestored.length > 0)
     }
 
-    private calculateViewsHor(
+    private calculateViews(
+        axis: UI_AXIS,
         views: UIView[],
         parentView: UIView,
         arrayViews: UIView[],
@@ -45,12 +62,13 @@ export default class UICore {
     ) {
         for (var i = 0; i < views.length; i++) {
             if (views[i].hasToBeCalculated()) {
-                this.calculateViewHor(views[i], parentView, arrayViews, indexes, width, viewsRestored)
+                this.calculateView(axis, views[i], parentView, arrayViews, indexes, width, viewsRestored)
             }
         }
     }
 
-    private calculateViewHor(
+    private calculateView(
+        axis: UI_AXIS,
         view: UIView,
         parentView: UIView,
         arrayViews: UIView[],
@@ -60,11 +78,11 @@ export default class UICore {
     ) {
         //eval references to try to calculate the width
         var numDependencies = 0
-        var references = view.getReferencesHor()
-        for (var n = 0; n < references.length; n++) {
-            var dependency = this.calculateViewDependency(view, references[n], parentView)
+        var reference = view.getReference(axis)
+        for (const refId of UI_REFERENCE_LIST) {
+            var dependency = this.translateViewDependency(view, reference[refId], parentView)
             if (dependency.length > 0) {
-                this.evalDependenceHor(view, parentView, width, n, arrayViews[indexes[dependency]])
+                this.evalDependence(view, parentView, width, refId, arrayViews[indexes[dependency]])
                 numDependencies += 1
             }
         }
@@ -76,7 +94,7 @@ export default class UICore {
         }
 
         //calculate width
-        if (view.sizeWidth == "s") {
+        if (view.sizeWidth == UI_VIEW_ID.SCREEN) {
             //fixed width
             this.applyFixedSizeHor(view)
         } else if (view.sizeWidth == "sp") {
@@ -140,137 +158,32 @@ export default class UICore {
         }
     }
 
-    private calculateViewsVer(
-        views: UIView[],
-        parentView: UIView,
-        arrayViews: UIView[],
-        indexes: { [key: string]: number },
-        height: number,
-        viewsRestored: UIView[],
-    ) {
-        for (var i = 0; i < views.length; i++) {
-            if (views[i].hasToBeCalculated()) {
-                this.calculateViewVer(views[i], parentView, arrayViews, indexes, height, viewsRestored)
+    private assignSize(axis: UI_AXIS, view: UIView, size: number) {
+        //if parent has size we force the space to the parent
+        if (size > 0) {
+            if (view.positions[axis][UI_POSITION.END] > size) {
+                view.positions[axis][UI_POSITION.END] = size
+            }
+            if (view.positions[axis][UI_POSITION.START] < 0) {
+                view.positions[axis][UI_POSITION.START] = 0
             }
         }
+        view.positions[axis][UI_POSITION.SIZE] =
+            view.positions[axis][UI_POSITION.END] - view.positions[axis][UI_POSITION.START]
     }
 
-    private calculateViewVer(
-        view: UIView,
-        parentView: UIView,
-        arrayViews: UIView[],
-        indexes: { [key: string]: number },
-        height: number,
-        viewsRestored: UIView[],
-    ) {
-        //eval references to try to calculate the height
-        var numDependencies = 0
-        var references = view.getReferencesVer()
-        for (var n = 0; n < references.length; n++) {
-            var dependency = this.calculateViewDependency(view, references[n], parentView)
-            if (dependency.length > 0) {
-                this.evalDependenceVer(view, parentView, height, n, arrayViews[indexes[dependency]])
-                numDependencies += 1
-            }
-        }
-
-        //set top parent if there is not vertical dependencies
-        if (numDependencies == 0 && !view.centerVer) {
-            view.top = 0
-            view.topChanged = true
-        }
-
-        //calculate height
-        if (view.sizeHeight == "s") {
-            //fixed height
-            this.applyFixedSizeVer(view)
-        } else if (view.sizeHeight == "sp") {
-            //apply percent
-            this.applyPercentVer(view, parentView, height)
-        }
-
-        //apply margins to top and bottom
-        this.assignMarginsVer(view)
-
-        //calculate width if it is possible
-        if (view.topChanged && view.bottomChanged) {
-            //calculate the height
-            this.assignSizeVer(view, height)
-
-            //check gravity
-            this.assignCenterVer(view, height)
-
-            //if there are children we eval them with width restrictions
-            if (view.childrenOrderVer.length > 0) {
-                //calculate the real height with padding
-                var viewHeight = view.scrollVertical ? 0 : view.height - view.paddingTop - view.paddingBottom
-                this.calculateViewsVer(view.childrenOrderVer, view, arrayViews, indexes, viewHeight, viewsRestored)
-
-                //move top and bottom of all children using the paddingTop
-                this.applyPaddingChildrenVer(view)
-            }
+    private applyFixedSize(axis: UI_AXIS, view: UIView) {
+        //set left and top if they are not setted
+        if (view.positions[axis][UI_POSITION.END_CHANGED]) {
+            view.positions[axis][UI_POSITION.START] =
+                view.positions[axis][UI_POSITION.END] - view.positions[axis][UI_POSITION.WIDTH_VALUE]
+            view.left = view.right - view.widthValue
+            view.leftChanged = true
         } else {
-            //if there are children we calculate the size of the children
-            //giving the height of the parent
-            if (view.childrenOrderVer.length > 0) {
-                //calculate the real height with padding
-                var viewHeight = view.scrollVertical ? 0 : height
-
-                //calculate the children height
-                this.calculateViewsVer(view.childrenOrderVer, view, arrayViews, indexes, 0, viewsRestored)
-
-                //move top and bottom of all children using the paddingTop
-                this.applyPaddingChildrenVer(view)
-
-                //set the width of the children
-                this.applySizeChildrenVer(view, arrayViews, indexes, viewsRestored)
-            } else {
-                //else if there are not children we calculate the content size
-                this.applySizeContentVer(view)
-            }
-
-            //calculate the width
-            this.assignSizeVer(view, height)
-
-            //check gravity
-            this.assignCenterVer(view, height)
+            view.right = view.left + view.widthValue
+            view.leftChanged = true
+            view.rightChanged = true
         }
-
-        //check if size of children if bigger than container to add vertical scroll
-        if (this.applyScrollVer(view, height)) {
-            //apply the padding of the scroll to the element
-            view.paddingRight += this.scrollWidth
-            view.scrollVerticalApplied = true
-
-            //save the view as one to recalculate
-            viewsRestored.push(view)
-        }
-    }
-
-    private assignSizeHor(view: UIView, width: number) {
-        //if parent has size we force the space to the parent
-        if (width > 0) {
-            if (view.right > width) {
-                view.right = width
-            }
-            if (view.left < 0) {
-                view.left = 0
-            }
-        }
-        view.width = view.right - view.left
-    }
-
-    private assignSizeVer(view: UIView, height: number) {
-        //if parent has size we force the space to the parent
-        if (height > 0) {
-            if (view.bottom > height) {
-                view.bottom = height
-            }
-            if (view.top < 0) {
-                view.top = 0
-            }
-        }
-        view.height = view.bottom - view.top
     }
 
     private applyFixedSizeHor(view: UIView) {
@@ -677,6 +590,60 @@ export default class UICore {
      * @param iReference index of reference to evaluate
      * @param viewDependency from wich get the value
      **/
+    private evalDependence(
+        view: UIView,
+        parentView: UIView,
+        width: number,
+        referenceId: UI_REFERENCE,
+        viewDependency: UIView,
+    ) {
+        if (viewDependency == null) {
+            Log.logE("The view '" + view.id + "' has a wrong reference")
+            return
+        }
+
+        switch (referenceId) {
+            case UI_REFERENCE.START_START: //leftLeft
+                if (parentView != viewDependency) {
+                    view.left = viewDependency.left
+                }
+                view.leftChanged = true
+                break
+            case UI_REFERENCE.START_END: //leftRight
+                view.left = viewDependency.rightChanged
+                    ? viewDependency.right
+                    : viewDependency.left + viewDependency.width
+                view.leftChanged = true
+                break
+            case UI_REFERENCE.END_END: //rightRight
+                if (parentView == viewDependency) {
+                    if (parentView.rightChanged) {
+                        view.right = width
+                    } else {
+                        view.right = 0
+                        break
+                    }
+                } else {
+                    view.right = viewDependency.rightChanged
+                        ? viewDependency.right
+                        : viewDependency.left + viewDependency.width
+                }
+                view.rightChanged = true
+                break
+            case UI_REFERENCE.END_START: //rightLeft
+                view.right = viewDependency.left
+                view.rightChanged = true
+                break
+        }
+    }
+
+    /**
+     * Set left, top, right, bottom values for the reference received
+     * @param view to set the values
+     * @param parentView to check and get values
+     * @param iReference index of reference to evaluate
+     * @param viewDependency from wich get the value
+     **/
     private evalDependenceHor(
         view: UIView,
         parentView: UIView,
@@ -779,11 +746,11 @@ export default class UICore {
         }
     }
 
-    private calculateViewDependency(view: UIView, viewDependency: string, parentView: UIView): string {
+    private translateViewDependency(view: UIView, viewDependency: string, parentView: UIView): string {
         //replace parent or last viewDependency
-        if (viewDependency == "p") {
+        if (viewDependency == UI_VIEW_ID.PARENT) {
             return parentView.id
-        } else if (viewDependency == "l") {
+        } else if (viewDependency == UI_VIEW_ID.LAST) {
             //get previous view and check is null to set as parent
             var previousView = view.getPreviousView()
             if (previousView == null) {
