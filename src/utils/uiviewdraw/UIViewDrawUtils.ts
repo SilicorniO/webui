@@ -1,5 +1,5 @@
 import Log from "../log/Log"
-import UIView from "../../model/UIView"
+import UIView, { AXIS, UI_SIZE } from "../../model/UIView"
 import UIConfiguration from "../../UIConfiguration"
 
 export interface UIViewDrawPosition {
@@ -44,11 +44,11 @@ export default class UIViewDrawUtils {
             //get paddings
             if (ele.childElementCount == 0) {
                 var curStyle = window.getComputedStyle(ele)
-                if (view.sizeWidth == "sc") {
+                if (view.attrs[AXIS.X].size == "sc") {
                     paddingLeft = parseInt(curStyle.paddingLeft, 10)
                     paddingRight = parseInt(curStyle.paddingRight, 10)
                 }
-                if (view.sizeHeight == "sc") {
+                if (view.attrs[AXIS.Y].size == "sc") {
                     paddingTop = parseInt(curStyle.paddingTop, 10)
                     paddingBottom = parseInt(curStyle.paddingBottom, 10)
                 }
@@ -76,10 +76,10 @@ export default class UIViewDrawUtils {
             }
 
             //set location
-            var left = view.left
-            var top = view.top
-            var width = view.width > 0 ? view.width - paddingLeft - paddingRight : 0
-            var height = view.height > 0 ? view.height - paddingTop - paddingBottom : 0
+            var left = view.positions[AXIS.X].start
+            var top = view.positions[AXIS.Y].start
+            var width = view.positions[AXIS.X].size > 0 ? view.positions[AXIS.X].size - paddingLeft - paddingRight : 0
+            var height = view.positions[AXIS.Y].size > 0 ? view.positions[AXIS.Y].size - paddingTop - paddingBottom : 0
             ele.style.left = left + "px"
             ele.style.top = top + "px"
             if (width > 0) {
@@ -90,11 +90,11 @@ export default class UIViewDrawUtils {
             }
             ele.style.position = "absolute"
 
-            if (view.left + view.width > maxX) {
-                maxX = view.left + view.width
+            if (view.positions[AXIS.X].start + view.positions[AXIS.X].size > maxX) {
+                maxX = view.positions[AXIS.X].start + view.positions[AXIS.X].size
             }
-            if (view.top + view.height > maxY) {
-                maxY = view.top + view.height
+            if (view.positions[AXIS.Y].end + view.positions[AXIS.Y].size > maxY) {
+                maxY = view.positions[AXIS.Y].end + view.positions[AXIS.Y].size
             }
 
             var childrenSize = this.applyPositions(view, viewColors)
@@ -169,17 +169,17 @@ export default class UIViewDrawUtils {
     public static applySizeScreen(screenView: UIView, width: number, height: number) {
         var ele = document.getElementById(screenView.id)
         if (screenView.id != "s" && ele != null) {
-            if (screenView.sizeWidth == "s") {
-                ele.style.width = screenView.width + "px"
-            } else if (screenView.sizeWidth == "sp") {
-                ele.style.width = screenView.widthValue + "%"
+            if (screenView.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
+                ele.style.width = screenView.positions[AXIS.X].size + "px"
+            } else if (screenView.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
+                ele.style.width = screenView.attrsCalc[AXIS.X].sizeValue + "%"
             } else {
                 ele.style.width = width + "px"
             }
-            if (screenView.sizeHeight == "s") {
-                ele.style.height = screenView.height + "px"
-            } else if (screenView.sizeHeight == "sp") {
-                ele.style.height = screenView.heightValue + "%"
+            if (screenView.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
+                ele.style.height = screenView.positions[AXIS.Y].size + "px"
+            } else if (screenView.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
+                ele.style.height = screenView.attrsCalc[AXIS.Y].sizeValue + "%"
             } else {
                 ele.style.height = height + "px"
             }

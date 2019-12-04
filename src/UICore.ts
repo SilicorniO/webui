@@ -1,6 +1,6 @@
 import Log from "./utils/log/Log"
 import UIViewUtils from "./utils/uiview/UIViewUtils"
-import UIView, { UI_AXIS, UI_VIEW_ID, UI_REFERENCE_LIST, UI_REFERENCE, UI_POSITION } from "./model/UIView"
+import UIView, { AXIS, UI_VIEW_ID, UI_REF_LIST, UI_REF } from "./model/UIView"
 
 export default class UICore {
     private scrollWidth: number
@@ -31,28 +31,28 @@ export default class UICore {
 
             //calculate views
             this.calculateViews(
-                UI_AXIS.X,
+                AXIS.X,
                 screen.childrenOrderHor,
                 screen,
                 arrayViews,
                 indexes,
-                screen.width,
+                screen.positions[AXIS.X].size,
                 viewsRestored,
             )
             this.calculateViews(
-                UI_AXIS.Y,
+                AXIS.Y,
                 screen.childrenOrderVer,
                 screen,
                 arrayViews,
                 indexes,
-                screen.height,
+                screen.positions[AXIS.Y].size,
                 viewsRestored,
             )
         } while (viewsRestored.length > 0)
     }
 
     private calculateViews(
-        axis: UI_AXIS,
+        axis: AXIS,
         views: UIView[],
         parentView: UIView,
         arrayViews: UIView[],
@@ -68,7 +68,7 @@ export default class UICore {
     }
 
     private calculateView(
-        axis: UI_AXIS,
+        axis: AXIS,
         view: UIView,
         parentView: UIView,
         arrayViews: UIView[],
@@ -79,48 +79,50 @@ export default class UICore {
         //eval references to try to calculate the width
         var numDependencies = 0
         var reference = view.getReference(axis)
-        for (const refId of UI_REFERENCE_LIST) {
+        for (const refId of UI_REF_LIST) {
             var dependency = this.translateViewDependency(view, reference[refId], parentView)
             if (dependency.length > 0) {
-                this.evalDependence(view, parentView, width, refId, arrayViews[indexes[dependency]])
+                this.evalDependence(axis, view, parentView, width, refId, arrayViews[indexes[dependency]])
                 numDependencies += 1
             }
         }
 
         //set left parent if there is not horizontal dependencies
-        if (numDependencies == 0 && !view.centerHor) {
-            view.left = 0
-            view.leftChanged = true
+        if (numDependencies == 0 && !view.attrs[axis].center) {
+            view.positions[axis].start = 0
+            view.positions[axis].startChanged = true
         }
 
         //calculate width
-        if (view.sizeWidth == UI_VIEW_ID.SCREEN) {
+        if (view.attrs[axis].size == UI_VIEW_ID.SCREEN) {
             //fixed width
-            this.applyFixedSizeHor(view)
-        } else if (view.sizeWidth == "sp") {
+            this.applyFixedSize(axis, view)
+        } else if (view.attrs[axis].size == "sp") {
             //apply percent
-            this.applyPercentHor(view, parentView, width)
+            this.applyPercent(axis, view, parentView, width)
         }
 
         //apply margins to left and right
-        this.assignMarginsHor(view)
+        this.assignMargins(axis, view)
 
         //calculate width if it is possible
-        if (view.leftChanged && view.rightChanged) {
+        if (view.positions[axis].startChanged && view.positions[axis].endChanged) {
             //calculate the width
-            this.assignSizeHor(view, width)
+            this.assignSize(axis, view, width)
 
             //check gravity
-            this.assignCenterHor(view, width)
+            this.assignCenter(axis, view, width)
 
             //if there are children we eval them with width restrictions
             if (view.childrenOrderHor.length > 0) {
                 //calculate the real width with padding
-                var viewWidth = view.scrollHorizontal ? 0 : view.width - view.paddingLeft - view.paddingRight
-                this.calculateViewsHor(view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored)
+                var viewWidth = view.attrs[axis].scroll
+                    ? 0
+                    : view.positions[axis].size - view.positions[axis].paddingStart - view.positions[axis].paddingEnd
+                this.calculateViews(axis, view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored)
 
                 //move left and right of all children using the paddingLeft
-                this.applyPaddingChildrenHor(view)
+                this.applyPaddingChildren(axis, view)
             }
         } else {
             //if there are children we calculate the size of the children
@@ -128,85 +130,58 @@ export default class UICore {
             if (view.childrenOrderHor.length > 0) {
                 //calculate the real width with padding
                 var viewWidth = 0 //view.scrollHorizontal? 0 : width;
-                this.calculateViewsHor(view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored)
+                this.calculateViews(axis, view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored)
 
                 //move left and right of all children using the paddingLeft
-                this.applyPaddingChildrenHor(view)
+                this.applyPaddingChildren(axis, view)
 
                 //set the width of the children
-                this.applySizeChildrenHor(view, arrayViews, indexes, viewsRestored)
+                this.applySizeChildren(axis, view, arrayViews, indexes, viewsRestored)
             } else {
                 //else if there are not children we calculate the content size
-                this.applySizeContentHor(view)
+                this.applySizeContent(axis, view)
             }
 
             //calculate the width
-            this.assignSizeHor(view, width)
+            this.assignSize(axis, view, width)
 
             //check gravity
-            this.assignCenterHor(view, width)
+            this.assignCenter(axis, view, width)
         }
 
         //check if size of children if bigger than container to add vertical scroll
-        if (this.applyScrollHor(view, width)) {
+        if (this.applyScroll(axis, view, width)) {
             //apply the padding of the scroll to the element
-            view.paddingBottom += this.scrollWidth
-            view.scrollHorizontalApplied = true
+            view.positions[axis == AXIS.X ? AXIS.Y : AXIS.X].paddingEnd += this.scrollWidth
+            view.positions[axis].scrollApplied = true
 
             //save the view as one to recalculate
             viewsRestored.push(view)
         }
     }
 
-    private assignSize(axis: UI_AXIS, view: UIView, size: number) {
+    private assignSize(axis: AXIS, view: UIView, size: number) {
         //if parent has size we force the space to the parent
         if (size > 0) {
-            if (view.positions[axis][UI_POSITION.END] > size) {
-                view.positions[axis][UI_POSITION.END] = size
+            if (view.positions[axis].end > size) {
+                view.positions[axis].end = size
             }
-            if (view.positions[axis][UI_POSITION.START] < 0) {
-                view.positions[axis][UI_POSITION.START] = 0
+            if (view.positions[axis].start < 0) {
+                view.positions[axis].start = 0
             }
         }
-        view.positions[axis][UI_POSITION.SIZE] =
-            view.positions[axis][UI_POSITION.END] - view.positions[axis][UI_POSITION.START]
+        view.positions[axis].size = view.positions[axis].end - view.positions[axis].start
     }
 
-    private applyFixedSize(axis: UI_AXIS, view: UIView) {
+    private applyFixedSize(axis: AXIS, view: UIView) {
         //set left and top if they are not setted
-        if (view.positions[axis][UI_POSITION.END_CHANGED]) {
-            view.positions[axis][UI_POSITION.START] =
-                view.positions[axis][UI_POSITION.END] - view.positions[axis][UI_POSITION.WIDTH_VALUE]
-            view.left = view.right - view.widthValue
-            view.leftChanged = true
+        if (view.positions[axis].endChanged) {
+            view.positions[axis].start = view.positions[axis].end - view.attrsCalc[axis].sizeValue
+            view.positions[axis].startChanged = true
         } else {
-            view.right = view.left + view.widthValue
-            view.leftChanged = true
-            view.rightChanged = true
-        }
-    }
-
-    private applyFixedSizeHor(view: UIView) {
-        //set left and top if they are not setted
-        if (view.rightChanged) {
-            view.left = view.right - view.widthValue
-            view.leftChanged = true
-        } else {
-            view.right = view.left + view.widthValue
-            view.leftChanged = true
-            view.rightChanged = true
-        }
-    }
-
-    private applyFixedSizeVer(view: UIView) {
-        //set bottom and top if they are not setted
-        if (view.bottomChanged) {
-            view.top = view.bottom - view.heightValue
-            view.topChanged = true
-        } else {
-            view.bottom = view.top + view.heightValue
-            view.topChanged = true
-            view.bottomChanged = true
+            view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
+            view.positions[axis].startChanged = true
+            view.positions[axis].endChanged = true
         }
     }
 
@@ -214,25 +189,12 @@ export default class UICore {
      * Add the padding of the view to all its children
      * @param view parent
      **/
-    private applyPaddingChildrenHor(view: UIView) {
-        if (view.paddingLeft != 0) {
-            view.forEachChild(function(child, index) {
-                child.left += view.paddingLeft
-                child.right += view.paddingLeft
-            })
-        }
-    }
-
-    /**
-     * Add the padding of the view to all its children
-     * @param view parent
-     **/
-    private applyPaddingChildrenVer(view: UIView) {
-        if (view.paddingTop != 0) {
-            view.forEachChild(function(child, index) {
-                child.top += view.paddingTop
-                child.bottom += view.paddingTop
-            })
+    private applyPaddingChildren(axis: AXIS, view: UIView) {
+        if (view.positions[axis].paddingEnd != 0) {
+            for (const child of view.getUIChildren()) {
+                child.positions[axis].start += view.positions[axis].paddingStart
+                child.positions[axis].end += view.positions[axis].paddingEnd
+            }
         }
     }
 
@@ -240,17 +202,17 @@ export default class UICore {
      * Apply scroll to the view if their children are widther than parent
      * @param view View parent
      **/
-    private applyScrollHor(view: UIView, width: number) {
-        if (view.scrollHorizontal) {
-            var maxX = 0
-            view.forEachChild(function(child, index) {
-                if (child.right > maxX) {
-                    maxX = child.right
+    private applyScroll(axis: AXIS, view: UIView, width: number) {
+        if (view.attrs[axis].scroll) {
+            var max = 0
+            for (const child of view.getUIChildren()) {
+                if (child.positions[axis].end > max) {
+                    max = child.positions[axis].end
                 }
-            })
-            if (maxX > width + view.paddingLeft) {
+            }
+            if (max > width + view.positions[axis].start) {
                 //check it here and not before because in the future we could change this state to not scroll without recalculate everything
-                if (!view.scrollHorizontalApplied) {
+                if (!view.positions[axis].scrollApplied) {
                     //apply style to show horizontal scroll
                     var element = document.getElementById(view.id)
                     element.style.overflowX = "auto"
@@ -266,70 +228,18 @@ export default class UICore {
     }
 
     /**
-     * Apply scroll to the view if their children are taller than parent
-     * @param view View parent
-     **/
-    private applyScrollVer(view: UIView, height: number) {
-        if (view.scrollVertical) {
-            var maxY = 0
-            view.forEachChild(function(child, index) {
-                if (child.bottom > maxY) {
-                    maxY = child.bottom
-                }
-            })
-            if (view.sizeHeight != "sc" || maxY > height + view.paddingTop) {
-                //check it here and not before because in the future we could change this state to not scroll without recalculate everything
-                if (!view.scrollVerticalApplied) {
-                    //apply style to show vertical scroll
-                    var element = document.getElementById(view.id)
-                    element.style.overflowY = "auto"
-
-                    //recalculate all the children
-                    return true
-                }
-            }
-        }
-
-        //not applied
-        return false
-    }
-
-    /**
      * Calculate the left and right values with the content
      * @param view View to set size with content
      **/
-    private applySizeContentHor(view: UIView) {
+    private applySizeContent(axis: AXIS, view: UIView) {
         //if the size depends of children, calculate the position of children
-        if (view.rightChanged) {
-            view.left = view.right - view.widthValue
-            view.leftChanged = true
-        } else if (view.leftChanged) {
-            view.right = view.left + view.widthValue
-            view.rightChanged = true
-            view.leftChanged = true
-        }
-    }
-
-    /**
-     * Calculate the left and right values with the content
-     * @param view View to set size with content
-     **/
-    private applySizeContentVer(view: UIView) {
-        //if the size depends of children, calculate the position of children
-        if (view.bottomChanged) {
-            view.top = view.bottom - view.heightValue
-            view.topChanged = true
-        } else if (view.topChanged) {
-            var ele = view.element
-            ele.style.width = view.width + "px"
-            view.heightValue = ele.offsetHeight
-
-            view.bottom = view.top + view.heightValue
-            view.bottomChanged = true
-        } else if (view.centerVer) {
-            var ele = view.element
-            ele.style.width = view.width + "px"
-            view.heightValue = ele.offsetHeight
+        if (view.positions[axis].endChanged) {
+            view.positions[axis].start = view.positions[axis].end - view.attrsCalc[axis].sizeValue
+            view.positions[axis].startChanged = true
+        } else if (view.positions[axis].startChanged) {
+            view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
+            view.positions[axis].endChanged = true
+            view.positions[axis].startChanged = true
         }
     }
 
@@ -337,120 +247,78 @@ export default class UICore {
      * Calculate the left or the right with the size of the children if the sizeWidth is "sc"
      * @param view View to set the size
      **/
-    private applySizeChildrenHor(
+    private applySizeChildren(
+        axis: AXIS,
         view: UIView,
         arrayViews: UIView[],
         indexes: { [key: string]: number },
         viewsRestored: UIView[],
     ) {
-        var minX = 0
-        var maxX = 0
-        view.forEachChild(function(child, index) {
-            if (child.width > 0) {
-                if (child.right > maxX) {
-                    maxX = child.right
-                } else if (child.left < minX) {
-                    minX = child.left
+        var min = 0
+        var max = 0
+        for (const child of view.getUIChildren()) {
+            if (child.positions[axis].size > 0) {
+                if (child.positions[axis].end > max) {
+                    max = child.positions[axis].end
+                } else if (child.positions[axis].start < min) {
+                    min = child.positions[axis].start
                 }
             }
-        })
-        var widthChildren = maxX - minX
+        }
+        for (const child of view.getUIChildren()) {
+            if (child.positions[axis].size > 0) {
+                if (child.positions[axis].end > max) {
+                    max = child.positions[axis].end
+                } else if (child.positions[axis].start < min) {
+                    min = child.positions[axis].start
+                }
+            }
+        }
+        var sizeChildren = max - min
 
         //if no size it is becase there is any child with fixed size, so we get the bigger child
-        if (widthChildren == 0) {
-            view.forEachChild(function(child) {
-                if (child.widthValue > widthChildren) {
-                    widthChildren = child.widthValue
+        if (sizeChildren == 0) {
+            for (const child of view.getUIChildren()) {
+                if (child.attrsCalc[axis].sizeValue > sizeChildren) {
+                    sizeChildren = child.attrsCalc[axis].sizeValue
                 }
-            })
-        } else if (minX < 0) {
+            }
+        } else if (min < 0) {
             //move all the children to positive values
-            view.forEachChild(function(child) {
-                if (child.leftChanged && child.rightChanged && child.width > 0) {
-                    child.left += -minX
-                    child.right += -minX
+            for (const child of view.getUIChildren()) {
+                if (
+                    child.positions[axis].startChanged &&
+                    child.positions[axis].endChanged &&
+                    child.positions[axis].size > 0
+                ) {
+                    child.positions[axis].start += -min
+                    child.positions[axis].end += -min
                 }
-            })
+            }
         }
 
-        if (view.rightChanged) {
-            view.left = view.right - widthChildren - view.paddingLeft
-            view.leftChanged = true
+        if (view.positions[axis].endChanged) {
+            view.positions[axis].start = view.positions[axis].end - sizeChildren - view.positions[axis].paddingStart
+            view.positions[axis].startChanged = true
         } else {
-            view.right = view.left + widthChildren + view.paddingRight
-            view.rightChanged = true
-            view.leftChanged = true
+            view.positions[axis].end = view.positions[axis].start + sizeChildren + view.positions[axis].paddingEnd
+            view.positions[axis].endChanged = true
+            view.positions[axis].startChanged = true
         }
-        view.width = view.right - view.left
+        view.positions[axis].size = view.positions[axis].end - view.positions[axis].start
 
         //apply width of children if they were waiting to have the parent size
         //this is used for r:p and parent has no size defined
-        view.forEachChild(child => {
-            if (!child.leftChanged || !child.rightChanged || child.width <= 0) {
-                child.cleanHor()
-                this.calculateViewHor(child, view, arrayViews, indexes, widthChildren, viewsRestored)
+        for (const child of view.getUIChildren()) {
+            if (
+                !child.positions[axis].startChanged ||
+                !child.positions[axis].endChanged ||
+                child.positions[axis].size <= 0
+            ) {
+                child.clean(axis)
+                this.calculateView(axis, child, view, arrayViews, indexes, sizeChildren, viewsRestored)
             }
-        })
-    }
-
-    /**
-     * Calculate the top or the bottom with the size of the children if the sizeWidth is "sc"
-     * @param view View to set the size
-     **/
-    private applySizeChildrenVer(
-        view: UIView,
-        arrayViews: UIView[],
-        indexes: { [key: string]: number },
-        viewsRestored: UIView[],
-    ) {
-        var minY = 0
-        var maxY = 0
-        view.forEachChild(function(child) {
-            if (child.height > 0) {
-                if (child.bottom > maxY) {
-                    maxY = child.bottom
-                } else if (child.top < minY) {
-                    minY = child.top
-                }
-            }
-        })
-        var heightChildren = maxY - minY
-
-        //if no size it is becase there is any child with fixed size, so we get the bigger child
-        if (heightChildren == 0) {
-            view.forEachChild(function(child) {
-                if (child.heightValue > heightChildren) {
-                    heightChildren = child.heightValue
-                }
-            })
-        } else if (minY < 0) {
-            //move all the children to positive values
-            view.forEachChild(function(child) {
-                if (child.topChanged && child.bottomChanged && child.height > 0) {
-                    child.left += -minY
-                    child.right += -minY
-                }
-            })
         }
-
-        if (view.bottomChanged) {
-            view.top = view.bottom - heightChildren - view.paddingTop
-            view.topChanged = true
-        } else {
-            view.bottom = view.top + heightChildren + view.paddingBottom
-            view.bottomChanged = true
-        }
-        view.height = view.bottom - view.top
-
-        //apply height of children if they were waiting to have the parent size
-        //this is used for b:p and parent has no size defined
-        //and gv:c or gv:b
-        view.forEachChild(child => {
-            if (!child.topChanged || !child.bottomChanged || child.height <= 0) {
-                child.cleanVer()
-                this.calculateViewVer(child, view, arrayViews, indexes, heightChildren, viewsRestored)
-            }
-        })
     }
 
     /**
@@ -459,81 +327,41 @@ export default class UICore {
      * @param parentView View of the parent to know its size
      * @param width width to apply if right was not applied
      **/
-    private applyPercentHor(view: UIView, parentView: UIView, width: number) {
-        if (view.rightChanged && !view.leftChanged) {
-            view.left = view.right - (parentView.width * view.widthValue) / 100
+    private applyPercent(axis: AXIS, view: UIView, parentView: UIView, width: number) {
+        if (view.positions[axis].endChanged && !view.positions[axis].startChanged) {
+            view.positions[axis].start =
+                view.positions[axis].end - (parentView.positions[axis].size * view.attrsCalc[axis].sizeValue) / 100
         } else {
-            view.right = view.left + (parentView.width * view.widthValue) / 100
+            view.positions[axis].end =
+                view.positions[axis].start + (parentView.positions[axis].size * view.attrsCalc[axis].sizeValue) / 100
         }
 
         //move the percent if necessary
-        if (view.percentWidthPos > 0) {
-            var percentWidth = (view.right - view.left) * view.percentWidthPos
-            view.left += percentWidth
-            view.right += percentWidth
+        if (view.attrsCalc[axis].percentPos > 0) {
+            var percentWidth = (view.positions[axis].end - view.positions[axis].start) * view.attrsCalc[axis].percentPos
+            view.positions[axis].start += percentWidth
+            view.positions[axis].end += percentWidth
         }
 
         //mark left and right as changed
-        view.rightChanged = true
-        view.leftChanged = true
-    }
-
-    /**
-     * Apply percent to a view with a width setted
-     * @param view View to set percent
-     * @param parentView View of the parent to know its size
-     * @param height height to apply if top was not applied
-     **/
-    private applyPercentVer(view: UIView, parentView: UIView, height: number) {
-        if (view.bottomChanged && !view.topChanged) {
-            view.top = view.bottom - (parentView.height * view.heightValue) / 100
-        } else {
-            view.bottom = view.top + (parentView.height * view.heightValue) / 100
-        }
-
-        //move the percent if necessary
-        if (view.percentHeightPos > 0) {
-            var percentHeight = (view.bottom - view.top) * view.percentHeightPos
-            view.top += percentHeight
-            view.bottom += percentHeight
-        }
-
-        //masrk right and left as changed
-        view.bottomChanged = true
-        view.topChanged = true
+        view.positions[axis].endChanged = true
+        view.positions[axis].startChanged = true
     }
 
     /**
      * Assign gravity values to the view
      * @param view View to get and change values
-     * @param width int
+     * @param size int
      **/
-    private assignCenterHor(view: UIView, width: number) {
+    private assignCenter(axis: AXIS, view: UIView, size: number) {
         //horizontal
-        if (view.centerHor && width > 0) {
-            var viewWidth = view.width > 0 ? view.width : view.widthValue
-            view.left = Math.max(0, (width - viewWidth) / 2)
-            view.right = Math.min(width, view.left + viewWidth)
-            view.leftChanged = true
-            view.rightChanged = true
-            view.width = view.right - view.left
-        }
-    }
-
-    /**
-     * Assign gravity values to the view
-     * @param view View to get and change values
-     * @param height int
-     **/
-    private assignCenterVer(view: UIView, height: number) {
-        //horizontal
-        if (view.centerVer && height > 0) {
-            var viewHeight = view.height > 0 ? view.height : view.heightValue
-            view.top = Math.max(0, (height - viewHeight) / 2)
-            view.bottom = Math.min(height, view.top + viewHeight)
-            view.topChanged = true
-            view.bottomChanged = true
-            view.height = view.bottom - view.top
+        if (view.attrs[axis].center && size > 0) {
+            var viewWidth = view.positions[axis].size > 0 ? view.positions[axis].size : view.attrsCalc[axis].sizeValue
+            view.positions[axis].start = Math.max(0, (size - viewWidth) / 2)
+            view.positions[axis].end = Math.min(size, view.positions[axis].start + viewWidth)
+            view.positions[axis].startChanged = true
+            view.positions[axis].endChanged = true
+            view.positions[axis].size = view.positions[axis].end - view.positions[axis].start
         }
     }
 
@@ -541,44 +369,21 @@ export default class UICore {
      * Assign margin values to the view
      * @param view View to get and change values
      **/
-    private assignMarginsHor(view: UIView) {
+    private assignMargins(axis: AXIS, view: UIView) {
         //get real margin values
-        var viewMarginLeft = view.marginLeft
-        var viewMarginRight = view.marginRight
+        var viewMarginStart = view.positions[axis].marginStart
+        var viewMarginEnd = view.positions[axis].marginEnd
 
-        if (viewMarginLeft != 0 && view.leftChanged) {
-            view.left += viewMarginLeft
-            if (!view.rightChanged || view.sizeWidth == "s") {
-                view.right += viewMarginLeft
+        if (viewMarginStart != 0 && view.positions[axis].startChanged) {
+            view.positions[axis].start += viewMarginStart
+            if (!view.positions[axis].endChanged || view.attrs[axis].size == "s") {
+                view.positions[axis].end += viewMarginStart
             }
         }
-        if (viewMarginRight != 0 && view.rightChanged) {
-            view.right -= viewMarginRight
-            if (!view.leftChanged || view.sizeWidth == "s") {
-                view.left -= viewMarginRight
-            }
-        }
-    }
-
-    /**
-     * Assign margin values to the view
-     * @param view View to get and change values
-     **/
-    private assignMarginsVer(view: UIView) {
-        //save margin to apply to their children
-        var viewMarginTop = view.marginTop
-        var viewMarginBottom = view.marginBottom
-
-        if (view.marginTop != 0 && view.topChanged) {
-            view.top += viewMarginTop
-            if (!view.bottomChanged || view.sizeHeight == "s") {
-                view.bottom += viewMarginTop
-            }
-        }
-        if (view.marginBottom != 0 && view.bottomChanged) {
-            view.bottom -= viewMarginBottom
-            if (!view.topChanged || view.sizeHeight == "s") {
-                view.top -= viewMarginBottom
+        if (viewMarginEnd != 0 && view.positions[axis].endChanged) {
+            view.positions[axis].end -= viewMarginEnd
+            if (!view.positions[axis].startChanged || view.attrs[axis].size == "s") {
+                view.positions[axis].start -= viewMarginEnd
             }
         }
     }
@@ -591,10 +396,11 @@ export default class UICore {
      * @param viewDependency from wich get the value
      **/
     private evalDependence(
+        axis: AXIS,
         view: UIView,
         parentView: UIView,
         width: number,
-        referenceId: UI_REFERENCE,
+        referenceId: UI_REF,
         viewDependency: UIView,
     ) {
         if (viewDependency == null) {
@@ -603,145 +409,36 @@ export default class UICore {
         }
 
         switch (referenceId) {
-            case UI_REFERENCE.START_START: //leftLeft
+            case UI_REF.START_START:
                 if (parentView != viewDependency) {
-                    view.left = viewDependency.left
+                    view.positions[axis].start = viewDependency.positions[axis].start
                 }
-                view.leftChanged = true
+                view.positions[axis].startChanged = true
                 break
-            case UI_REFERENCE.START_END: //leftRight
-                view.left = viewDependency.rightChanged
-                    ? viewDependency.right
-                    : viewDependency.left + viewDependency.width
-                view.leftChanged = true
+            case UI_REF.START_END:
+                view.positions[axis].start = viewDependency.positions[axis].endChanged
+                    ? viewDependency.positions[axis].end
+                    : viewDependency.positions[axis].start + viewDependency.positions[axis].size
+                view.positions[axis].startChanged = true
                 break
-            case UI_REFERENCE.END_END: //rightRight
+            case UI_REF.END_END:
                 if (parentView == viewDependency) {
-                    if (parentView.rightChanged) {
-                        view.right = width
+                    if (parentView.positions[axis].endChanged) {
+                        view.positions[axis].end = width
                     } else {
-                        view.right = 0
+                        view.positions[axis].end = 0
                         break
                     }
                 } else {
-                    view.right = viewDependency.rightChanged
-                        ? viewDependency.right
-                        : viewDependency.left + viewDependency.width
+                    view.positions[axis].end = viewDependency.positions[axis].endChanged
+                        ? viewDependency.positions[axis].end
+                        : viewDependency.positions[axis].start + viewDependency.positions[axis].size
                 }
-                view.rightChanged = true
+                view.positions[axis].endChanged = true
                 break
-            case UI_REFERENCE.END_START: //rightLeft
-                view.right = viewDependency.left
-                view.rightChanged = true
-                break
-        }
-    }
-
-    /**
-     * Set left, top, right, bottom values for the reference received
-     * @param view to set the values
-     * @param parentView to check and get values
-     * @param iReference index of reference to evaluate
-     * @param viewDependency from wich get the value
-     **/
-    private evalDependenceHor(
-        view: UIView,
-        parentView: UIView,
-        width: number,
-        iReference: number,
-        viewDependency: UIView,
-    ) {
-        if (viewDependency == null) {
-            Log.logE("The view '" + view.id + "' has a wrong reference")
-            return
-        }
-
-        switch (iReference) {
-            case 0: //leftLeft
-                if (parentView != viewDependency) {
-                    view.left = viewDependency.left
-                }
-                view.leftChanged = true
-                break
-            case 1: //leftRight
-                view.left = viewDependency.rightChanged
-                    ? viewDependency.right
-                    : viewDependency.left + viewDependency.width
-                view.leftChanged = true
-                break
-            case 2: //rightRight
-                if (parentView == viewDependency) {
-                    if (parentView.rightChanged) {
-                        view.right = width
-                    } else {
-                        view.right = 0
-                        break
-                    }
-                } else {
-                    view.right = viewDependency.rightChanged
-                        ? viewDependency.right
-                        : viewDependency.left + viewDependency.width
-                }
-                view.rightChanged = true
-                break
-            case 3: //rightLeft
-                view.right = viewDependency.left
-                view.rightChanged = true
-                break
-        }
-    }
-
-    /**
-     * Set left, top, right, bottom values for the reference received
-     * @param view to set the values
-     * @param parentView to check and get values
-     * @param iReference index of reference to evaluate
-     * @param viewDependency from wich get the value
-     **/
-    private evalDependenceVer(
-        view: UIView,
-        parentView: UIView,
-        height: number,
-        iReference: number,
-        viewDependency: UIView,
-    ) {
-        if (viewDependency == null) {
-            Log.logE("The view '" + view.id + "' has a wrong reference")
-            return
-        }
-
-        switch (iReference) {
-            case 0: //topTop
-                if (parentView != viewDependency) {
-                    view.top = viewDependency.top
-                }
-                view.topChanged = true
-                break
-            case 1: //topBottom
-                view.top = viewDependency.bottomChanged
-                    ? viewDependency.bottom
-                    : viewDependency.top + viewDependency.height
-                view.topChanged = true
-                break
-
-            case 2: //bottomBottom
-                if (parentView == viewDependency) {
-                    if (parentView.bottomChanged) {
-                        view.bottom = height
-                    } else {
-                        view.bottom = 0
-                        break
-                    }
-                } else {
-                    view.bottom = viewDependency.bottomChanged
-                        ? viewDependency.bottom
-                        : viewDependency.top + viewDependency.height
-                }
-                view.bottomChanged = true
-                break
-            case 3: //bottomTop
-                view.bottom = viewDependency.top
-                view.bottomChanged = true
+            case UI_REF.END_START:
+                view.positions[axis].end = viewDependency.positions[axis].start
+                view.positions[axis].endChanged = true
                 break
         }
     }

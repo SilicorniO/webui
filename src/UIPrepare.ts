@@ -1,4 +1,4 @@
-import UIView from "./model/UIView"
+import UIView, { UI_VIEW_ID, AXIS, UI_SIZE, UI_REF_LIST } from "./model/UIView"
 import Log from "./utils/log/Log"
 import UIViewUtils from "./utils/uiview/UIViewUtils"
 import UIUtils from "./utils/ui/UIUtils"
@@ -70,18 +70,18 @@ export default class UIPrepare {
         parent.forEachChild(function(child, index) {
             var numDependencies = 0
 
-            var references = hor ? child.getReferencesHor() : child.getReferencesVer()
-            for (var n = 0; n < references.length; n++) {
-                let reference = references[n]
+            var referencesAxis = hor ? child.getReference(AXIS.X) : child.getReference(AXIS.Y)
+            for (const key of UI_REF_LIST) {
+                let reference = referencesAxis[key]
 
                 //update p and l references
-                if (reference == "p") {
+                if (reference == UI_VIEW_ID.PARENT) {
                     reference = parent.id
-                } else if (reference == "l") {
+                } else if (reference == UI_VIEW_ID.LAST) {
                     if (lastChild) {
                         reference = lastChild.id
                     } else {
-                        reference = "" //parent.id;
+                        reference = UI_VIEW_ID.NONE
                     }
                 }
 
@@ -181,12 +181,12 @@ export default class UIPrepare {
                 }
 
                 if (view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded)) {
-                    if (view.sizeWidth == "sc" && !view.hasUIChildren()) {
-                        view.widthValue = UIViewUtils.calculateWidthView(view, ele)
+                    if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
+                        view.attrsCalc[AXIS.X].sizeValue = UIViewUtils.calculateWidthView(view, ele)
                     }
 
-                    if (view.sizeHeight == "sc" && !view.hasUIChildren()) {
-                        view.heightValue = UIViewUtils.calculateHeightView(view, ele)
+                    if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
+                        view.attrsCalc[AXIS.Y].sizeValue = UIViewUtils.calculateHeightView(view, ele)
                     }
 
                     //translate paddings and margins
@@ -220,37 +220,37 @@ export default class UIPrepare {
         }
 
         //apply width and height if they are defined
-        if (screen.sizeWidth != "sc") {
-            if (screen.sizeWidth == "s") {
-                ele.style.width = screen.widthValue + "px"
-            } else if (screen.sizeWidth == "sp") {
-                ele.style.width = screen.widthValue + "%"
+        if (screen.attrs[AXIS.X].size != UI_SIZE.SIZE_CONTENT) {
+            if (screen.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
+                ele.style.width = screen.attrsCalc[AXIS.X].sizeValue + "px"
+            } else if (screen.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
+                ele.style.width = screen.attrsCalc[AXIS.X].sizeValue + "%"
             }
 
             var offsetWidth = ele.offsetWidth
-            if (offsetWidth != screen.width) {
-                screen.width = offsetWidth
+            if (offsetWidth != screen.positions[AXIS.X].size) {
+                screen.positions[AXIS.X].size = offsetWidth
                 sizeChanged = true
             }
         }
-        if (screen.sizeHeight != "sc") {
-            if (screen.sizeHeight == "s") {
-                ele.style.height = screen.heightValue + "px"
-            } else if (screen.sizeWidth == "sp") {
-                ele.style.height = screen.heightValue + "%"
+        if (screen.attrs[AXIS.Y].size != "sc") {
+            if (screen.attrs[AXIS.Y].size == "s") {
+                ele.style.height = screen.attrsCalc[AXIS.Y].sizeValue + "px"
+            } else if (screen.attrs[AXIS.Y].size == "sp") {
+                ele.style.height = screen.attrsCalc[AXIS.Y].sizeValue + "%"
             }
 
-            screen.height = ele.offsetHeight
+            screen.positions[AXIS.Y].size = ele.offsetHeight
         }
         ele.style.position = "relative"
 
-        screen.right = screen.width
-        screen.bottom = screen.height
+        screen.positions[AXIS.X].end = screen.positions[AXIS.X].size
+        screen.positions[AXIS.Y].end = screen.positions[AXIS.Y].size
 
-        screen.rightChanged = true
-        screen.leftChanged = true
-        screen.bottomChanged = true
-        screen.topChanged = true
+        screen.positions[AXIS.X].endChanged = true
+        screen.positions[AXIS.X].startChanged = true
+        screen.positions[AXIS.Y].endChanged = true
+        screen.positions[AXIS.Y].startChanged = true
 
         //mark size as loaded
         screen.sizeLoaded = true
@@ -464,7 +464,7 @@ export default class UIPrepare {
                     view.childrenInOrder = false
 
                     //3. Check if parent has size content, to mark it as modified
-                    if (view.sizeWidth == "sc" || view.sizeHeight == "sc") {
+                    if (view.attrs[AXIS.X].size == "sc" || view.attrs[AXIS.Y].size == "sc") {
                         view.cleanSizeLoaded()
                     }
                     return
