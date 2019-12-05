@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer")
+import PuppeteerUtils from "../PuppeteerUtils"
 
 const timeout = 5000
 
@@ -21,101 +22,29 @@ describe("Positions", () => {
     })
 
     test("Top Left", async () => {
-        await page.goto("file:///Users/jsr/workspace/webui/webui_github/src/__tests__/positions/top-left.html", {
-            waitUntil: "domcontentloaded",
-        })
-        await page.waitFor("#ele")
-        const result = await page.evaluate(() => {
-            // get element
-            const element = document.getElementById("ele")
-            if (element == null) {
-                return "Element not exists!"
-            }
+        await PuppeteerUtils.loadPage(page, "top-left")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
 
-            // get screen
-            const screen = document.getElementById("screen")
-            if (screen == null) {
-                return "Screen not exists!"
-            }
-
-            // evaluate right position
-            return {
-                elementTop: element.style.top,
-                elementLeft: element.style.left,
-                elementWidth: element.offsetWidth,
-                elementHeight: element.offsetHeight,
-                screenWidth: screen.offsetWidth,
-                screenHeight: screen.offsetHeight,
-            }
-        })
-        console.log(result)
-        expect(result.elementTop).toBe(0 + "px")
-        expect(result.elementLeft).toBe(0 + "px")
+        expect(element.top).toBe(0 + "px")
+        expect(element.left).toBe(0 + "px")
     })
 
     test("Bottom right", async () => {
-        await page.goto("file:///Users/jsr/workspace/webui/webui_github/src/__tests__/positions/bottom-right.html", {
-            waitUntil: "domcontentloaded",
-        })
-        await page.waitFor("#ele")
-        const result = await page.evaluate(() => {
-            // get element
-            const element = document.getElementById("ele")
-            if (element == null) {
-                return "Element not exists!"
-            }
+        await PuppeteerUtils.loadPage(page, "bottom-right")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
 
-            // get screen
-            const screen = document.getElementById("screen")
-            if (screen == null) {
-                return "Screen not exists!"
-            }
-
-            // evaluate right position
-            return {
-                elementTop: element.style.top,
-                elementLeft: element.style.left,
-                elementWidth: element.offsetWidth,
-                elementHeight: element.offsetHeight,
-                screenWidth: screen.offsetWidth,
-                screenHeight: screen.offsetHeight,
-            }
-        })
-        console.log(result)
-        expect(result.elementTop).toBe(result.screenHeight - result.elementHeight + "px")
-        expect(result.elementLeft).toBe(result.screenWidth - result.elementWidth + "px")
+        expect(element.top).toBe(screen.height - element.height + "px")
+        expect(element.left).toBe(screen.width - element.width + "px")
     })
 
     test("Center", async () => {
-        await page.goto("file:///Users/jsr/workspace/webui/webui_github/src/__tests__/positions/center.html", {
-            waitUntil: "domcontentloaded",
-        })
-        await page.waitFor("#ele")
-        const result = await page.evaluate(() => {
-            // get element
-            const element = document.getElementById("ele")
-            if (element == null) {
-                return "Element not exists!"
-            }
+        await PuppeteerUtils.loadPage(page, "center")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
 
-            // get screen
-            const screen = document.getElementById("screen")
-            if (screen == null) {
-                return "Screen not exists!"
-            }
-
-            // evaluate right position
-            return {
-                elementTop: element.style.top,
-                elementLeft: element.style.left,
-                elementWidth: element.offsetWidth,
-                elementHeight: element.offsetHeight,
-                screenWidth: screen.offsetWidth,
-                screenHeight: screen.offsetHeight,
-            }
-        })
-        console.log(result)
-        expect(result.elementTop).toBe((result.screenHeight - result.elementHeight) / 2 + "px")
-        expect(result.elementLeft).toBe((result.screenWidth - result.elementWidth) / 2 + "px")
+        expect(element.top).toBe((screen.height - element.height) / 2 + "px")
+        expect(element.left).toBe((screen.width - element.width) / 2 + "px")
     })
 })
