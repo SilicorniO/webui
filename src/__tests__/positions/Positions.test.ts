@@ -22,7 +22,7 @@ describe("Positions", () => {
     })
 
     test("Top Left", async () => {
-        await PuppeteerUtils.loadPage(page, "top-left")
+        await PuppeteerUtils.loadPage(page, "positions", "top-left")
         const element = await PuppeteerUtils.evalElement(page, "ele")
         const screen = await PuppeteerUtils.evalElement(page, "screen")
 
@@ -31,7 +31,7 @@ describe("Positions", () => {
     })
 
     test("Bottom right", async () => {
-        await PuppeteerUtils.loadPage(page, "bottom-right")
+        await PuppeteerUtils.loadPage(page, "positions", "bottom-right")
         const element = await PuppeteerUtils.evalElement(page, "ele")
         const screen = await PuppeteerUtils.evalElement(page, "screen")
 
@@ -40,11 +40,56 @@ describe("Positions", () => {
     })
 
     test("Center", async () => {
-        await PuppeteerUtils.loadPage(page, "center")
+        await PuppeteerUtils.loadPage(page, "positions", "center")
         const element = await PuppeteerUtils.evalElement(page, "ele")
         const screen = await PuppeteerUtils.evalElement(page, "screen")
 
         expect(element.top).toBe((screen.height - element.height) / 2 + "px")
+        expect(element.left).toBe((screen.width - element.width) / 2 + "px")
+    })
+
+    test("Top center", async () => {
+        await PuppeteerUtils.loadPage(page, "positions", "top-center")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
+
+        expect(element.top).toBe(0 + "px")
+        expect(element.left).toBe((screen.width - element.width) / 2 + "px")
+    })
+
+    test("Bottom center", async () => {
+        await PuppeteerUtils.loadPage(page, "positions", "bottom-center")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
+
+        expect(element.top).toBe(screen.height - element.height + "px")
+        expect(element.left).toBe((screen.width - element.width) / 2 + "px")
+    })
+
+    test("Left center", async () => {
+        await PuppeteerUtils.loadPage(page, "positions", "left-center")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
+
+        expect(element.top).toBe((screen.height - element.height) / 2 + "px")
+        expect(element.left).toBe(0 + "px")
+    })
+
+    test("Right center", async () => {
+        await PuppeteerUtils.loadPage(page, "positions", "right-center")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
+
+        expect(element.top).toBe((screen.height - element.height) / 2 + "px")
+        expect(element.left).toBe(screen.width - element.width + "px")
+    })
+
+    test("At left", async () => {
+        await PuppeteerUtils.loadPage(page, "positions", "at-left")
+        const element = await PuppeteerUtils.evalElement(page, "ele")
+        const screen = await PuppeteerUtils.evalElement(page, "screen")
+
+        expect(element.top).toBe(0 + "px")
         expect(element.left).toBe((screen.width - element.width) / 2 + "px")
     })
 })

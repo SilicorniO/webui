@@ -6,9 +6,9 @@ export interface DataElement {
 }
 
 export default class PuppeteerUtils {
-    public static async loadPage(page: any, testName: string) {
+    public static async loadPage(page: any, folder: string, testName: string) {
         await page.goto(
-            "file:///Users/jsr/workspace/webui/webui_github/src/__tests__/positions/" + testName + ".html",
+            "file:///Users/jsr/workspace/webui/webui_github/src/__tests__/" + folder + "/html/" + testName + ".html",
             {
                 waitUntil: "domcontentloaded",
             },
