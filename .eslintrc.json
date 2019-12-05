@@ -1,7 +1,8 @@
 {
     "env": {
         "browser": true,
-        "es6": true
+        "es6": true,
+        "jest": true
     },
     "extends": [
         "plugin:@typescript-eslint/eslint-recommended",
@@ -10,7 +11,11 @@
     ],
     "globals": {
         "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
+        "SharedArrayBuffer": "readonly",
+        "page": true,
+        "browser": true,
+        "context": true,
+        "jestPuppeteer": true
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {

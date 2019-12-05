@@ -3,7 +3,7 @@ import UIConfigurationData, {
     UIConfigurationDataScreenMode,
     UIConfigurationDataAnimations,
     UIDataEvent,
-} from "model/UIConfigurationData"
+} from "./model/UIConfigurationData"
 
 export default class UIConfiguration {
     private static readonly ATTRIBUTE_DEFAULT = "ui"

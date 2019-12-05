@@ -13,7 +13,7 @@ import CounterUtils from "./utils/counter/CounterUtils"
 /**
  * @constructor
  */
-export default class WebUI {
+class WebUI {
     //size of scrollbars to use as padding when views have scrollbars visible
     private scrollWidth: number = 0
     private scrollHeight: number = 0
@@ -287,3 +287,5 @@ export default class WebUI {
         )
     }
 }
+
+export default new WebUI()
