@@ -1,7 +1,4 @@
-import WebUI from "../../WebUI"
-import MutationObserver from "../../__mocks__/MutationObserver"
 const puppeteer = require("puppeteer")
-const fs = require("fs")
 
 const timeout = 5000
 
@@ -10,8 +7,6 @@ describe("Positions", () => {
     let page: any
 
     beforeAll(async () => {
-        // ;(global as any).MutationObserver = MutationObserver
-        // page = await global.browser.newPage()
         browser = await puppeteer.launch({
             ignoreHTTPSErrors: true,
             args: ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"],
@@ -54,8 +49,8 @@ describe("Positions", () => {
             }
         })
         console.log(result)
-        expect(result.elementTop).toBe("0px")
-        expect(result.elementLeft).toBe("0px")
+        expect(result.elementTop).toBe(0 + "px")
+        expect(result.elementLeft).toBe(0 + "px")
     })
 
     test("Bottom right", async () => {

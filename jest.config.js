@@ -5,9 +5,9 @@ module.exports = {
     transform: {
         "^.+\\.(ts|tsx)$": "ts-jest",
     },
-}
-/*
     globalSetup: "./jest.global-setup.js",
     globalTeardown: "./jest.global-teardown.js",
+}
+/*
     testEnvironment: "./puppeteer.environment.js",
 */
