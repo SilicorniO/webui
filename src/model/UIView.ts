@@ -4,9 +4,9 @@ import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
 
 export enum UI_VISIBILITY {
-    V = "v",
-    I = "i",
-    G = "g",
+    VISIBLE = "v",
+    INVISIBLE = "i",
+    GONE = "g",
 }
 
 export enum UI_VIEW_ID {
@@ -174,7 +174,7 @@ export default class UIView {
     }
 
     // visibility
-    visibility: UI_VISIBILITY = UI_VISIBILITY.V
+    visibility: UI_VISIBILITY = UI_VISIBILITY.VISIBLE
 
     // animations
     animationDurations: number[] = []
@@ -332,7 +332,7 @@ export default class UIView {
     // ----- VISIBILITY -----
 
     public setVisibility(visibility: UI_VISIBILITY) {
-        if (visibility != UI_VISIBILITY.G && this.visibility == UI_VISIBILITY.G) {
+        if (visibility != UI_VISIBILITY.GONE && this.visibility == UI_VISIBILITY.GONE) {
             this.sizeLoaded = false
         }
         this.visibility = visibility
@@ -352,7 +352,7 @@ export default class UIView {
     }
 
     public hasToBeCalculated(): boolean {
-        return this.visibility != UI_VISIBILITY.G
+        return this.visibility != UI_VISIBILITY.GONE
     }
 
     public animateNextRefresh(animationDuration: number) {
@@ -687,7 +687,7 @@ export default class UIView {
             } else if (attr == "sh") {
                 this.setScroll(AXIS.X, true)
             } else if (attr == "v") {
-                this.setVisibility((value as UI_VISIBILITY) || UI_VISIBILITY.V)
+                this.setVisibility((value as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE)
             } else if (attr.length > 0) {
                 Log.logW("Attribute unknown: " + attr + " in view " + this.id)
             }

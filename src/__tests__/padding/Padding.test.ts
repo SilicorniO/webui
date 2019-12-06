@@ -4,7 +4,7 @@ import PuppeteerUtils from "../PuppeteerUtils"
 const timeout = 5000
 const PADDING = 20
 
-describe("Paddings", () => {
+describe("Padding", () => {
     let browser: any
     let page: any
 

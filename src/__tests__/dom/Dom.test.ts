@@ -3,7 +3,7 @@ import PuppeteerUtils from "../PuppeteerUtils"
 
 const timeout = 5000
 
-describe("Attributes", () => {
+describe("Dom", () => {
     let browser: any
     let page: any
 
@@ -21,12 +21,11 @@ describe("Attributes", () => {
         done()
     })
 
-    test("Different name", async () => {
-        await PuppeteerUtils.loadPage(page, __dirname, "different-name")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+    test("Doctype", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "doctype")
+        const layer1 = await PuppeteerUtils.evalElement(page, "layer1")
 
-        expect(element.top).toBe((screen.height - element.height) / 2)
-        expect(element.left).toBe((screen.width - element.width) / 2)
+        expect(layer1.width).not.toBe(0)
+        expect(layer1.height).not.toBe(0)
     })
 })

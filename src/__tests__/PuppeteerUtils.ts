@@ -7,6 +7,7 @@ export interface DataElement {
     height: number
     overflowX: string
     overflowY: string
+    opacity: string
 }
 
 export default class PuppeteerUtils {
@@ -35,6 +36,7 @@ export default class PuppeteerUtils {
                 height: element.offsetHeight,
                 overflowX: element.style.overflowX,
                 overflowY: element.style.overflowY,
+                opacity: element.style.opacity,
             }
         }, elementId)
     }

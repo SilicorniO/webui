@@ -4,7 +4,7 @@ import PuppeteerUtils from "../PuppeteerUtils"
 const timeout = 5000
 const MARGIN = 20
 
-describe("Margins", () => {
+describe("Margin", () => {
     let browser: any
     let page: any
 

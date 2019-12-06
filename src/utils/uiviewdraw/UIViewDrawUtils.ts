@@ -1,5 +1,5 @@
 import Log from "../log/Log"
-import UIView, { AXIS, UI_SIZE, UI_VIEW_ID } from "../../model/UIView"
+import UIView, { AXIS, UI_SIZE, UI_VIEW_ID, UI_VISIBILITY } from "../../model/UIView"
 import UIConfiguration from "../../UIConfiguration"
 
 export interface UIViewDrawPosition {
@@ -94,7 +94,7 @@ export default class UIViewDrawUtils {
                 maxX = view.positions[AXIS.X].start + view.positions[AXIS.X].size
             }
             if (view.positions[AXIS.Y].end + view.positions[AXIS.Y].size > maxY) {
-                maxY = view.positions[AXIS.Y].end + view.positions[AXIS.Y].size
+                maxY = view.positions[AXIS.Y].start + view.positions[AXIS.Y].size
             }
 
             var childrenSize = this.applyPositions(view, viewColors)
@@ -135,7 +135,10 @@ export default class UIViewDrawUtils {
             opacityNow = 0
         } else {
             ele.style.display = "inline-block"
-            if (view.visibility == "i" || (parentView && parentView.visibility == "i")) {
+            if (
+                view.visibility == UI_VISIBILITY.INVISIBLE ||
+                (parentView && parentView.visibility == UI_VISIBILITY.INVISIBLE)
+            ) {
                 // ele.style.visibility = "hidden";
                 opacityNow = 0
             } else {

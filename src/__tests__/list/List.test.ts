@@ -3,7 +3,7 @@ import PuppeteerUtils from "../PuppeteerUtils"
 
 const timeout = 5000
 
-describe("Lists", () => {
+describe("List", () => {
     let browser: any
     let page: any
 

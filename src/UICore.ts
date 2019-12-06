@@ -264,10 +264,21 @@ export default class UICore {
         if (view.positions[axis].endChanged) {
             view.positions[axis].start = view.positions[axis].end - view.attrsCalc[axis].sizeValue
             view.positions[axis].startChanged = true
+            // } else if (view.positions[axis].startChanged) {
+            //     var ele = view.element
+            //     ele.style.width = view.positions[axis].size + "px"
+            //     view.attrsCalc[axis].sizeValue = ele.offsetHeight
+
+            //     view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
+            //     view.positions[axis].endChanged = true
+            // } else if (view.attrs[axis].center) {
+            //     var ele = view.element
+            //     ele.style.width = view.positions[axis].size + "px"
+            //     view.attrsCalc[axis].sizeValue = ele.offsetHeight
+            // }
         } else if (view.positions[axis].startChanged) {
             view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
             view.positions[axis].endChanged = true
-            view.positions[axis].startChanged = true
         }
     }
 
@@ -284,15 +295,6 @@ export default class UICore {
     ) {
         var min = 0
         var max = 0
-        for (const child of view.getUIChildren()) {
-            if (child.positions[axis].size > 0) {
-                if (child.positions[axis].end > max) {
-                    max = child.positions[axis].end
-                } else if (child.positions[axis].start < min) {
-                    min = child.positions[axis].start
-                }
-            }
-        }
         for (const child of view.getUIChildren()) {
             if (child.positions[axis].size > 0) {
                 if (child.positions[axis].end > max) {
@@ -331,7 +333,6 @@ export default class UICore {
         } else {
             view.positions[axis].end = view.positions[axis].start + sizeChildren + view.positions[axis].paddingEnd
             view.positions[axis].endChanged = true
-            view.positions[axis].startChanged = true
         }
         view.positions[axis].size = view.positions[axis].end - view.positions[axis].start
 
