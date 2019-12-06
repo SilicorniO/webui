@@ -1,19 +1,18 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../build/webui-lib.js"></script>
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
 </head>
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <span ui="t:p;l:p">
-            <div ui="p:mb">
-                <div ui="">
-                    <span>Mobile: padding-big-20</span><br />
-                    <span>Tablet: padding-big-50</span><br />
-                    <span>Desktop: padding-big-100</span>
-                <div>
-            </div>
+        <div id="content" ui="p:mb">
+            <div id="element" ui="">
+                <span>Mobile: padding-big-20</span><br />
+                <span>Tablet: padding-big-50</span><br />
+                <span>Desktop: padding-big-100</span>
+            <div>
+        </div>
     </div>
     
     <script>
@@ -40,7 +39,7 @@
             {
                 //tablet
                 attribute: "uit",
-                widthStart: 451,
+                widthStart: 450,
                 widthEnd: 700,
                 dimens: {
                     ms: 5, 	//margin small
@@ -51,7 +50,7 @@
             {
                 //desktop
                 attribute: "uid",
-                widthStart: 701
+                widthStart: 700
             }
         ]
     });

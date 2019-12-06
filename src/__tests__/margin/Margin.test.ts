@@ -24,8 +24,8 @@ describe("Margin", () => {
 
     test("Margin All", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "margin-all")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
 
         expect(element.top).toBe(MARGIN)
         expect(element.left).toBe(MARGIN)
@@ -35,9 +35,9 @@ describe("Margin", () => {
 
     test("Margin left", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "margin-left")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
 
         expect(element.top).toBe((screen.height - element.height) / 2)
         expect(element.left).toBe(content.left + content.width + MARGIN)
@@ -45,9 +45,9 @@ describe("Margin", () => {
 
     test("Margin right", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "margin-right")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
 
         expect(element.top).toBe((screen.height - element.height) / 2)
         expect(element.left).toBe(content.left - MARGIN - element.width)
@@ -55,9 +55,9 @@ describe("Margin", () => {
 
     test("Margin top", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "margin-top")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
 
         expect(element.top).toBe(content.top + content.height + MARGIN)
         expect(element.left).toBe((screen.width - element.width) / 2)
@@ -65,9 +65,9 @@ describe("Margin", () => {
 
     test("Margin bottom", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "margin-bottom")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
 
         expect(element.top).toBe(content.top - MARGIN - element.height)
         expect(element.left).toBe((screen.width - element.width) / 2)

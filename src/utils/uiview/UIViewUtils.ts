@@ -10,7 +10,7 @@ export default class UIViewUtils {
      * @param ele DOM element to calculate the width
      * @return width calculated
      **/
-    public static calculateWidthView(view: UIView, ele: HTMLElement, index?: number, infiniteParent?: HTMLElement) {
+    public static calculateWidthView(view: UIView, ele: HTMLElement, height?: number) {
         //prepare parent to give the son a lot of space for calculation
         // var parent = ele.parentElement;
         // var parentWidth = parent.offsetWidth;
@@ -20,6 +20,9 @@ export default class UIViewUtils {
         //get the height width much space
         ele.style.position = "fixed"
         // ele.style.display = 'inline-block';
+        if (height) {
+            ele.style.height = height + "px"
+        }
         ele.style.width = "auto"
         // ele.style.height = 'auto';
         var width = ele.offsetWidth
@@ -42,7 +45,7 @@ export default class UIViewUtils {
      * @param ele DOM element to calculate the height
      * @return height calculated
      **/
-    public static calculateHeightView(view: UIView, ele: HTMLElement, index?: number, infiniteParent?: HTMLElement) {
+    public static calculateHeightView(view: UIView, ele: HTMLElement, width?: number) {
         //prepare parent to give the son a lot of space for calculation
         // var parent = ele.parentElement;
         // var parentHeight = parent.offsetHeight;
@@ -53,6 +56,9 @@ export default class UIViewUtils {
         ele.style.position = "fixed"
         // ele.style.display = 'inline-block';
         // ele.style.width = 'auto';
+        if (width) {
+            ele.style.width = width + "px"
+        }
         ele.style.height = "auto"
         var height = ele.offsetHeight
 

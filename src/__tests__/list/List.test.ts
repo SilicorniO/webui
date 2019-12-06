@@ -23,9 +23,9 @@ describe("List", () => {
 
     test("List vertical", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "list-vertical")
-        const item1 = await PuppeteerUtils.evalElement(page, "item1")
-        const item2 = await PuppeteerUtils.evalElement(page, "item2")
-        const item3 = await PuppeteerUtils.evalElement(page, "item3")
+        const item1 = await PuppeteerUtils.evalUiElement(page, "item1")
+        const item2 = await PuppeteerUtils.evalUiElement(page, "item2")
+        const item3 = await PuppeteerUtils.evalUiElement(page, "item3")
 
         expect(item1.top).toBe(0)
         expect(item1.left).toBe(0)
@@ -37,9 +37,9 @@ describe("List", () => {
 
     test("List horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "list-horizontal")
-        const item1 = await PuppeteerUtils.evalElement(page, "item1")
-        const item2 = await PuppeteerUtils.evalElement(page, "item2")
-        const item3 = await PuppeteerUtils.evalElement(page, "item3")
+        const item1 = await PuppeteerUtils.evalUiElement(page, "item1")
+        const item2 = await PuppeteerUtils.evalUiElement(page, "item2")
+        const item3 = await PuppeteerUtils.evalUiElement(page, "item3")
 
         expect(item1.top).toBe(0)
         expect(item1.left).toBe(0)

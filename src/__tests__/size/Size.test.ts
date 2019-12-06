@@ -24,39 +24,39 @@ describe("Size", () => {
 
     test("Width", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "width")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(element.width).toBe(SIZE)
     })
 
     test("Height", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "height")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(element.height).toBe(SIZE)
     })
 
     test("Content horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "content-horizontal")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(screen.width).toBe(element.width)
     })
 
     test("Content vertical", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "content-vertical")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(screen.height).toBe(element.height)
     })
 
     test("Percent horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "percent-horizontal")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.left).toBe(0)
         expect(element1.width).toBe(screen.width / 2)
@@ -66,9 +66,9 @@ describe("Size", () => {
 
     test("Percent vertical", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "percent-vertical")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.top).toBe(0)
         expect(element1.height).toBe(screen.height / 2)

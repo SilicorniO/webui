@@ -23,8 +23,8 @@ describe("Scrolls", () => {
 
     test("Scroll vertical", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "scroll-vertical")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const lastElement = await PuppeteerUtils.evalElement(page, "lastElement")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const lastElement = await PuppeteerUtils.evalUiElement(page, "lastElement")
 
         expect(lastElement.top).toBeGreaterThan(content.height)
         expect(content.overflowY).toBe("auto")
@@ -32,8 +32,8 @@ describe("Scrolls", () => {
 
     test("Scroll horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "scroll-horizontal")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const lastElement = await PuppeteerUtils.evalElement(page, "lastElement")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const lastElement = await PuppeteerUtils.evalUiElement(page, "lastElement")
 
         expect(lastElement.left).toBeGreaterThan(content.width)
         expect(content.overflowX).toBe("auto")
@@ -41,8 +41,8 @@ describe("Scrolls", () => {
 
     test("Scroll vertical and horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "scroll-vertical-and-horizontal")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const lastElement = await PuppeteerUtils.evalElement(page, "lastElement")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const lastElement = await PuppeteerUtils.evalUiElement(page, "lastElement")
 
         expect(lastElement.top).toBeGreaterThan(content.height)
         expect(content.overflowY).toBe("auto")

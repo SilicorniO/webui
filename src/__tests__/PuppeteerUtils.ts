@@ -1,4 +1,4 @@
-export interface DataElement {
+export interface UiDataElement {
     top: number
     left: number
     sTop: string
@@ -10,6 +10,11 @@ export interface DataElement {
     opacity: string
 }
 
+export interface DataElement {
+    width: number
+    height: number
+}
+
 export default class PuppeteerUtils {
     public static async loadPage(page: any, folder: string, testName: string) {
         await page.goto("file://" + folder + "/html/" + testName + ".html", {
@@ -17,7 +22,7 @@ export default class PuppeteerUtils {
         })
     }
 
-    public static async evalElement(page: any, elementId: string): Promise<DataElement> {
+    public static async evalUiElement(page: any, elementId: string): Promise<UiDataElement> {
         await page.waitFor("#" + elementId)
         return await page.evaluate((eId: string) => {
             // get element
@@ -37,6 +42,23 @@ export default class PuppeteerUtils {
                 overflowX: element.style.overflowX,
                 overflowY: element.style.overflowY,
                 opacity: element.style.opacity,
+            }
+        }, elementId)
+    }
+
+    public static async evalElement(page: any, elementId: string): Promise<DataElement> {
+        await page.waitFor("#" + elementId)
+        return await page.evaluate((eId: string) => {
+            // get element
+            const element = document.getElementById(eId)
+            if (element == null) {
+                return "Element not exists!"
+            }
+
+            // evaluate right position
+            return {
+                width: element.offsetWidth,
+                height: element.offsetHeight,
             }
         }, elementId)
     }

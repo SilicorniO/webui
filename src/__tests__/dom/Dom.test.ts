@@ -23,7 +23,7 @@ describe("Dom", () => {
 
     test("Doctype", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "doctype")
-        const layer1 = await PuppeteerUtils.evalElement(page, "layer1")
+        const layer1 = await PuppeteerUtils.evalUiElement(page, "layer1")
 
         expect(layer1.width).not.toBe(0)
         expect(layer1.height).not.toBe(0)

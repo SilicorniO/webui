@@ -23,8 +23,8 @@ describe("Attribute", () => {
 
     test("Different name", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "different-name")
-        const screen = await PuppeteerUtils.evalElement(page, "screen")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(element.top).toBe((screen.height - element.height) / 2)
         expect(element.left).toBe((screen.width - element.width) / 2)

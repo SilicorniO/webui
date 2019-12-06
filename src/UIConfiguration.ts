@@ -118,10 +118,18 @@ export default class UIConfiguration {
 
                 //check each screenMode
                 if (
-                    (!screenMode.widthStart || screenMode.widthStart == 0 || screenMode.widthStart < widthScreen) &&
-                    (!screenMode.widthEnd || screenMode.widthEnd == 0 || screenMode.widthEnd > widthScreen) &&
-                    (!screenMode.heightStart || screenMode.heightStart == 0 || screenMode.heightStart < heightScreen) &&
-                    (!screenMode.heightEnd || screenMode.heightEnd == 0 || screenMode.heightEnd < heightScreen)
+                    (screenMode.widthStart == undefined ||
+                        screenMode.widthStart == 0 ||
+                        widthScreen >= screenMode.widthStart) &&
+                    (screenMode.widthEnd == undefined ||
+                        screenMode.widthEnd == 0 ||
+                        widthScreen < screenMode.widthEnd) &&
+                    (screenMode.heightStart == undefined ||
+                        screenMode.heightStart == 0 ||
+                        heightScreen >= screenMode.heightStart) &&
+                    (screenMode.heightEnd == undefined ||
+                        screenMode.heightEnd == 0 ||
+                        heightScreen < screenMode.heightEnd)
                 ) {
                     aAttributes.push(screenMode["attribute"])
                     Log.log("SHOWING ATTRIBUTE: " + screenMode["attribute"])

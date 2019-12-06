@@ -23,10 +23,10 @@ describe("Table", () => {
 
     test("Table 0", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "table-0")
-        const t0 = await PuppeteerUtils.evalElement(page, "t0")
-        const t2 = await PuppeteerUtils.evalElement(page, "t2")
-        const r0e0 = await PuppeteerUtils.evalElement(page, "r0e0")
-        const r1e2 = await PuppeteerUtils.evalElement(page, "r1e2")
+        const t0 = await PuppeteerUtils.evalUiElement(page, "t0")
+        const t2 = await PuppeteerUtils.evalUiElement(page, "t2")
+        const r0e0 = await PuppeteerUtils.evalUiElement(page, "r0e0")
+        const r1e2 = await PuppeteerUtils.evalUiElement(page, "r1e2")
 
         expect(r0e0.left).toBe(t0.left)
         expect(r0e0.width).toBe(t0.width)

@@ -264,21 +264,17 @@ export default class UICore {
         if (view.positions[axis].endChanged) {
             view.positions[axis].start = view.positions[axis].end - view.attrsCalc[axis].sizeValue
             view.positions[axis].startChanged = true
-            // } else if (view.positions[axis].startChanged) {
-            //     var ele = view.element
-            //     ele.style.width = view.positions[axis].size + "px"
-            //     view.attrsCalc[axis].sizeValue = ele.offsetHeight
-
-            //     view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
-            //     view.positions[axis].endChanged = true
-            // } else if (view.attrs[axis].center) {
-            //     var ele = view.element
-            //     ele.style.width = view.positions[axis].size + "px"
-            //     view.attrsCalc[axis].sizeValue = ele.offsetHeight
-            // }
         } else if (view.positions[axis].startChanged) {
-            view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
-            view.positions[axis].endChanged = true
+            // TODO previous axis should be already asigned to calculate now the size correctly
+            if (axis == AXIS.Y && view.positions[AXIS.X].startChanged && view.positions[AXIS.X].endChanged) {
+                const height = UIViewUtils.calculateHeightView(view, view.element, view.positions[axis].size)
+                view.attrsCalc[axis].sizeValue = height
+                view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
+                view.positions[axis].endChanged = true
+            } else {
+                view.positions[axis].end = view.positions[axis].start + view.attrsCalc[axis].sizeValue
+                view.positions[axis].endChanged = true
+            }
         }
     }
 

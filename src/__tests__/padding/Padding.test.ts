@@ -21,19 +21,29 @@ describe("Padding", () => {
         await browser.close()
         done()
     })
+
     test("Padding all", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "padding-all")
-        const content = await PuppeteerUtils.evalElement(page, "content")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(element.width).toBe(PADDING + content.width + PADDING)
         expect(element.height).toBe(PADDING + content.height + PADDING)
     })
 
+    test("Padding all fullsize", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "padding-all-fullsize")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.width).toBe(content.width - PADDING - PADDING)
+        expect(element.height).toBe(content.height - PADDING - PADDING)
+    })
+
     test("Padding left", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "padding-left")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
 
         expect(element.width).toBe(PADDING + content.width)
         expect(element.height).toBe(content.height)
@@ -41,8 +51,8 @@ describe("Padding", () => {
 
     test("Padding right", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "padding-right")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
 
         expect(element.width).toBe(content.width + PADDING)
         expect(element.height).toBe(content.height)
@@ -50,8 +60,8 @@ describe("Padding", () => {
 
     test("Padding top", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "padding-top")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
 
         expect(element.width).toBe(content.width)
         expect(element.height).toBe(PADDING + content.height)
@@ -59,8 +69,8 @@ describe("Padding", () => {
 
     test("Padding bottom", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "padding-bottom")
-        const element = await PuppeteerUtils.evalElement(page, "element")
-        const content = await PuppeteerUtils.evalElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
 
         expect(element.width).toBe(content.width)
         expect(element.height).toBe(content.height + PADDING)

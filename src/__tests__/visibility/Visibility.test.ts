@@ -23,8 +23,8 @@ describe("Visibility", () => {
 
     test("Visible", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "visible")
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.opacity).toBe("1")
         expect(element2.left).toBe(element1.left + element1.width)
@@ -33,8 +33,8 @@ describe("Visibility", () => {
     test("Visible javascript", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "visible-js")
         await page.waitForSelector("#element1", { visible: true })
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.opacity).toBe("1")
         expect(element2.left).toBe(element1.left + element1.width)
@@ -42,8 +42,8 @@ describe("Visibility", () => {
 
     test("Invisible", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "invisible")
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.opacity).toBe("0")
         expect(element2.left).toBe(element1.left + element1.width)
@@ -51,8 +51,8 @@ describe("Visibility", () => {
 
     test("Invisible parent", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "invisible-parent")
-        const parent = await PuppeteerUtils.evalElement(page, "parent")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const parent = await PuppeteerUtils.evalUiElement(page, "parent")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(parent.opacity).toBe("0")
         expect(element.top).toBe(parent.top + parent.height)
@@ -61,8 +61,8 @@ describe("Visibility", () => {
     test("Invisible javascript", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "invisible-js")
         await page.waitForSelector("#element1", { visible: false })
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.opacity).toBe("1")
         expect(element2.left).toBe(element1.left + element1.width)
@@ -70,8 +70,8 @@ describe("Visibility", () => {
 
     test("Gone", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "gone")
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.opacity).toBe("0")
         expect(element2.left).toBe(0)
@@ -79,8 +79,8 @@ describe("Visibility", () => {
 
     test("Gone parent", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "gone-parent")
-        const parent = await PuppeteerUtils.evalElement(page, "parent")
-        const element = await PuppeteerUtils.evalElement(page, "element")
+        const parent = await PuppeteerUtils.evalUiElement(page, "parent")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(parent.opacity).toBe("0")
         expect(element.top).toBe(0)
@@ -89,8 +89,8 @@ describe("Visibility", () => {
     test("Gone javascript", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "gone-js")
         await page.waitForSelector("#element1", { visible: false })
-        const element1 = await PuppeteerUtils.evalElement(page, "element1")
-        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
 
         expect(element1.opacity).toBe("1")
         expect(element2.left).toBe(element1.left + element1.width)
