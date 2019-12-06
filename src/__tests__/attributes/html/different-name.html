@@ -1,0 +1,23 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" data-ui="fw;fh">
+        <div id="element" data-ui="c">Testing attribute with different name</div>
+    </div>
+    
+    <script>
+    WebUI.start({
+        attribute: 'data-ui',
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs'
+    });
+    
+    </script>
+    
+</body>
+</html>

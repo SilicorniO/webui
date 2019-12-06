@@ -9,7 +9,8 @@
   "scripts": {
     "build": "webpack",
     "lint": "tsc --noEmit && eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
-    "test": "npx jest"
+    "test": "npx jest",
+    "test:coverage": "npx jest --coverage"
   },
   "repository": {
     "type": "git",
