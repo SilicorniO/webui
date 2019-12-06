@@ -1,16 +1,13 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../build/webui-lib.js"></script>
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
 </head>
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <div id="content" ui="c">Center</div>
-        <div id="content1" ui="al:content;cv;mr:mm">Margin-Right</div>
-        <div id="content2" ui="at:content;ch;mb:mm">Margin-Bottom</div>
-        <div id="content3" ui="ar:content;cv;ml:mm">Margin-Left</div>
-        <div id="content4" ui="ab:content;ch;mt:mm">Margin-Top</div>
+        <div id="content" ui=""><span ui="">Padding-Bottom</span></div>
+        <div id="element" ui="ab:l;pb:mm"><span ui="">Padding-Bottom</span></div>
     </div>
     
     <script>
@@ -22,7 +19,7 @@
             ms: 10, 	//margin small
             mm: 20, 	//margin medium
             mb: 100 	//margin big
-        },
+        }
     });
     
     </script>

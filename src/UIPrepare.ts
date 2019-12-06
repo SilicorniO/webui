@@ -31,13 +31,13 @@ export default class UIPrepare {
         if (!parent.childrenInOrder) {
             //clean dependencies of all views
             parent.forEachChild(function(child, index) {
-                child.dependenciesHor = []
-                child.dependenciesVer = []
+                child.dependencies[AXIS.X] = []
+                child.dependencies[AXIS.Y] = []
             })
 
             //then order all the views with parent screen
-            parent.childrenOrderHor = this.orderViewsSameParent(parent, true)
-            parent.childrenOrderVer = this.orderViewsSameParent(parent, false)
+            parent.childrenOrder[AXIS.X] = this.orderViewsSameParent(parent, true)
+            parent.childrenOrder[AXIS.Y] = this.orderViewsSameParent(parent, false)
 
             //mark as parent with order
             parent.childrenInOrder = true
@@ -87,9 +87,9 @@ export default class UIPrepare {
 
                 if (reference.length > 0) {
                     if (hor) {
-                        child.dependenciesHor.push(reference)
+                        child.dependencies[AXIS.X].push(reference)
                     } else {
-                        child.dependenciesVer.push(reference)
+                        child.dependencies[AXIS.Y].push(reference)
                     }
                     numDependencies++
                 }
@@ -125,7 +125,7 @@ export default class UIPrepare {
             //for each view check dependencies
             parent.forEachChild((child, index) => {
                 if (child.orderNum == -1) {
-                    var dependencies = hor ? child.dependenciesHor : child.dependenciesVer
+                    var dependencies = hor ? child.dependencies[AXIS.X] : child.dependencies[AXIS.Y]
                     var sumDependencies = 0
                     for (var n = 0; n < dependencies.length; n++) {
                         var orderNum = 0

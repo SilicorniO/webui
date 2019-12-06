@@ -1,4 +1,4 @@
-import UIView from "../../model/UIView"
+import UIView, { AXIS } from "../../model/UIView"
 
 /**
  * @constructor
@@ -182,10 +182,10 @@ export default class UIViewUtils {
 
         //get the views of the parent
         var viewId = view.id
-        view.parent.forEachChild(function(parentChild, index) {
+        view.parent.forEachChild((parentChild, index) => {
             if (
-                (hor && parentChild.dependenciesHor.includes(viewId)) ||
-                (ver && parentChild.dependenciesVer.includes(viewId))
+                (hor && parentChild.dependencies[AXIS.X].includes(viewId)) ||
+                (ver && parentChild.dependencies[AXIS.Y].includes(viewId))
             ) {
                 dependencyViews.push(parentChild)
             }

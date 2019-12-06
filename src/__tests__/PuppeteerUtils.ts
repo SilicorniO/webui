@@ -1,18 +1,17 @@
 export interface DataElement {
-    top: string
-    left: string
+    top: number
+    left: number
+    sTop: string
+    sLeft: string
     width: number
     height: number
 }
 
 export default class PuppeteerUtils {
     public static async loadPage(page: any, folder: string, testName: string) {
-        await page.goto(
-            "file:///Users/jsr/workspace/webui/webui_github/src/__tests__/" + folder + "/html/" + testName + ".html",
-            {
-                waitUntil: "domcontentloaded",
-            },
-        )
+        await page.goto("file://" + folder + "/html/" + testName + ".html", {
+            waitUntil: "domcontentloaded",
+        })
     }
 
     public static async evalElement(page: any, elementId: string): Promise<DataElement> {
@@ -26,8 +25,10 @@ export default class PuppeteerUtils {
 
             // evaluate right position
             return {
-                top: element.style.top,
-                left: element.style.left,
+                sTop: element.style.top,
+                sLeft: element.style.left,
+                top: parseFloat(element.style.top),
+                left: parseFloat(element.style.left),
                 width: element.offsetWidth,
                 height: element.offsetHeight,
             }

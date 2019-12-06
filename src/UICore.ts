@@ -32,7 +32,7 @@ export default class UICore {
             //calculate views
             this.calculateViews(
                 AXIS.X,
-                screen.childrenOrderHor,
+                screen.childrenOrder[AXIS.X],
                 screen,
                 arrayViews,
                 indexes,
@@ -41,7 +41,7 @@ export default class UICore {
             )
             this.calculateViews(
                 AXIS.Y,
-                screen.childrenOrderVer,
+                screen.childrenOrder[AXIS.Y],
                 screen,
                 arrayViews,
                 indexes,
@@ -87,7 +87,7 @@ export default class UICore {
             }
         }
 
-        //set left parent if there is not horizontal dependencies
+        //set left parent if there is not dependencies
         if (numDependencies == 0 && !view.attrs[axis].center) {
             view.positions[axis].start = 0
             view.positions[axis].startChanged = true
@@ -114,12 +114,12 @@ export default class UICore {
             this.assignCenter(axis, view, width)
 
             //if there are children we eval them with width restrictions
-            if (view.childrenOrderHor.length > 0) {
+            if (view.childrenOrder[axis].length > 0) {
                 //calculate the real width with padding
                 var viewWidth = view.attrs[axis].scroll
                     ? 0
                     : view.positions[axis].size - view.positions[axis].paddingStart - view.positions[axis].paddingEnd
-                this.calculateViews(axis, view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored)
+                this.calculateViews(axis, view.childrenOrder[axis], view, arrayViews, indexes, viewWidth, viewsRestored)
 
                 //move left and right of all children using the paddingLeft
                 this.applyPaddingChildren(axis, view)
@@ -127,10 +127,10 @@ export default class UICore {
         } else {
             //if there are children we calculate the size of the children
             //giving the width of the parent
-            if (view.childrenOrderHor.length > 0) {
+            if (view.childrenOrder[axis].length > 0) {
                 //calculate the real width with padding
                 var viewWidth = 0 //view.scrollHorizontal? 0 : width;
-                this.calculateViews(axis, view.childrenOrderHor, view, arrayViews, indexes, viewWidth, viewsRestored)
+                this.calculateViews(axis, view.childrenOrder[axis], view, arrayViews, indexes, viewWidth, viewsRestored)
 
                 //move left and right of all children using the paddingLeft
                 this.applyPaddingChildren(axis, view)
@@ -190,10 +190,10 @@ export default class UICore {
      * @param view parent
      **/
     private applyPaddingChildren(axis: AXIS, view: UIView) {
-        if (view.positions[axis].paddingEnd != 0) {
+        if (view.positions[axis].paddingStart != 0) {
             for (const child of view.getUIChildren()) {
                 child.positions[axis].start += view.positions[axis].paddingStart
-                child.positions[axis].end += view.positions[axis].paddingEnd
+                child.positions[axis].end += view.positions[axis].paddingStart
             }
         }
     }
@@ -213,7 +213,7 @@ export default class UICore {
             if (max > width + view.positions[axis].start) {
                 //check it here and not before because in the future we could change this state to not scroll without recalculate everything
                 if (!view.positions[axis].scrollApplied) {
-                    //apply style to show horizontal scroll
+                    //apply style to show scroll
                     var element = document.getElementById(view.id)
                     element.style.overflowX = "auto"
 

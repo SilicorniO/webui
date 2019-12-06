@@ -6,14 +6,20 @@
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <div id="element" ui="t:p;ch">Top-Center</div>
+        <div id="content" ui="c">Center</div>
+        <div id="element" ui="al:content;cv;mr:mm">Margin-Right</div>
     </div>
     
     <script>
     WebUI.start({
         viewColors: true,
         showLogs: true,
-        viewLogs: 'logs'
+        viewLogs: 'logs',
+        dimens: {
+            ms: 10, 	//margin small
+            mm: 20, 	//margin medium
+            mb: 100 	//margin big
+        },
     });
     
     </script>

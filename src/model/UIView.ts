@@ -95,6 +95,16 @@ export interface UIPositionAxis {
     [AXIS.Y]: UIPosition
 }
 
+export interface UIChildrenOrderAxis {
+    [AXIS.X]: UIView[]
+    [AXIS.Y]: UIView[]
+}
+
+export interface UIDependenciesAxis {
+    [AXIS.X]: string[]
+    [AXIS.Y]: string[]
+}
+
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
 
@@ -103,14 +113,18 @@ export default class UIView {
     parent: UIView
     screen: UIView
 
-    childrenOrderHor: UIView[] = []
-    childrenOrderVer: UIView[] = []
+    childrenOrder: UIChildrenOrderAxis = {
+        [AXIS.X]: [],
+        [AXIS.Y]: [],
+    }
     childrenUI: boolean = true
 
     order: number = 0
     orderNum: number = 0
-    dependenciesHor: string[] = []
-    dependenciesVer: string[] = []
+    dependencies: UIDependenciesAxis = {
+        [AXIS.X]: [],
+        [AXIS.Y]: [],
+    }
 
     public refs: UIRefAxis = {
         [AXIS.X]: {
