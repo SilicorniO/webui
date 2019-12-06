@@ -57,12 +57,12 @@ export default class UICore {
         parentView: UIView,
         arrayViews: UIView[],
         indexes: { [key: string]: number },
-        width: number,
+        size: number,
         viewsRestored: UIView[],
     ) {
         for (var i = 0; i < views.length; i++) {
             if (views[i].hasToBeCalculated()) {
-                this.calculateView(axis, views[i], parentView, arrayViews, indexes, width, viewsRestored)
+                this.calculateView(axis, views[i], parentView, arrayViews, indexes, size, viewsRestored)
             }
         }
     }
@@ -73,7 +73,7 @@ export default class UICore {
         parentView: UIView,
         arrayViews: UIView[],
         indexes: { [key: string]: number },
-        width: number,
+        size: number,
         viewsRestored: UIView[],
     ) {
         //eval references to try to calculate the width
@@ -82,7 +82,7 @@ export default class UICore {
         for (const refId of UI_REF_LIST) {
             var dependency = this.translateViewDependency(view, reference[refId], parentView)
             if (dependency.length > 0) {
-                this.evalDependence(axis, view, parentView, width, refId, arrayViews[indexes[dependency]])
+                this.evalDependence(axis, view, parentView, size, refId, arrayViews[indexes[dependency]])
                 numDependencies += 1
             }
         }
@@ -99,7 +99,7 @@ export default class UICore {
             this.applyFixedSize(axis, view)
         } else if (view.attrs[axis].size == UI_SIZE.PERCENTAGE) {
             //apply percent
-            this.applyPercent(axis, view, parentView, width)
+            this.applyPercent(axis, view, parentView, size)
         }
 
         //apply margins to left and right
@@ -108,10 +108,10 @@ export default class UICore {
         //calculate width if it is possible
         if (view.positions[axis].startChanged && view.positions[axis].endChanged) {
             //calculate the width
-            this.assignSize(axis, view, width)
+            this.assignSize(axis, view, size)
 
             //check gravity
-            this.assignCenter(axis, view, width)
+            this.assignCenter(axis, view, size)
 
             //if there are children we eval them with width restrictions
             if (view.childrenOrder[axis].length > 0) {
@@ -143,14 +143,14 @@ export default class UICore {
             }
 
             //calculate the width
-            this.assignSize(axis, view, width)
+            this.assignSize(axis, view, size)
 
             //check gravity
-            this.assignCenter(axis, view, width)
+            this.assignCenter(axis, view, size)
         }
 
         //check if size of children if bigger than container to add vertical scroll
-        if (this.applyScroll(axis, view, width)) {
+        if (this.applyScroll(axis, view, size)) {
             //apply the padding of the scroll to the element
             view.positions[axis == AXIS.X ? AXIS.Y : AXIS.X].paddingEnd += this.scrollWidth
             view.positions[axis].scrollApplied = true
@@ -202,7 +202,31 @@ export default class UICore {
      * Apply scroll to the view if their children are widther than parent
      * @param view View parent
      **/
-    private applyScroll(axis: AXIS, view: UIView, width: number) {
+    // private applyScroll(axis: AXIS, view: UIView, size: number) {
+    //     if (view.attrs[axis].scroll) {
+    //         var max = 0
+    //         for (const child of view.getUIChildren()) {
+    //             if (child.positions[axis].end > max) {
+    //                 max = child.positions[axis].end
+    //             }
+    //         }
+    //         if (max > size + view.positions[axis].start) {
+    //             //check it here and not before because in the future we could change this state to not scroll without recalculate everything
+    //             if (!view.positions[axis].scrollApplied) {
+    //                 //apply style to show scroll
+    //                 var element = document.getElementById(view.id)
+    //                 element.style.overflowX = "auto"
+
+    //                 //recalculate all the children
+    //                 return true
+    //             }
+    //         }
+    //     }
+
+    //     //not applied
+    //     return false
+    // }
+    private applyScroll(axis: AXIS, view: UIView, size: number) {
         if (view.attrs[axis].scroll) {
             var max = 0
             for (const child of view.getUIChildren()) {
@@ -210,12 +234,16 @@ export default class UICore {
                     max = child.positions[axis].end
                 }
             }
-            if (max > width + view.positions[axis].start) {
+            if (view.attrs[axis].size != "sc" || max > size + view.positions[axis].paddingStart) {
                 //check it here and not before because in the future we could change this state to not scroll without recalculate everything
                 if (!view.positions[axis].scrollApplied) {
-                    //apply style to show scroll
+                    //apply style to show vertical scroll
                     var element = document.getElementById(view.id)
-                    element.style.overflowX = "auto"
+                    if (axis == AXIS.X) {
+                        element.style.overflowX = "auto"
+                    } else {
+                        element.style.overflowY = "auto"
+                    }
 
                     //recalculate all the children
                     return true

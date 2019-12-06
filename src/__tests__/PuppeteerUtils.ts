@@ -5,6 +5,8 @@ export interface DataElement {
     sLeft: string
     width: number
     height: number
+    overflowX: string
+    overflowY: string
 }
 
 export default class PuppeteerUtils {
@@ -31,6 +33,8 @@ export default class PuppeteerUtils {
                 left: parseFloat(element.style.left),
                 width: element.offsetWidth,
                 height: element.offsetHeight,
+                overflowX: element.style.overflowX,
+                overflowY: element.style.overflowY,
             }
         }, elementId)
     }
