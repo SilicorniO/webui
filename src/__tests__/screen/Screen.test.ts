@@ -31,6 +31,17 @@ describe("Screen", () => {
         expect(subscreen.width).toBe(screen.width - PADDING - PADDING)
     })
 
+    test("Subscreen multiple", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "subscreen-multiple")
+        const content1 = await PuppeteerUtils.evalUiElement(page, "content1")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const content2 = await PuppeteerUtils.evalUiElement(page, "content2")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+
+        expect(content1.width).toBe(element1.width + MARGIN_MEDIUM * 2)
+        expect(content2.width).toBe(element2.width + MARGIN_MEDIUM * 2)
+    })
+
     test("Between header and footer", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "between-header-and-footer")
         const bodyContent = await PuppeteerUtils.evalElement(page, "body-content")

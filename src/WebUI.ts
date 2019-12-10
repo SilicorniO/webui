@@ -22,7 +22,7 @@ class WebUI {
     private screens: UIView[] = []
 
     //ids of nodes changed
-    private nodesAdded: UIHTMLElement[] = []
+    private nodesAdded: HTMLElement[] = []
     private nodesUpdated: UIHTMLElement[] = []
     private parentNodesRemoved: UIHTMLElement[] = []
 
@@ -110,8 +110,8 @@ class WebUI {
             for (var mutation of mutationsList) {
                 if (mutation.type == "childList") {
                     for (var i = 0; i < mutation.addedNodes.length; i++) {
-                        const nodeUi = UIHTMLElement.get(mutation.addedNodes[i])
-                        if (nodeUi != null) {
+                        const nodeUi = mutation.addedNodes[i]
+                        if (nodeUi != null && nodeUi instanceof HTMLElement) {
                             this.nodesAdded.push(nodeUi)
                         }
                     }

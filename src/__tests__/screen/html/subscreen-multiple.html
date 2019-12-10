@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../build/webui-lib.js"></script>
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
 </head>
 <body style="margin:0">
     
@@ -11,15 +11,15 @@
     <div style="width:100%;background-color:lightgray">
         <div>
             <div id="screen1" ui="">
-                <div ui="p:mm">
-                    <span ui="">Multiple screens at the same time in the body 1</span>
+                <div id="content1" ui="p:mm">
+                    <span id="element1" ui="">Multiple screens at the same time in the body 1</span>
                 </div>
             </div>
         </div>
         <div style="">
             <div id="screen2" ui="w:100%">
-                    <div ui="p:mm;r:p">
-                        <span ui="">Multiple screens at the same time in the body 2</span>
+                    <div id="content2" ui="p:mm;r:p">
+                        <span id="element2" ui="">Multiple screens at the same time in the body 2</span>
                     </div>
                 </div>
             </div>

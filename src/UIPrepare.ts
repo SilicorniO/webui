@@ -387,7 +387,7 @@ export default class UIPrepare {
      * @param {UIConfiguration} configuration
      * @return {number} Count of added nodes
      */
-    public addNodes(nodesAdded: UIHTMLElement[], screens: UIView[], configuration: UIConfiguration): number {
+    public addNodes(nodesAdded: HTMLElement[], screens: UIView[], configuration: UIConfiguration): number {
         //counter to know how many nodes were added
         var countNodesAdded = 0
 

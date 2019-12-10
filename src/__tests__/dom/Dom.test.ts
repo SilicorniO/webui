@@ -28,4 +28,36 @@ describe("Dom", () => {
         expect(layer1.width).not.toBe(0)
         expect(layer1.height).not.toBe(0)
     })
+
+    test("Add element", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "add-element")
+
+        // add one element
+        await page.click("#addElement")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        expect(element1.top).toBe(0)
+        expect(element1.left).toBe(0)
+
+        // add second element
+        await page.click("#addElement")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+        expect(element2.top).toBe(0)
+        expect(element2.left).toBe(0)
+    })
+
+    test("Add element UI", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "add-element-ui")
+
+        // add one element
+        await page.click("#addElement")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        expect(element1.top).toBe(0)
+        expect(element1.left).toBe(0)
+
+        // add second element
+        await page.click("#addElement")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+        expect(element2.top).toBe(element1.top + element1.height)
+        expect(element2.left).toBe(0)
+    })
 })

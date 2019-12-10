@@ -1,14 +1,14 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../build/webui-lib.js"></script>
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
 </head>
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
         <div id="container" ui=""></div>
         <div id="buttons" ui="ab:l">
-            <a href="#" onClick="addElementUI()" ui="ar:l">Add element UI</a>
+            <a id="addElement" href="#" onClick="addElementUI()" ui="ar:l">Add element UI</a>
         </div>
     </div>
     
@@ -22,15 +22,15 @@
     
     var container = document.getElementById('container');
 
-    var num = 0;
+    var id = 0
     function addElementUI(){
+        id += 1
         var element = document.createElement('span');
+        element.id = "element" + id;
         element.innerHTML = "element";
-        element.setAttribute('ui', 'ml:100' + (num>0? ';ab:l' : ''));
+        element.setAttribute('ui', 'ml:100' + (id>1? ';ab:l' : ''));
         container.appendChild(element);
-        num++;
     }
-    
 
     </script>
     

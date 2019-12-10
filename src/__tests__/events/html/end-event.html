@@ -1,0 +1,47 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <span ui="">Testing events</span>
+    </div>
+    
+    <script>
+        var endEvent = false
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            viewLogs: 'logs',
+            timeRedraw: 20,
+            screenModes: [
+                {
+                    //mobile
+                    attribute: "uim",
+                    widthEnd: 450
+                },
+                {
+                    //tablet
+                    attribute: "uit",
+                    widthStart: 451,
+                    widthEnd: 700
+                },
+                {
+                    //desktop
+                    attribute: "uid",
+                    widthStart: 701
+                }
+            ],
+            events: function(event) {
+                if (event.name == "end") {
+                    endEvent = true
+                }
+            }
+        });
+    
+    </script>
+    
+</body>
+</html>
