@@ -1,12 +1,12 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../build/webui-lib.js"></script>
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
 </head>
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <span ui="">Testing opacity animation enabled</span>
+        <span id="element" ui="">Testing opacity animation disabled</span>
     </div>
     
     <script>
@@ -16,8 +16,8 @@
         viewLogs: 'logs',
         timeRedraw: 20,
         animations: {
-            defaultTime: 5,
-            defaultOpacity: true
+            defaultTime: 0.1,
+            defaultOpacity: false
         }
     });
     

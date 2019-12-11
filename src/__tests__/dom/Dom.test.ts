@@ -1,7 +1,9 @@
 const puppeteer = require("puppeteer")
 import PuppeteerUtils from "../PuppeteerUtils"
 
-const timeout = 5000
+const TIMEOUT = 5000
+const REDRAW_TIME = 30
+const MARGIN_MEDIUM = 20
 
 describe("Dom", () => {
     let browser: any
@@ -13,7 +15,7 @@ describe("Dom", () => {
             args: ["--no-sandbox", "--disable-setuid-sandbox", "--ignore-certificate-errors"],
         })
         page = await browser.newPage()
-    }, timeout)
+    }, TIMEOUT)
 
     afterAll(async (done: () => void) => {
         await page.close()
@@ -34,12 +36,14 @@ describe("Dom", () => {
 
         // add one element
         await page.click("#addElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
         const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
         expect(element1.top).toBe(0)
         expect(element1.left).toBe(0)
 
         // add second element
         await page.click("#addElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
         const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
         expect(element2.top).toBe(0)
         expect(element2.left).toBe(0)
@@ -50,14 +54,57 @@ describe("Dom", () => {
 
         // add one element
         await page.click("#addElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
         const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
         expect(element1.top).toBe(0)
-        expect(element1.left).toBe(0)
+        expect(element1.left).toBe(MARGIN_MEDIUM)
 
         // add second element
         await page.click("#addElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
         const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
         expect(element2.top).toBe(element1.top + element1.height)
-        expect(element2.left).toBe(0)
+        expect(element2.left).toBe(MARGIN_MEDIUM)
+    })
+
+    test("Remove element", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "remove-element")
+
+        // add one element
+        await page.click("#removeElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
+        const container = await PuppeteerUtils.evalUiElement(page, "container")
+        const element2 = await PuppeteerUtils.evalElement(page, "element2")
+        expect(container.width).toBe(element2.width + 1)
+    })
+
+    test("Remove element UI", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "remove-element-ui")
+
+        // add one element
+        await page.click("#removeElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
+        const container = await PuppeteerUtils.evalUiElement(page, "container")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+        expect(container.width).toBe(element2.width)
+        expect(container.height).toBe(element2.height)
+    })
+
+    test("Change element UI", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-ui")
+
+        // check position
+        let element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        let element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+        expect(element2.top).toBe(element1.top + element1.height)
+        expect(element2.left).toBe(element1.left)
+
+        // add one element
+        await page.click("#changeElement")
+        await PuppeteerUtils.delay(REDRAW_TIME)
+        element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+        expect(element2.top).toBe(element1.top)
+        expect(element2.left).toBe(element1.left + element1.width)
     })
 })

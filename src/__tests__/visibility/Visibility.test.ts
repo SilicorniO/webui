@@ -95,4 +95,20 @@ describe("Visibility", () => {
         expect(element1.opacity).toBe("1")
         expect(element2.left).toBe(element1.left + element1.width)
     })
+
+    test("Opacity disabled", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "opacity-disabled")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.transition).toBe("")
+    })
+
+    test("Opacity enabled", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "opacity-enabled")
+
+        // initial opacity
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.transition.length).toBeGreaterThan(0)
+    })
 })

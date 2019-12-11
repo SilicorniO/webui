@@ -1,13 +1,13 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="text/javascript" src="../build/webui-lib.js"></script>
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
 </head>
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <div id="square1" ui="w:200;h:200"></div>
-        <div id="square2" ui="ar:l;w:200;h:200;ml:100"></div>
+        <div id="element1" ui="w:200;h:200"></div>
+        <div id="element2" ui="ar:l;w:200;h:200;ml:100"></div>
     </div>
     
     <script>
@@ -19,19 +19,16 @@
             showLogs: true,
             timeRedraw: 100,
             events: function(event) {
-                console.log(event);
                 if (event.name == 'end') {
                     if (numEnds == 0) {
                         numEnds += 1;
 
-                        console.log("After first end");
+                        var element1 = document.getElementById('element1');
+                        element1.ui.setVisibility("g");
+                        element1.ui.animateNextRefresh(0.1);
 
-                        var square1 = document.getElementById('square1');
-                        square1.ui.setVisibility("g");
-                        square1.ui.animateNextRefresh(1);
-
-                        var square2 = document.getElementById('square2');
-                        square2.ui.animateNextRefresh(1);
+                        var element2 = document.getElementById('element2');
+                        element2.ui.animateNextRefresh(1);
 
                         WebUI.refresh();
                     }

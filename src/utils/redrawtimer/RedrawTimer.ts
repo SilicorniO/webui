@@ -1,4 +1,5 @@
 export default class RedrawTimer {
+    private static readonly TIME_MILLIS_DEFAULT = 20
     private time: number | null = null
 
     /**
@@ -6,11 +7,7 @@ export default class RedrawTimer {
      * @param cb Callback to call when it is time to redraw
      * @param timeMillis milliseconds to wait
      **/
-    public timer(cb: () => void, timeMillis: number) {
-        if (!timeMillis) {
-            timeMillis = 20
-        }
-
+    public timer(cb: () => void, timeMillis: number = RedrawTimer.TIME_MILLIS_DEFAULT) {
         //check if it is running
         var running = this.time != null
 

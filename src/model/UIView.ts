@@ -240,6 +240,14 @@ export default class UIView {
         this.element["ui"] = this
     }
 
+    public setWidth(value: string | number) {
+        this.setSize(AXIS.X, "" + value)
+    }
+
+    public setHeight(value: string | number) {
+        this.setSize(AXIS.Y, "" + value)
+    }
+
     public setSize(axis: AXIS, value: string) {
         if (value == UI_SIZE.SIZE_CONTENT) {
             this.attrs[axis].size = value
@@ -293,6 +301,22 @@ export default class UIView {
             this.setMarginStart(AXIS.Y, margin)
             this.setMarginEnd(AXIS.Y, margin)
         }
+    }
+
+    public setMarginLeft(margin: string | number) {
+        this.setMarginStart(AXIS.X, "" + margin)
+    }
+
+    public setMarginTop(margin: string | number) {
+        this.setMarginStart(AXIS.Y, "" + margin)
+    }
+
+    public setMarginRight(margin: string | number) {
+        this.setMarginEnd(AXIS.X, "" + margin)
+    }
+
+    public setMarginBottom(margin: string | number) {
+        this.setMarginEnd(AXIS.Y, "" + margin)
     }
 
     public setMarginStart(axis: AXIS, margin: string) {

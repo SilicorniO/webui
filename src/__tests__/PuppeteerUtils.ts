@@ -8,6 +8,7 @@ export interface UiDataElement {
     overflowX: string
     overflowY: string
     opacity: string
+    transition: string
 }
 
 export interface DataElement {
@@ -42,6 +43,7 @@ export default class PuppeteerUtils {
                 overflowX: element.style.overflowX,
                 overflowY: element.style.overflowY,
                 opacity: element.style.opacity,
+                transition: element.style.transition,
             }
         }, elementId)
     }
@@ -61,5 +63,11 @@ export default class PuppeteerUtils {
                 height: element.offsetHeight,
             }
         }, elementId)
+    }
+
+    public static async delay(timeInMillis: number): Promise<void> {
+        return await new Promise((resolve, _reject) => {
+            setTimeout(resolve, timeInMillis)
+        })
     }
 }

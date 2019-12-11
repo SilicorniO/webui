@@ -1,0 +1,34 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="container" ui="">
+            <div id="element1" ui="">element 1</div>
+            <div id="element2" ui="ab:l">element 2</div>
+        </div>
+        <div id="buttons" ui="ab:l">
+            <a id="removeElement" href="#" onClick="removeElementUI()" ui="ar:l">Remove element UI</a>
+        </div>
+    </div>
+    
+    <script>
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            viewLogs: 'logs',
+            timeRedraw: 20
+        });
+        
+        var element1 = document.getElementById('element1');
+
+        function removeElementUI(){
+            element1.parentNode.removeChild(element1);
+        }
+    </script>
+    
+</body>
+</html>
