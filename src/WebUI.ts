@@ -15,8 +15,7 @@ import CounterUtils from "./utils/counter/CounterUtils"
  */
 class WebUI {
     //size of scrollbars to use as padding when views have scrollbars visible
-    private scrollWidth: number = 0
-    private scrollHeight: number = 0
+    private scrollSize: number = 0
 
     //list of screens
     private screens: UIView[] = []
@@ -73,8 +72,8 @@ class WebUI {
         this.clearUI()
 
         //calculate the size of scrollbars
-        if (this.scrollWidth == 0) {
-            this.scrollWidth = HtmlUtils.getScrollWidth()
+        if (this.scrollSize == 0) {
+            this.scrollSize = HtmlUtils.getScrollWidth()
         }
 
         //save configuration
@@ -85,7 +84,7 @@ class WebUI {
         Log.uiViewLogs = this.configuration.logsView
 
         //prepare core with the configuration
-        this.uiCore = new UICore(this.scrollWidth)
+        this.uiCore = new UICore(this.scrollSize)
 
         //start running on actual dom
         this.drawScreens()

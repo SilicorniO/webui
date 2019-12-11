@@ -105,6 +105,46 @@ export interface UIDependenciesAxis {
     [AXIS.Y]: string[]
 }
 
+enum ATTR {
+    WIDTH = "w",
+    FULL_WIDTH = "fw",
+    HEIGHT = "h",
+    FULL_HEIGHT = "fh",
+    LEFT = "l",
+    RIGHT = "r",
+    TOP = "t",
+    BOTTOM = "b",
+    AT_LEFT = "al",
+    AT_LEFT_EQUAL = "ale",
+    AT_RIGHT = "ar",
+    AT_RIGHT_EQUAL = "are",
+    AT_TOP = "at",
+    AT_TOP_EQUAL = "ate",
+    AT_BOTTOM = "ab",
+    AT_BOTTOM_EQUAL = "abe",
+    MARGIN_LEFT = "ml",
+    MARGIN_TOP = "mt",
+    MARGIN_RIGHT = "mr",
+    MARGIN_BOTTOM = "mb",
+    MARGIN = "m",
+    PADDING_LEFT = "pl",
+    PADDING_RIGHT = "pr",
+    PADDING_TOP = "pt",
+    PADDING_BOTTOM = "pb",
+    PADDING = "p",
+    CENTER_VERTICAL = "cv",
+    CENTER_HORIZONTAL = "ch",
+    CENTER = "c",
+    SCROLL_VERTICAL = "sv",
+    SCROLL_HORIZONTAL = "sh",
+    VISIBILITY = "v",
+}
+
+export interface UIAttributeValue {
+    attr: string
+    value?: string
+}
+
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
 
@@ -117,7 +157,6 @@ export default class UIView {
         [AXIS.X]: [],
         [AXIS.Y]: [],
     }
-    childrenUI: boolean = true
 
     order: number = 0
     orderNum: number = 0
@@ -210,6 +249,7 @@ export default class UIView {
 
     //----- Flags for changes -----
     sizeLoaded: boolean = false
+    positionLoaded: boolean = false
     childrenInOrder: boolean = false
 
     /**
@@ -343,6 +383,22 @@ export default class UIView {
         }
     }
 
+    public setPaddingLeft(margin: string | number) {
+        this.setPaddingStart(AXIS.X, "" + margin)
+    }
+
+    public setPaddingTop(margin: string | number) {
+        this.setPaddingStart(AXIS.Y, "" + margin)
+    }
+
+    public setPaddingRight(margin: string | number) {
+        this.setPaddingEnd(AXIS.X, "" + margin)
+    }
+
+    public setPaddingBottom(margin: string | number) {
+        this.setPaddingEnd(AXIS.Y, "" + margin)
+    }
+
     public setPaddingStart(axis: AXIS, padding: string) {
         this.attrs[axis].paddingStart = padding
         this.sizeLoaded = false
@@ -395,9 +451,9 @@ export default class UIView {
         this.animationDurations.push(animationDuration)
 
         //animate children
-        this.forEachChild((child: UIView) => {
+        for (const child of this.getUIChildren()) {
             child.animateDependencies(animationDuration)
-        })
+        }
     }
 
     /**
@@ -422,20 +478,6 @@ export default class UIView {
      */
     public getChildElements(): UIHTMLElement[] {
         return UIHTMLElement.getAll(this.element.childNodes)
-    }
-
-    /**
-     * Call to callback for each child with UI
-     * @param cb
-     */
-    public forEachChild(cb: (child: UIView, i: number) => void) {
-        var children = UIHTMLElement.getAll(this.element.childNodes)
-        for (var i = 0; i < children.length; i++) {
-            var child = children[i].ui
-            if (child) {
-                cb(child, i)
-            }
-        }
     }
 
     public getUIChildren(): UIView[] {
@@ -602,130 +644,21 @@ export default class UIView {
      **/
     public readUI(element: HTMLElement, attributeMain: string, attributes: string[]): UIView {
         //read main attributes
-        var aValues = UIUtils.readAttributes(element.getAttribute(attributeMain))
+        let attributeValues = UIUtils.readAttributes(element.getAttribute(attributeMain))
         for (var i = 0; i < attributes.length; i++) {
-            aValues = aValues.concat(UIUtils.readAttributes(element.getAttribute(attributes[i])))
+            attributeValues = attributeValues.concat(UIUtils.readAttributes(element.getAttribute(attributes[i])))
         }
 
         //check if we have attributes
-        if (aValues.length == 0) {
+        if (attributeValues.length == 0) {
             return
         }
 
         //set the ui values
-        for (var i = 0; i < aValues.length; i++) {
-            var attr = aValues[i].attr
-            var value = aValues[i].value
-
-            if (attr == "w") {
-                this.setSize(AXIS.X, value)
-            } else if (attr == "fw") {
-                this.setSize(AXIS.X, "100%")
-            } else if (attr == "h") {
-                this.setSize(AXIS.Y, value)
-            } else if (attr == "fh") {
-                this.setSize(AXIS.Y, "100%")
-            } else if (attr == "l") {
-                this.setReference(AXIS.X, UI_REF.START_START, value)
-            } else if (attr == "r") {
-                this.setReference(AXIS.X, UI_REF.END_END, value)
-            } else if (attr == "t") {
-                this.setReference(AXIS.Y, UI_REF.START_START, value)
-            } else if (attr == "b") {
-                this.setReference(AXIS.Y, UI_REF.END_END, value)
-            } else if (attr == "al") {
-                this.setReference(AXIS.X, UI_REF.END_START, value)
-            } else if (attr == "ale") {
-                this.setReference(AXIS.X, UI_REF.END_START, value)
-                this.setReference(AXIS.Y, UI_REF.START_START, value)
-                this.setReference(AXIS.Y, UI_REF.END_END, value)
-            } else if (attr == "ar") {
-                this.setReference(AXIS.X, UI_REF.START_END, value)
-            } else if (attr == "are") {
-                this.setReference(AXIS.X, UI_REF.START_END, value)
-                this.setReference(AXIS.Y, UI_REF.START_START, value)
-                this.setReference(AXIS.Y, UI_REF.END_END, value)
-            } else if (attr == "at") {
-                this.setReference(AXIS.Y, UI_REF.END_START, value)
-            } else if (attr == "ate") {
-                this.setReference(AXIS.Y, UI_REF.END_START, value)
-                this.setReference(AXIS.X, UI_REF.START_START, value)
-                this.setReference(AXIS.X, UI_REF.END_END, value)
-            } else if (attr == "ab") {
-                this.setReference(AXIS.Y, UI_REF.START_END, value)
-            } else if (attr == "abe") {
-                this.setReference(AXIS.Y, UI_REF.START_END, value)
-                this.setReference(AXIS.X, UI_REF.START_START, value)
-                this.setReference(AXIS.X, UI_REF.END_END, value)
-            } else if (attr == "ml") {
-                this.setMarginStart(AXIS.X, value)
-            } else if (attr == "mr") {
-                this.setMarginEnd(AXIS.X, value)
-            } else if (attr == "mt") {
-                this.setMarginStart(AXIS.Y, value)
-            } else if (attr == "mb") {
-                this.setMarginEnd(AXIS.Y, value)
-            } else if (attr == "m") {
-                var mValues = value.split(",")
-                if (mValues.length == 1) {
-                    this.setMargin(value)
-                } else if (mValues.length == 4) {
-                    this.setMarginStart(AXIS.X, mValues[0])
-                    this.setMarginStart(AXIS.Y, mValues[1])
-                    this.setMarginEnd(AXIS.X, mValues[2])
-                    this.setMarginEnd(AXIS.Y, mValues[3])
-                }
-            } else if (attr == "pl") {
-                this.setPaddingStart(AXIS.X, value)
-            } else if (attr == "pr") {
-                this.setPaddingEnd(AXIS.X, value)
-            } else if (attr == "pt") {
-                this.setPaddingStart(AXIS.Y, value)
-            } else if (attr == "pb") {
-                this.setPaddingEnd(AXIS.Y, value)
-            } else if (attr == "p") {
-                var pValues = value.split(",")
-                if (pValues.length == 1) {
-                    this.setPadding(value)
-                } else if (pValues.length == 4) {
-                    this.setPaddingStart(AXIS.X, mValues[0])
-                    this.setPaddingStart(AXIS.Y, mValues[1])
-                    this.setPaddingEnd(AXIS.X, mValues[2])
-                    this.setPaddingEnd(AXIS.Y, mValues[3])
-                }
-            } else if (attr == "cv") {
-                this.setCenter(AXIS.Y, true)
-            } else if (attr == "ch") {
-                this.setCenter(AXIS.X, true)
-            } else if (attr == "c") {
-                this.setCenter(AXIS.X, true)
-                this.setCenter(AXIS.Y, true)
-            } else if (attr == "cui") {
-                if (value == "n") {
-                    this.childrenUI = false
-                } else {
-                    this.childrenUI = true
-                }
-            } else if (attr == "sv") {
-                this.setScroll(AXIS.Y, true)
-            } else if (attr == "sh") {
-                this.setScroll(AXIS.X, true)
-            } else if (attr == "v") {
-                this.setVisibility((value as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE)
-            } else if (attr.length > 0) {
-                Log.logW("Attribute unknown: " + attr + " in view " + this.id)
-            }
+        for (const attributeValue of attributeValues) {
+            this.readUIAttribute(attributeValue)
         }
 
-        //if no references we add one to the parent: top
-        // var refs = false;
-        // var references = this.getReferences();
-        // for(var i=0; i<references.length; i++){
-        // 	if(references[i].length>0){
-        // 		refs = true;
-        // 		break;
-        // 	}
-        // }
         const referencesXEmpty = UIView.isReferenceEmpty(this.getReference(AXIS.X))
         if (referencesXEmpty && !this.attrs[AXIS.X].center) {
             this.setReference(AXIS.X, UI_REF.START_START, UI_VIEW_ID.PARENT)
@@ -735,10 +668,109 @@ export default class UIView {
         if (referencesYEmpty && !this.attrs[AXIS.Y].center) {
             this.setReference(AXIS.Y, UI_REF.START_START, UI_VIEW_ID.PARENT)
         }
+    }
 
-        // if(!refs){
-        // 	this.setTop(parentId);
-        // }
+    /**
+     * Read attribute and value
+     * @param attr attribute
+     * @param value value of attribute
+     */
+    private readUIAttribute(attributeValue: UIAttributeValue) {
+        const attr = attributeValue.attr
+        const value = attributeValue.value
+
+        if (attr === ATTR.WIDTH) {
+            this.setSize(AXIS.X, value)
+        } else if (attr === ATTR.FULL_WIDTH) {
+            this.setSize(AXIS.X, "100%")
+        } else if (attr === ATTR.HEIGHT) {
+            this.setSize(AXIS.Y, value)
+        } else if (attr === ATTR.FULL_HEIGHT) {
+            this.setSize(AXIS.Y, "100%")
+        } else if (attr === ATTR.LEFT) {
+            this.setReference(AXIS.X, UI_REF.START_START, value)
+        } else if (attr === ATTR.RIGHT) {
+            this.setReference(AXIS.X, UI_REF.END_END, value)
+        } else if (attr === ATTR.TOP) {
+            this.setReference(AXIS.Y, UI_REF.START_START, value)
+        } else if (attr === ATTR.BOTTOM) {
+            this.setReference(AXIS.Y, UI_REF.END_END, value)
+        } else if (attr === ATTR.AT_LEFT) {
+            this.setReference(AXIS.X, UI_REF.END_START, value)
+        } else if (attr === ATTR.AT_LEFT_EQUAL) {
+            this.setReference(AXIS.X, UI_REF.END_START, value)
+            this.setReference(AXIS.Y, UI_REF.START_START, value)
+            this.setReference(AXIS.Y, UI_REF.END_END, value)
+        } else if (attr === ATTR.AT_RIGHT) {
+            this.setReference(AXIS.X, UI_REF.START_END, value)
+        } else if (attr === ATTR.AT_RIGHT_EQUAL) {
+            this.setReference(AXIS.X, UI_REF.START_END, value)
+            this.setReference(AXIS.Y, UI_REF.START_START, value)
+            this.setReference(AXIS.Y, UI_REF.END_END, value)
+        } else if (attr === ATTR.AT_TOP) {
+            this.setReference(AXIS.Y, UI_REF.END_START, value)
+        } else if (attr === ATTR.AT_TOP_EQUAL) {
+            this.setReference(AXIS.Y, UI_REF.END_START, value)
+            this.setReference(AXIS.X, UI_REF.START_START, value)
+            this.setReference(AXIS.X, UI_REF.END_END, value)
+        } else if (attr === ATTR.AT_BOTTOM) {
+            this.setReference(AXIS.Y, UI_REF.START_END, value)
+        } else if (attr === ATTR.AT_BOTTOM_EQUAL) {
+            this.setReference(AXIS.Y, UI_REF.START_END, value)
+            this.setReference(AXIS.X, UI_REF.START_START, value)
+            this.setReference(AXIS.X, UI_REF.END_END, value)
+        } else if (attr === ATTR.MARGIN_LEFT) {
+            this.setMarginStart(AXIS.X, value)
+        } else if (attr === ATTR.MARGIN_RIGHT) {
+            this.setMarginEnd(AXIS.X, value)
+        } else if (attr === ATTR.MARGIN_TOP) {
+            this.setMarginStart(AXIS.Y, value)
+        } else if (attr === ATTR.MARGIN_BOTTOM) {
+            this.setMarginEnd(AXIS.Y, value)
+        } else if (attr === ATTR.MARGIN) {
+            var mValues = value.split(",")
+            if (mValues.length === 1) {
+                this.setMargin(value)
+            } else if (mValues.length === 4) {
+                this.setMarginStart(AXIS.X, mValues[0])
+                this.setMarginStart(AXIS.Y, mValues[1])
+                this.setMarginEnd(AXIS.X, mValues[2])
+                this.setMarginEnd(AXIS.Y, mValues[3])
+            }
+        } else if (attr === ATTR.PADDING_LEFT) {
+            this.setPaddingStart(AXIS.X, value)
+        } else if (attr === ATTR.PADDING_RIGHT) {
+            this.setPaddingEnd(AXIS.X, value)
+        } else if (attr === ATTR.PADDING_TOP) {
+            this.setPaddingStart(AXIS.Y, value)
+        } else if (attr === ATTR.PADDING_BOTTOM) {
+            this.setPaddingEnd(AXIS.Y, value)
+        } else if (attr === ATTR.PADDING) {
+            var pValues = value.split(",")
+            if (pValues.length === 1) {
+                this.setPadding(value)
+            } else if (pValues.length === 4) {
+                this.setPaddingStart(AXIS.X, mValues[0])
+                this.setPaddingStart(AXIS.Y, mValues[1])
+                this.setPaddingEnd(AXIS.X, mValues[2])
+                this.setPaddingEnd(AXIS.Y, mValues[3])
+            }
+        } else if (attr === ATTR.CENTER_VERTICAL) {
+            this.setCenter(AXIS.Y, true)
+        } else if (attr === ATTR.CENTER_HORIZONTAL) {
+            this.setCenter(AXIS.X, true)
+        } else if (attr === ATTR.CENTER) {
+            this.setCenter(AXIS.X, true)
+            this.setCenter(AXIS.Y, true)
+        } else if (attr === ATTR.SCROLL_VERTICAL) {
+            this.setScroll(AXIS.Y, true)
+        } else if (attr === ATTR.SCROLL_HORIZONTAL) {
+            this.setScroll(AXIS.X, true)
+        } else if (attr === ATTR.VISIBILITY) {
+            this.setVisibility((value as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE)
+        } else if (attr.length > 0) {
+            Log.logW("Attribute unknown: " + attr + " in view " + this.id)
+        }
     }
 
     private static isReferenceEmpty(reference: ViewRef): boolean {

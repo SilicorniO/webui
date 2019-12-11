@@ -30,10 +30,10 @@ export default class UIPrepare {
     public orderViews(parent: UIView) {
         if (!parent.childrenInOrder) {
             //clean dependencies of all views
-            parent.forEachChild(function(child, index) {
+            for (const child of parent.getUIChildren()) {
                 child.dependencies[AXIS.X] = []
                 child.dependencies[AXIS.Y] = []
-            })
+            }
 
             //then order all the views with parent screen
             parent.childrenOrder[AXIS.X] = this.orderViewsSameParent(parent, true)
@@ -44,13 +44,11 @@ export default class UIPrepare {
         }
 
         //for each one, add the view and then its ordered children
-        parent.forEachChild(
-            ((child: UIView, index: number) => {
-                if (child.getChildElements().length > 0) {
-                    this.orderViews(child)
-                }
-            }).bind(this),
-        )
+        for (const child of parent.getUIChildren()) {
+            if (child.getChildElements().length > 0) {
+                this.orderViews(child)
+            }
+        }
     }
 
     /**
@@ -67,7 +65,7 @@ export default class UIPrepare {
         //prepare references in views
         let views0dependencies = 0
         let lastChild: UIView | null = null
-        parent.forEachChild(function(child, index) {
+        for (const child of parent.getUIChildren()) {
             var numDependencies = 0
 
             var referencesAxis = hor ? child.getReference(AXIS.X) : child.getReference(AXIS.Y)
@@ -106,7 +104,7 @@ export default class UIPrepare {
 
             //save last child for references
             lastChild = child
-        })
+        }
 
         //get the elements of the parent for performance
         const childElements = parent.getChildElements()
@@ -123,7 +121,7 @@ export default class UIPrepare {
             numViewsSet = 0
 
             //for each view check dependencies
-            parent.forEachChild((child, index) => {
+            for (const child of parent.getUIChildren()) {
                 if (child.orderNum == -1) {
                     var dependencies = hor ? child.dependencies[AXIS.X] : child.dependencies[AXIS.Y]
                     var sumDependencies = 0
@@ -149,7 +147,7 @@ export default class UIPrepare {
                         allViewsSet = false
                     }
                 }
-            })
+            }
         } while (!allViewsSet && numViewsSet > 0)
 
         if (numViewsSet == 0 && parent.hasUIChildren() && views0dependencies < childElements.length) {
@@ -527,7 +525,7 @@ export default class UIPrepare {
                 //update parent to re-calculate it
                 if (view) {
                     //connect view with children
-                    view.forEachChild(function(child) {
+                    for (const child of view.getUIChildren()) {
                         //search if the view was in the list of screens to delete it
                         if (child.parent == null) {
                             var screenIndex = screens.indexOf(child)
@@ -538,7 +536,7 @@ export default class UIPrepare {
 
                         //assign the parent
                         child.parent = view
-                    })
+                    }
 
                     //save the id
                     nodeIdsUpdated.push(view.id)

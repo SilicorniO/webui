@@ -224,7 +224,6 @@ You can define the position of your webui-view with short commands inside the "u
  * ch - Center horizontal: Set the view in the center of the parent horizontally.
  * cv - Center vertical: Set the view in the center of the parent vertically.
  * c - Center: Set the view in the center of the parent.
- * cui - Children ui: ("n") If you don't want to process the children of the view although they have "ui" attribute.
  * sv - Scroll vertical: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
  * sh - Scroll horizontal: () Just add this parameter to show vertical scrollbars in the view if it is necessary.
  * v - Visibility: ("v") to show the view, this is the default value. ("i") to set the view as invisible but having size. ("g") to hide view from eyes and calculations.

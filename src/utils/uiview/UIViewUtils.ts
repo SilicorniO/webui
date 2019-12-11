@@ -162,9 +162,9 @@ export default class UIViewUtils {
         aViews.push(view)
 
         //add the children
-        view.forEachChild((child: UIView, _index: number) => {
+        for (const child of view.getUIChildren()) {
             this.generateArrayViews(child, aViews)
-        })
+        }
 
         return aViews
     }
@@ -188,14 +188,14 @@ export default class UIViewUtils {
 
         //get the views of the parent
         var viewId = view.id
-        view.parent.forEachChild((parentChild, index) => {
+        for (const parentChild of view.parent.getUIChildren()) {
             if (
                 (hor && parentChild.dependencies[AXIS.X].includes(viewId)) ||
                 (ver && parentChild.dependencies[AXIS.Y].includes(viewId))
             ) {
                 dependencyViews.push(parentChild)
             }
-        })
+        }
 
         //return the list of views with dependencies
         return dependencyViews

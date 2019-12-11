@@ -1,4 +1,4 @@
-import UIView from "../../model/UIView"
+import UIView, { UIAttributeValue } from "../../model/UIView"
 import UIHTMLElement from "../../model/UIHTMLElement"
 
 /**
@@ -10,7 +10,7 @@ export default class UIUtils {
      * @param text String with the text to parse
      * @return array of objects with key and value
      **/
-    public static readAttributes(text: string): { [key: string]: string }[] {
+    public static readAttributes(text: string): UIAttributeValue[] {
         //check text is not null
         if (text == null) {
             return []
@@ -20,13 +20,18 @@ export default class UIUtils {
         var aValues = text.replace(" ", "").split(";")
 
         //for each value read the value and key adding it to an array
-        var aAttributes: { [key: string]: string }[] = []
+        var aAttributes: UIAttributeValue[] = []
         for (var i = 0; i < aValues.length; i++) {
             var aValue = aValues[i].split(":")
             if (aValue.length == 2) {
-                aAttributes.push({ attr: aValue[0], value: aValue[1] })
+                aAttributes.push({
+                    attr: aValue[0],
+                    value: aValue[1],
+                })
             } else if (aValue.length == 1) {
-                aAttributes.push({ attr: aValue[0], value: "" })
+                aAttributes.push({
+                    attr: aValue[0],
+                })
             }
         }
 

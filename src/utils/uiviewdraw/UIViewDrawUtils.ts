@@ -151,9 +151,9 @@ export default class UIViewDrawUtils {
         }
         ele.style.opacity = "" + opacityNow
 
-        view.forEachChild(childView => {
+        for (const childView of view.getUIChildren()) {
             this.applyVisibility(childView, view, configuration, ele.style.display == "none")
-        })
+        }
     }
 
     private static generateRandomViewColor() {

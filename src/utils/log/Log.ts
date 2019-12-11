@@ -29,9 +29,9 @@ export default class Log {
 
     public static logIView(prefix: string, view: UIView) {
         Log.logI("[" + prefix + "] " + view.toString())
-        view.forEachChild((child, _index) => {
+        for (const child of view.getUIChildren()) {
             Log.logIView(prefix, child)
-        })
+        }
     }
 
     public static logShow(type: LogType, text: string) {
