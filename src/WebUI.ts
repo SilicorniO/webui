@@ -2,13 +2,13 @@ import UIPrepare from "./UIPrepare"
 import UIViewDrawUtils from "./utils/uiviewdraw/UIViewDrawUtils"
 import RedrawTimer from "./utils/redrawtimer/RedrawTimer"
 import UIConfiguration from "./UIConfiguration"
-import UICore from "./UICore"
 import Log from "./utils/log/Log"
 import UIView from "./model/UIView"
 import UIHTMLElement from "./model/UIHTMLElement"
 import UIConfigurationData from "./model/UIConfigurationData"
 import HtmlUtils from "./utils/html/HTMLUtils"
 import CounterUtils from "./utils/counter/CounterUtils"
+import UICalculator from "./core/calculate/UICalculator"
 
 /**
  * @constructor
@@ -27,7 +27,6 @@ class WebUI {
 
     //controllers
     private uiPrepare: UIPrepare = new UIPrepare(this.refresh.bind(this))
-    private uiCore: UICore | null = null
 
     //configuration
     private configuration: UIConfiguration = new UIConfiguration()
@@ -82,9 +81,6 @@ class WebUI {
         //apply global values for logs
         Log.uiShowLogs = this.configuration.showLogs
         Log.uiViewLogs = this.configuration.logsView
-
-        //prepare core with the configuration
-        this.uiCore = new UICore(this.scrollSize)
 
         //start running on actual dom
         this.drawScreens()
@@ -244,7 +240,7 @@ class WebUI {
             CounterUtils.startCounter("core")
 
             //assign position and sizes to screen
-            this.uiCore.calculateScreen(screen)
+            UICalculator.calculateScreen(screen, this.scrollSize)
 
             timerCore = CounterUtils.endCounter("core")
         }

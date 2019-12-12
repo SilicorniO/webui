@@ -42,30 +42,8 @@ export default class UIView {
     // ----- calculated -----
 
     public positions: UIAxis<UIPosition> = {
-        [AXIS.X]: {
-            size: 0,
-            start: 0,
-            end: 0,
-            startChanged: false,
-            endChanged: false,
-            scrollApplied: false,
-            marginStart: 0,
-            marginEnd: 0,
-            paddingStart: 0,
-            paddingEnd: 0,
-        },
-        [AXIS.Y]: {
-            size: 0,
-            start: 0,
-            end: 0,
-            startChanged: false,
-            endChanged: false,
-            scrollApplied: false,
-            marginStart: 0,
-            marginEnd: 0,
-            paddingStart: 0,
-            paddingEnd: 0,
-        },
+        [AXIS.X]: new UIPosition(),
+        [AXIS.Y]: new UIPosition(),
     }
 
     // ----- Object to draw -----
@@ -323,12 +301,7 @@ export default class UIView {
     }
 
     public clean(axis: AXIS) {
-        this.positions[axis].startChanged = false
-        this.positions[axis].endChanged = false
-
-        this.positions[axis].start = 0
-        this.positions[axis].end = 0
-        this.positions[axis].size = 0
+        this.positions[axis].clean()
     }
 
     public cleanUI() {
