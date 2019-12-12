@@ -133,14 +133,14 @@ export default class UIViewDrawUtils {
         //hide view if visibility is gone
         var opacityOld = parseInt(ele.style.opacity, 10)
         var opacityNow = opacityOld
-        if (view.visibility == "g" || forceGone) {
+        if (view.attrs.visibility == "g" || forceGone) {
             ele.style.display = "none"
             opacityNow = 0
         } else {
             ele.style.display = "inline-block"
             if (
-                view.visibility == UI_VISIBILITY.INVISIBLE ||
-                (parentView && parentView.visibility == UI_VISIBILITY.INVISIBLE)
+                view.attrs.visibility == UI_VISIBILITY.INVISIBLE ||
+                (parentView && parentView.attrs.visibility == UI_VISIBILITY.INVISIBLE)
             ) {
                 // ele.style.visibility = "hidden";
                 opacityNow = 0

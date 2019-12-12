@@ -1,48 +1,12 @@
-import Log from "../utils/log/Log"
-import UIUtils from "../utils/ui/UIUtils"
 import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
-import { UIAttrAxis, UI_REF, UI_SIZE, UIAttr, UI_VIEW_ID, UI_REF_LIST } from "./UIAttr"
+import UIAttr, { UI_SIZE } from "./UIAttr"
 import { AXIS, AXIS_LIST, UIAxisArray, UIAxis } from "./UIAxis"
-import UIAttributeValue from "./UIAttributeValue"
 import UIPosition from "./UIPosition"
 import UIDraw from "./UIDraw"
 import { UI_VISIBILITY } from "./UIVisibility"
-
-enum ATTR {
-    WIDTH = "w",
-    FULL_WIDTH = "fw",
-    HEIGHT = "h",
-    FULL_HEIGHT = "fh",
-    LEFT = "l",
-    RIGHT = "r",
-    TOP = "t",
-    BOTTOM = "b",
-    AT_LEFT = "al",
-    AT_LEFT_EQUAL = "ale",
-    AT_RIGHT = "ar",
-    AT_RIGHT_EQUAL = "are",
-    AT_TOP = "at",
-    AT_TOP_EQUAL = "ate",
-    AT_BOTTOM = "ab",
-    AT_BOTTOM_EQUAL = "abe",
-    MARGIN_LEFT = "ml",
-    MARGIN_TOP = "mt",
-    MARGIN_RIGHT = "mr",
-    MARGIN_BOTTOM = "mb",
-    MARGIN = "m",
-    PADDING_LEFT = "pl",
-    PADDING_RIGHT = "pr",
-    PADDING_TOP = "pt",
-    PADDING_BOTTOM = "pb",
-    PADDING = "p",
-    CENTER_VERTICAL = "cv",
-    CENTER_HORIZONTAL = "ch",
-    CENTER = "c",
-    SCROLL_VERTICAL = "sv",
-    SCROLL_HORIZONTAL = "sh",
-    VISIBILITY = "v",
-}
+import UIViewAttrs from "./UIViewAttrs"
+import UIAttrReader from "../core/read/UIAttrReader"
 
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
@@ -73,38 +37,7 @@ export default class UIView {
         [AXIS.Y]: [],
     }
 
-    public attrs: UIAttrAxis = {
-        [AXIS.X]: {
-            [UI_REF.START_START]: "",
-            [UI_REF.START_END]: "",
-            [UI_REF.END_END]: "",
-            [UI_REF.END_START]: "",
-            size: UI_SIZE.SIZE_CONTENT,
-            sizeValue: 0,
-            percentPos: 0,
-            scroll: false,
-            center: false,
-            marginStart: "0",
-            marginEnd: "0",
-            paddingStart: "0",
-            paddingEnd: "0",
-        },
-        [AXIS.Y]: {
-            [UI_REF.START_START]: "",
-            [UI_REF.START_END]: "",
-            [UI_REF.END_END]: "",
-            [UI_REF.END_START]: "",
-            size: UI_SIZE.SIZE_CONTENT,
-            sizeValue: 0,
-            percentPos: 0,
-            scroll: false,
-            center: false,
-            marginStart: "0",
-            marginEnd: "0",
-            paddingStart: "0",
-            paddingEnd: "0",
-        },
-    }
+    public attrs: UIViewAttrs = new UIViewAttrs()
 
     // ----- calculated -----
 
@@ -143,9 +76,6 @@ export default class UIView {
     sizeLoaded: boolean = false
     positionLoaded: boolean = false
 
-    // visibility
-    visibility: UI_VISIBILITY = UI_VISIBILITY.VISIBLE
-
     // animations
     animationDurations: number[] = []
 
@@ -170,7 +100,7 @@ export default class UIView {
 
     private init(attributeMain: string, attributes: string[]) {
         //initialize
-        this.readUI(this.element, attributeMain, attributes)
+        this.attrs = UIAttrReader.readAttrs(this.element, attributeMain, attributes)
 
         //set this instance into the element
         // this.element.ui = this
@@ -178,37 +108,16 @@ export default class UIView {
     }
 
     public setWidth(value: string | number) {
-        this.setSize(AXIS.X, "" + value)
+        this.attrs[AXIS.X].setSize("" + value)
+        this.sizeLoaded = false
     }
 
     public setHeight(value: string | number) {
-        this.setSize(AXIS.Y, "" + value)
-    }
-
-    public setSize(axis: AXIS, value: string) {
-        if (value == UI_SIZE.SIZE_CONTENT) {
-            this.attrs[axis].size = value
-            this.attrs[axis].sizeValue = 0
-        } else if (String(value).indexOf("%") != -1) {
-            var indexPercent = value.indexOf("%")
-            this.attrs[axis].sizeValue = parseFloat(value.substring(0, indexPercent))
-            if (indexPercent < value.length - 1) {
-                this.attrs[axis].percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
-            }
-            this.attrs[axis].size = UI_SIZE.PERCENTAGE
-        } else {
-            this.attrs[axis].sizeValue = parseInt(value, 10)
-            this.attrs[axis].size = UI_SIZE.SCREEN
-        }
+        this.attrs[AXIS.Y].setSize("" + value)
         this.sizeLoaded = false
     }
 
     // ----- REFERENCES -----
-
-    public setReference(axis: AXIS, ref: UI_REF, id: string) {
-        this.attrs[axis][ref] = id
-        this.sizeLoaded = false
-    }
 
     public getAttrs(axis: AXIS): UIAttr {
         return this.attrs[axis]
@@ -230,30 +139,27 @@ export default class UIView {
 
     public setMargin(margin: string, axis?: AXIS) {
         if (axis != null) {
-            this.setMarginStart(axis, margin)
-            this.setMarginEnd(axis, margin)
+            this.attrs[AXIS.X].setMargin(margin)
+            this.attrs[AXIS.Y].setMargin(margin)
         } else {
-            this.setMarginStart(AXIS.X, margin)
-            this.setMarginEnd(AXIS.X, margin)
-            this.setMarginStart(AXIS.Y, margin)
-            this.setMarginEnd(AXIS.Y, margin)
+            this.attrs[axis].setMargin(margin)
         }
     }
 
     public setMarginLeft(margin: string | number) {
-        this.setMarginStart(AXIS.X, "" + margin)
+        this.attrs[AXIS.X].marginStart = "" + margin
     }
 
     public setMarginTop(margin: string | number) {
-        this.setMarginStart(AXIS.Y, "" + margin)
+        this.attrs[AXIS.Y].marginStart = "" + margin
     }
 
     public setMarginRight(margin: string | number) {
-        this.setMarginEnd(AXIS.X, "" + margin)
+        this.attrs[AXIS.X].marginEnd = "" + margin
     }
 
     public setMarginBottom(margin: string | number) {
-        this.setMarginEnd(AXIS.Y, "" + margin)
+        this.attrs[AXIS.Y].marginEnd = "" + margin
     }
 
     public setMarginStart(axis: AXIS, margin: string) {
@@ -270,30 +176,27 @@ export default class UIView {
 
     public setPadding(padding: string, axis?: AXIS) {
         if (axis != null) {
-            this.setPaddingStart(axis, padding)
-            this.setPaddingEnd(axis, padding)
+            this.attrs[AXIS.X].setPadding(padding)
+            this.attrs[AXIS.Y].setPadding(padding)
         } else {
-            this.setPaddingStart(AXIS.X, padding)
-            this.setPaddingEnd(AXIS.X, padding)
-            this.setPaddingStart(AXIS.Y, padding)
-            this.setPaddingEnd(AXIS.Y, padding)
+            this.attrs[axis].setPadding(padding)
         }
     }
 
-    public setPaddingLeft(margin: string | number) {
-        this.setPaddingStart(AXIS.X, "" + margin)
+    public setPaddingLeft(padding: string | number) {
+        this.attrs[AXIS.X].paddingStart = "" + padding
     }
 
-    public setPaddingTop(margin: string | number) {
-        this.setPaddingStart(AXIS.Y, "" + margin)
+    public setPaddingTop(padding: string | number) {
+        this.attrs[AXIS.Y].paddingStart = "" + padding
     }
 
-    public setPaddingRight(margin: string | number) {
-        this.setPaddingEnd(AXIS.X, "" + margin)
+    public setPaddingRight(padding: string | number) {
+        this.attrs[AXIS.X].paddingEnd = "" + padding
     }
 
-    public setPaddingBottom(margin: string | number) {
-        this.setPaddingEnd(AXIS.Y, "" + margin)
+    public setPaddingBottom(padding: string | number) {
+        this.attrs[AXIS.Y].paddingEnd = "" + padding
     }
 
     public setPaddingStart(axis: AXIS, padding: string) {
@@ -309,10 +212,10 @@ export default class UIView {
     // ----- VISIBILITY -----
 
     public setVisibility(visibility: UI_VISIBILITY) {
-        if (visibility != UI_VISIBILITY.GONE && this.visibility == UI_VISIBILITY.GONE) {
+        if (visibility != UI_VISIBILITY.GONE && this.attrs.visibility == UI_VISIBILITY.GONE) {
             this.sizeLoaded = false
         }
-        this.visibility = visibility
+        this.attrs.visibility = visibility
     }
 
     public cleanSizeLoaded() {
@@ -329,7 +232,7 @@ export default class UIView {
     }
 
     public hasToBeCalculated(): boolean {
-        return this.visibility != UI_VISIBILITY.GONE
+        return this.attrs.visibility != UI_VISIBILITY.GONE
     }
 
     public animateNextRefresh(animationDuration: number) {
@@ -429,38 +332,8 @@ export default class UIView {
     }
 
     public cleanUI() {
-        this.attrs = {
-            [AXIS.X]: {
-                [UI_REF.START_START]: "",
-                [UI_REF.START_END]: "",
-                [UI_REF.END_END]: "",
-                [UI_REF.END_START]: "",
-                size: UI_SIZE.SIZE_CONTENT,
-                sizeValue: 0,
-                percentPos: 0,
-                scroll: false,
-                center: false,
-                marginStart: "0",
-                marginEnd: "0",
-                paddingStart: "0",
-                paddingEnd: "0",
-            },
-            [AXIS.Y]: {
-                [UI_REF.START_START]: "",
-                [UI_REF.START_END]: "",
-                [UI_REF.END_END]: "",
-                [UI_REF.END_START]: "",
-                size: UI_SIZE.SIZE_CONTENT,
-                sizeValue: 0,
-                percentPos: 0,
-                scroll: false,
-                center: false,
-                marginStart: "0",
-                marginEnd: "0",
-                paddingStart: "0",
-                paddingEnd: "0",
-            },
-        }
+        this.attrs[AXIS.X].clean()
+        this.attrs[AXIS.Y].clean()
     }
 
     public applyDimens(coreConfig: UIConfiguration) {
@@ -477,21 +350,21 @@ export default class UIView {
             "[" +
             this.id +
             "]: ll:" +
-            this.attrs[AXIS.X][UI_REF.START_START] +
+            this.attrs[AXIS.X].startStart +
             ", lr:" +
-            this.attrs[AXIS.X][UI_REF.START_END] +
+            this.attrs[AXIS.X].startEnd +
             ", rr:" +
-            this.attrs[AXIS.X][UI_REF.END_END] +
+            this.attrs[AXIS.X].endEnd +
             ", rl:" +
-            this.attrs[AXIS.X][UI_REF.END_START] +
+            this.attrs[AXIS.X].endStart +
             ", tt:" +
-            this.attrs[AXIS.Y][UI_REF.START_START] +
+            this.attrs[AXIS.Y].startStart +
             ",tb: " +
-            this.attrs[AXIS.Y][UI_REF.START_END] +
+            this.attrs[AXIS.Y].startEnd +
             ", bb:" +
-            this.attrs[AXIS.Y][UI_REF.END_END] +
+            this.attrs[AXIS.Y].endEnd +
             ", bt:" +
-            this.attrs[AXIS.Y][UI_REF.END_START] +
+            this.attrs[AXIS.Y].endStart +
             ", ml:" +
             this.positions[AXIS.X].marginStart +
             ", mr:" +
@@ -527,154 +400,5 @@ export default class UIView {
             ", b:" +
             this.positions[AXIS.Y].end
         )
-    }
-
-    /**
-     * Create a view object reading the HTML of the element
-     * @param element where to read data
-     * @param attributeMain with the name of the attribute to read
-     * @param attributes with the name of the attributes to read as secondary
-     * @return View generated
-     **/
-    public readUI(element: HTMLElement, attributeMain: string, attributes: string[]): UIView {
-        //read main attributes
-        let attributeValues = UIUtils.readAttributes(element.getAttribute(attributeMain))
-        for (var i = 0; i < attributes.length; i++) {
-            attributeValues = attributeValues.concat(UIUtils.readAttributes(element.getAttribute(attributes[i])))
-        }
-
-        //check if we have attributes
-        if (attributeValues.length == 0) {
-            return
-        }
-
-        //set the ui values
-        for (const attributeValue of attributeValues) {
-            this.readUIAttribute(attributeValue)
-        }
-
-        const referencesXEmpty = UIView.isReferenceEmpty(this.getAttrs(AXIS.X))
-        if (referencesXEmpty && !this.attrs[AXIS.X].center) {
-            this.setReference(AXIS.X, UI_REF.START_START, UI_VIEW_ID.PARENT)
-        }
-
-        const referencesYEmpty = UIView.isReferenceEmpty(this.getAttrs(AXIS.Y))
-        if (referencesYEmpty && !this.attrs[AXIS.Y].center) {
-            this.setReference(AXIS.Y, UI_REF.START_START, UI_VIEW_ID.PARENT)
-        }
-    }
-
-    /**
-     * Read attribute and value
-     * @param attr attribute
-     * @param value value of attribute
-     */
-    private readUIAttribute(attributeValue: UIAttributeValue) {
-        const attr = attributeValue.attr
-        const value = attributeValue.value
-
-        if (attr === ATTR.WIDTH) {
-            this.setSize(AXIS.X, value)
-        } else if (attr === ATTR.FULL_WIDTH) {
-            this.setSize(AXIS.X, "100%")
-        } else if (attr === ATTR.HEIGHT) {
-            this.setSize(AXIS.Y, value)
-        } else if (attr === ATTR.FULL_HEIGHT) {
-            this.setSize(AXIS.Y, "100%")
-        } else if (attr === ATTR.LEFT) {
-            this.setReference(AXIS.X, UI_REF.START_START, value)
-        } else if (attr === ATTR.RIGHT) {
-            this.setReference(AXIS.X, UI_REF.END_END, value)
-        } else if (attr === ATTR.TOP) {
-            this.setReference(AXIS.Y, UI_REF.START_START, value)
-        } else if (attr === ATTR.BOTTOM) {
-            this.setReference(AXIS.Y, UI_REF.END_END, value)
-        } else if (attr === ATTR.AT_LEFT) {
-            this.setReference(AXIS.X, UI_REF.END_START, value)
-        } else if (attr === ATTR.AT_LEFT_EQUAL) {
-            this.setReference(AXIS.X, UI_REF.END_START, value)
-            this.setReference(AXIS.Y, UI_REF.START_START, value)
-            this.setReference(AXIS.Y, UI_REF.END_END, value)
-        } else if (attr === ATTR.AT_RIGHT) {
-            this.setReference(AXIS.X, UI_REF.START_END, value)
-        } else if (attr === ATTR.AT_RIGHT_EQUAL) {
-            this.setReference(AXIS.X, UI_REF.START_END, value)
-            this.setReference(AXIS.Y, UI_REF.START_START, value)
-            this.setReference(AXIS.Y, UI_REF.END_END, value)
-        } else if (attr === ATTR.AT_TOP) {
-            this.setReference(AXIS.Y, UI_REF.END_START, value)
-        } else if (attr === ATTR.AT_TOP_EQUAL) {
-            this.setReference(AXIS.Y, UI_REF.END_START, value)
-            this.setReference(AXIS.X, UI_REF.START_START, value)
-            this.setReference(AXIS.X, UI_REF.END_END, value)
-        } else if (attr === ATTR.AT_BOTTOM) {
-            this.setReference(AXIS.Y, UI_REF.START_END, value)
-        } else if (attr === ATTR.AT_BOTTOM_EQUAL) {
-            this.setReference(AXIS.Y, UI_REF.START_END, value)
-            this.setReference(AXIS.X, UI_REF.START_START, value)
-            this.setReference(AXIS.X, UI_REF.END_END, value)
-        } else if (attr === ATTR.MARGIN_LEFT) {
-            this.setMarginStart(AXIS.X, value)
-        } else if (attr === ATTR.MARGIN_RIGHT) {
-            this.setMarginEnd(AXIS.X, value)
-        } else if (attr === ATTR.MARGIN_TOP) {
-            this.setMarginStart(AXIS.Y, value)
-        } else if (attr === ATTR.MARGIN_BOTTOM) {
-            this.setMarginEnd(AXIS.Y, value)
-        } else if (attr === ATTR.MARGIN) {
-            var mValues = value.split(",")
-            if (mValues.length === 1) {
-                this.setMargin(value)
-            } else if (mValues.length === 4) {
-                this.setMarginStart(AXIS.X, mValues[0])
-                this.setMarginStart(AXIS.Y, mValues[1])
-                this.setMarginEnd(AXIS.X, mValues[2])
-                this.setMarginEnd(AXIS.Y, mValues[3])
-            }
-        } else if (attr === ATTR.PADDING_LEFT) {
-            this.setPaddingStart(AXIS.X, value)
-        } else if (attr === ATTR.PADDING_RIGHT) {
-            this.setPaddingEnd(AXIS.X, value)
-        } else if (attr === ATTR.PADDING_TOP) {
-            this.setPaddingStart(AXIS.Y, value)
-        } else if (attr === ATTR.PADDING_BOTTOM) {
-            this.setPaddingEnd(AXIS.Y, value)
-        } else if (attr === ATTR.PADDING) {
-            var pValues = value.split(",")
-            if (pValues.length === 1) {
-                this.setPadding(value)
-            } else if (pValues.length === 4) {
-                this.setPaddingStart(AXIS.X, mValues[0])
-                this.setPaddingStart(AXIS.Y, mValues[1])
-                this.setPaddingEnd(AXIS.X, mValues[2])
-                this.setPaddingEnd(AXIS.Y, mValues[3])
-            }
-        } else if (attr === ATTR.CENTER_VERTICAL) {
-            this.setCenter(AXIS.Y, true)
-        } else if (attr === ATTR.CENTER_HORIZONTAL) {
-            this.setCenter(AXIS.X, true)
-        } else if (attr === ATTR.CENTER) {
-            this.setCenter(AXIS.X, true)
-            this.setCenter(AXIS.Y, true)
-        } else if (attr === ATTR.SCROLL_VERTICAL) {
-            this.setScroll(AXIS.Y, true)
-        } else if (attr === ATTR.SCROLL_HORIZONTAL) {
-            this.setScroll(AXIS.X, true)
-        } else if (attr === ATTR.VISIBILITY) {
-            this.setVisibility((value as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE)
-        } else if (attr.length > 0) {
-            Log.logW("Attribute unknown: " + attr + " in view " + this.id)
-        }
-    }
-
-    private static isReferenceEmpty(attrs: UIAttr): boolean {
-        for (const id of UI_REF_LIST) {
-            if (attrs[id].length > 0) {
-                return false
-            }
-        }
-
-        // not found
-        return true
     }
 }

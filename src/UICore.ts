@@ -80,9 +80,9 @@ export default class UICore {
     ) {
         //eval references to try to calculate the width
         var numDependencies = 0
-        var reference = view.getAttrs(axis)
+        var attrs = view.getAttrs(axis)
         for (const refId of UI_REF_LIST) {
-            var dependency = this.translateViewDependency(view, reference[refId], parentView)
+            var dependency = this.translateViewDependency(view, attrs.getRef(refId), parentView)
             if (dependency.length > 0) {
                 this.evalDependence(axis, view, parentView, size, refId, arrayViews[indexes[dependency]])
                 numDependencies += 1

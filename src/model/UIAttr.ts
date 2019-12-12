@@ -24,23 +24,95 @@ export enum UI_SIZE {
     PERCENTAGE = "sp",
 }
 
-export interface UIAttr {
-    [UI_REF.START_START]: UIViewId
-    [UI_REF.START_END]: UIViewId
-    [UI_REF.END_END]: UIViewId
-    [UI_REF.END_START]: UIViewId
-    size: UI_SIZE
-    sizeValue: number
-    percentPos: number
-    scroll: boolean
-    center: boolean
-    marginStart: string
-    marginEnd: string
-    paddingStart: string
-    paddingEnd: string
-}
+export default class UIAttr {
+    startStart: UIViewId = ""
+    startEnd: UIViewId = ""
+    endEnd: UIViewId = ""
+    endStart: UIViewId = ""
+    size: UI_SIZE = UI_SIZE.SIZE_CONTENT
+    sizeValue: number = 0
+    percentPos: number = 0
+    scroll: boolean = false
+    center: boolean = false
+    marginStart: string = ""
+    marginEnd: string = ""
+    paddingStart: string = ""
+    paddingEnd: string = ""
 
-export interface UIAttrAxis {
-    [AXIS.X]: UIAttr
-    [AXIS.Y]: UIAttr
+    public getRef(ref: UI_REF) {
+        switch (ref) {
+            case UI_REF.START_START:
+                return this.startStart
+            case UI_REF.START_END:
+                return this.startEnd
+            case UI_REF.END_END:
+                return this.endEnd
+            case UI_REF.END_START:
+                return this.endStart
+            default:
+                return ""
+        }
+    }
+
+    public setRef(ref: UI_REF, id: string) {
+        switch (ref) {
+            case UI_REF.START_START:
+                this.startStart = id
+                return
+            case UI_REF.START_END:
+                this.startEnd = id
+                return
+            case UI_REF.END_END:
+                this.endEnd = id
+                return
+            case UI_REF.END_START:
+                this.endStart = id
+                return
+            default:
+                return
+        }
+    }
+
+    public setSize(value: string) {
+        if (value == UI_SIZE.SIZE_CONTENT) {
+            this.size = value
+            this.sizeValue = 0
+        } else if (String(value).indexOf("%") != -1) {
+            var indexPercent = value.indexOf("%")
+            this.sizeValue = parseFloat(value.substring(0, indexPercent))
+            if (indexPercent < value.length - 1) {
+                this.percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
+            }
+            this.size = UI_SIZE.PERCENTAGE
+        } else {
+            this.sizeValue = parseInt(value, 10)
+            this.size = UI_SIZE.SCREEN
+        }
+    }
+
+    public setMargin(margin: string) {
+        this.marginStart = margin
+        this.marginEnd = margin
+    }
+
+    public setPadding(padding: string) {
+        this.paddingStart = padding
+        this.paddingEnd = padding
+    }
+
+    public clean() {
+        this.startStart = ""
+        this.startEnd = ""
+        this.endEnd = ""
+        this.endStart = ""
+        this.size = UI_SIZE.SIZE_CONTENT
+        this.sizeValue = 0
+        this.percentPos = 0
+        this.scroll = false
+        this.center = false
+        this.marginStart = "0"
+        this.marginEnd = "0"
+        this.paddingStart = "0"
+        this.paddingEnd = "0"
+    }
 }

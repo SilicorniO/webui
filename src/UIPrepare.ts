@@ -6,6 +6,7 @@ import UIConfiguration from "./UIConfiguration"
 import UIHTMLElement from "./model/UIHTMLElement"
 import { AXIS } from "./model/UIAxis"
 import { UI_REF_LIST, UI_VIEW_ID, UI_SIZE } from "./model/UIAttr"
+import UIAttrReader from "./core/read/UIAttrReader"
 
 export default class UIPrepare {
     //save the refresh function
@@ -70,9 +71,9 @@ export default class UIPrepare {
         for (const child of parent.getUIChildren()) {
             var numDependencies = 0
 
-            var referencesAxis = hor ? child.getAttrs(AXIS.X) : child.getAttrs(AXIS.Y)
+            var attrsAxis = hor ? child.getAttrs(AXIS.X) : child.getAttrs(AXIS.Y)
             for (const key of UI_REF_LIST) {
-                let reference = referencesAxis[key]
+                let reference = attrsAxis.getRef(key)
 
                 //update p and l references
                 if (reference == UI_VIEW_ID.PARENT) {
@@ -519,7 +520,7 @@ export default class UIPrepare {
                         view.id = node.id
                     }
                     view.cleanUI()
-                    view.readUI(view.element, configuration.attribute, configuration.attributes)
+                    view.attrs = UIAttrReader.readAttrs(view.element, configuration.attribute, configuration.attributes)
                     view.sizeLoaded = false
                     view.childrenInOrder = false
                 }
