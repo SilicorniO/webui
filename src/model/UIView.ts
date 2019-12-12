@@ -8,6 +8,7 @@ import { UI_VISIBILITY } from "./UIVisibility"
 import UIViewAttrs from "./UIViewAttrs"
 import UIAttrReader from "../core/read/UIAttrReader"
 import { WebUIListener } from "../WebUI"
+import UIViewEventsManager from "../core/events/UIViewEventsManager"
 
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
@@ -25,16 +26,8 @@ export default class UIView {
     parent?: UIView
     screen?: UIView
 
-    // listener for redraw events
-    webUIListener: WebUIListener
-
-    // associated configuration
-    private configuration: UIConfiguration
-
-    // observers
-    observerAttributes: MutationObserver | null = null
-    observerCharacterData: MutationObserver | null = null
-    observerAddRemoveNodes: MutationObserver | null = null
+    // associated events manager to this view
+    eventsManager: UIViewEventsManager
 
     // calculated children
     childrenInOrder: boolean = false
@@ -94,15 +87,16 @@ export default class UIView {
             UIView.generatedId += 1
         }
 
-        this.webUIListener = webUIListener
         this.id = element.id
         this.element = UIHTMLElement.convert(element, this)
         this.parent = parent
         this.screen = screen
-        this.configuration = configuration
 
-        //initialize
+        // initialize
         this.attrs = UIAttrReader.readAttrs(this.element, configuration)
+
+        // initialize events manager
+        this.eventsManager = new UIViewEventsManager(this, webUIListener, configuration)
 
         // initialize opacity to 0 to show it when it has the position
         element.style.opacity = "0"
@@ -110,16 +104,13 @@ export default class UIView {
         //if it is an image we prepare to refresh when image is loaded
         if (element.tagName != null && element.tagName.toLowerCase() == "img") {
             element.onload = () => {
-                this.resizeEvent()
+                this.eventsManager.launchResizeEvent()
             }
         }
     }
 
     public evalEvents() {
-        this.evalListenAttributes()
-        this.evalListenCharacterData()
-        this.evalListenAddRemoveNodes()
-        this.evalListenResizeEvents()
+        this.eventsManager.evalEvents()
 
         // eval events of all children
         for (const child of this.getUIChildren()) {
@@ -127,118 +118,14 @@ export default class UIView {
         }
     }
 
-    private evalListenAttributes() {
-        // remove previous observer
-        if (this.observerAttributes != null) {
-            this.observerAttributes.disconnect()
-        }
-
-        // Create an observer instance linked to the callback function
-        const observerAttributes = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (const mutation of mutationsList) {
-                if (mutation.type == "attributes") {
-                    const attributeName = mutation.attributeName
-                    if (
-                        attributeName == "id" ||
-                        attributeName == "class" ||
-                        attributeName == this.configuration.attribute ||
-                        this.configuration.attributes.includes(attributeName)
-                    ) {
-                        this.webUIListener.onScreenReinit(this.screen || this)
-                    }
-                }
-            }
-        })
-
-        // start observing the target node for configured mutations
-        this.observerAttributes = observerAttributes
-        observerAttributes.observe(this.element, { attributes: true, subtree: false })
-    }
-
-    private evalListenCharacterData() {
-        // remove previous observer
-        if (this.observerCharacterData != null) {
-            this.observerCharacterData.disconnect()
-        }
-
-        // check has not children
-        if (this.element.childNodes.length > 0) {
-            return
-        }
-
-        // Create an observer instance linked to the callback function
-        const observerCharacterData = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (var mutation of mutationsList) {
-                if (mutation.type == "characterData") {
-                    this.webUIListener.onScreenRedraw(this.screen || this)
-                }
-            }
-        })
-
-        // start observing the target node for configured mutations
-        this.observerCharacterData = observerCharacterData
-        observerCharacterData.observe(this.element, { characterData: true, subtree: true })
-    }
-
-    private evalListenAddRemoveNodes() {
-        // remove previous observer
-        if (this.observerAddRemoveNodes != null) {
-            this.observerAddRemoveNodes.disconnect()
-        }
-
-        // Create an observer instance linked to the callback function
-        const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (var mutation of mutationsList) {
-                if (mutation.type == "childList") {
-                    this.webUIListener.onScreenReinit(this.screen || this)
-                }
-            }
-        })
-
-        // start observing the target node for configured mutations
-        this.observerAddRemoveNodes = observerAddRemoveNodes
-        observerAddRemoveNodes.observe(this.element, { childList: true, subtree: true })
-    }
-
-    private resizeEvent() {
-        this.sizeLoaded = false
-        this.webUIListener.onScreenRedraw(this.screen || this)
-    }
-
-    private evalListenResizeEvents() {
-        // listen events of parent or window
-        let parentElement: HTMLElement | Window = this.element.parentElement
-        if (parentElement == null) {
-            parentElement = window
-        }
-
-        // remove event by default
-        parentElement.removeEventListener("resize", this.resizeEvent.bind(this))
-
-        // check this view is screen
-        if (this.parent != null) {
-            return
-        }
-
-        // check the size of the view dependes of parent size
-        if (this.attrs.x.size != UI_SIZE.PERCENTAGE && this.attrs.y.size != UI_SIZE.PERCENTAGE) {
-            return
-        }
-
-        // apply listener
-        parentElement.addEventListener("resize", this.resizeEvent.bind(this))
-    }
-
     public setWidth(value: string | number) {
         this.attrs[AXIS.X].setSize("" + value)
-        this.sizeLoaded = false
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setHeight(value: string | number) {
         this.attrs[AXIS.Y].setSize("" + value)
-        this.sizeLoaded = false
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     // ----- REFERENCES -----
@@ -251,19 +138,19 @@ export default class UIView {
 
     public setScrollVertical(value: boolean) {
         this.attrs[AXIS.Y].scroll = value
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setScrollHorizontal(value: boolean) {
         this.attrs[AXIS.X].scroll = value
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     // ----- CENTER -----
 
     public setCenter(axis: AXIS, value: boolean) {
         this.attrs[axis].center = value
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     // ----- MARGIN ------
@@ -275,27 +162,27 @@ export default class UIView {
         } else {
             this.attrs[axis].setMargin(margin)
         }
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setMarginLeft(margin: string | number) {
         this.attrs[AXIS.X].marginStart = "" + margin
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setMarginTop(margin: string | number) {
         this.attrs[AXIS.Y].marginStart = "" + margin
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setMarginRight(margin: string | number) {
         this.attrs[AXIS.X].marginEnd = "" + margin
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setMarginBottom(margin: string | number) {
         this.attrs[AXIS.Y].marginEnd = "" + margin
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     // ----- PADDING -----
@@ -307,27 +194,27 @@ export default class UIView {
         } else {
             this.attrs[axis].setPadding(padding)
         }
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setPaddingLeft(padding: string | number) {
         this.attrs[AXIS.X].paddingStart = "" + padding
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setPaddingTop(padding: string | number) {
         this.attrs[AXIS.Y].paddingStart = "" + padding
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setPaddingRight(padding: string | number) {
         this.attrs[AXIS.X].paddingEnd = "" + padding
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public setPaddingBottom(padding: string | number) {
         this.attrs[AXIS.Y].paddingEnd = "" + padding
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     // ----- VISIBILITY -----
@@ -337,7 +224,7 @@ export default class UIView {
             this.sizeLoaded = false
         }
         this.attrs.visibility = visibility
-        this.resizeEvent()
+        this.eventsManager.launchResizeEvent()
     }
 
     public cleanSizeLoaded() {
