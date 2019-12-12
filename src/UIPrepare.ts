@@ -182,11 +182,11 @@ export default class UIPrepare {
 
                 if (view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded)) {
                     if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.positions[AXIS.X].sizeValue = UIViewUtils.calculateWidthView(view, ele)
+                        view.attrs[AXIS.X].sizeValue = UIViewUtils.calculateWidthView(view, ele)
                     }
 
                     if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.positions[AXIS.Y].sizeValue = UIViewUtils.calculateHeightView(view, ele)
+                        view.attrs[AXIS.Y].sizeValue = UIViewUtils.calculateHeightView(view, ele)
                     }
 
                     //translate paddings and margins
@@ -222,9 +222,9 @@ export default class UIPrepare {
         //apply width and height if they are defined
         if (screen.attrs[AXIS.X].size != UI_SIZE.SIZE_CONTENT) {
             if (screen.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
-                ele.style.width = screen.positions[AXIS.X].sizeValue + "px"
+                ele.style.width = screen.attrs[AXIS.X].sizeValue + "px"
             } else if (screen.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
-                ele.style.width = screen.positions[AXIS.X].sizeValue + "%"
+                ele.style.width = screen.attrs[AXIS.X].sizeValue + "%"
             }
 
             var offsetWidth = ele.offsetWidth
@@ -235,9 +235,9 @@ export default class UIPrepare {
         }
         if (screen.attrs[AXIS.Y].size != UI_SIZE.SIZE_CONTENT) {
             if (screen.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
-                ele.style.height = screen.positions[AXIS.Y].sizeValue + "px"
+                ele.style.height = screen.attrs[AXIS.Y].sizeValue + "px"
             } else if (screen.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
-                ele.style.height = screen.positions[AXIS.Y].sizeValue + "%"
+                ele.style.height = screen.attrs[AXIS.Y].sizeValue + "%"
             }
 
             screen.positions[AXIS.Y].size = ele.offsetHeight

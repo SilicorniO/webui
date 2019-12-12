@@ -30,6 +30,8 @@ export interface UIAttr {
     [UI_REF.END_END]: UIViewId
     [UI_REF.END_START]: UIViewId
     size: UI_SIZE
+    sizeValue: number
+    percentPos: number
     scroll: boolean
     center: boolean
     marginStart: string

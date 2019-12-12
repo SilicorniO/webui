@@ -4,8 +4,9 @@ import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
 import { UIAttrAxis, UI_REF, UI_SIZE, UIAttr, UI_VIEW_ID, UI_REF_LIST } from "./UIAttr"
 import { AXIS, AXIS_LIST, UIAxisArray, UIAxis } from "./UIAxis"
-import { UIAttributeValue } from "./UIAttributeValue"
-import { UIPosition } from "./UIPosition"
+import UIAttributeValue from "./UIAttributeValue"
+import UIPosition from "./UIPosition"
+import UIDraw from "./UIDraw"
 import { UI_VISIBILITY } from "./UIVisibility"
 
 enum ATTR {
@@ -79,6 +80,8 @@ export default class UIView {
             [UI_REF.END_END]: "",
             [UI_REF.END_START]: "",
             size: UI_SIZE.SIZE_CONTENT,
+            sizeValue: 0,
+            percentPos: 0,
             scroll: false,
             center: false,
             marginStart: "0",
@@ -92,6 +95,8 @@ export default class UIView {
             [UI_REF.END_END]: "",
             [UI_REF.END_START]: "",
             size: UI_SIZE.SIZE_CONTENT,
+            sizeValue: 0,
+            percentPos: 0,
             scroll: false,
             center: false,
             marginStart: "0",
@@ -101,12 +106,10 @@ export default class UIView {
         },
     }
 
-    //----- calculated -----
+    // ----- calculated -----
 
     public positions: UIAxis<UIPosition> = {
         [AXIS.X]: {
-            sizeValue: 0,
-            percentPos: 0,
             size: 0,
             start: 0,
             end: 0,
@@ -119,8 +122,6 @@ export default class UIView {
             paddingEnd: 0,
         },
         [AXIS.Y]: {
-            sizeValue: 0,
-            percentPos: 0,
             size: 0,
             start: 0,
             end: 0,
@@ -134,7 +135,11 @@ export default class UIView {
         },
     }
 
-    //----- Flags for changes -----
+    // ----- Object to draw -----
+
+    public draw: UIDraw
+
+    // ----- Flags for changes -----
     sizeLoaded: boolean = false
     positionLoaded: boolean = false
 
@@ -183,16 +188,16 @@ export default class UIView {
     public setSize(axis: AXIS, value: string) {
         if (value == UI_SIZE.SIZE_CONTENT) {
             this.attrs[axis].size = value
-            this.positions[axis].sizeValue = 0
+            this.attrs[axis].sizeValue = 0
         } else if (String(value).indexOf("%") != -1) {
             var indexPercent = value.indexOf("%")
-            this.positions[axis].sizeValue = parseFloat(value.substring(0, indexPercent))
+            this.attrs[axis].sizeValue = parseFloat(value.substring(0, indexPercent))
             if (indexPercent < value.length - 1) {
-                this.positions[axis].percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
+                this.attrs[axis].percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
             }
             this.attrs[axis].size = UI_SIZE.PERCENTAGE
         } else {
-            this.positions[axis].sizeValue = parseInt(value, 10)
+            this.attrs[axis].sizeValue = parseInt(value, 10)
             this.attrs[axis].size = UI_SIZE.SCREEN
         }
         this.sizeLoaded = false
@@ -431,6 +436,8 @@ export default class UIView {
                 [UI_REF.END_END]: "",
                 [UI_REF.END_START]: "",
                 size: UI_SIZE.SIZE_CONTENT,
+                sizeValue: 0,
+                percentPos: 0,
                 scroll: false,
                 center: false,
                 marginStart: "0",
@@ -444,6 +451,8 @@ export default class UIView {
                 [UI_REF.END_END]: "",
                 [UI_REF.END_START]: "",
                 size: UI_SIZE.SIZE_CONTENT,
+                sizeValue: 0,
+                percentPos: 0,
                 scroll: false,
                 center: false,
                 marginStart: "0",

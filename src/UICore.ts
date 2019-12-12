@@ -178,10 +178,10 @@ export default class UICore {
     private applyFixedSize(axis: AXIS, view: UIView) {
         //set left and top if they are not setted
         if (view.positions[axis].endChanged) {
-            view.positions[axis].start = view.positions[axis].end - view.positions[axis].sizeValue
+            view.positions[axis].start = view.positions[axis].end - view.attrs[axis].sizeValue
             view.positions[axis].startChanged = true
         } else {
-            view.positions[axis].end = view.positions[axis].start + view.positions[axis].sizeValue
+            view.positions[axis].end = view.positions[axis].start + view.attrs[axis].sizeValue
             view.positions[axis].startChanged = true
             view.positions[axis].endChanged = true
         }
@@ -264,17 +264,17 @@ export default class UICore {
     private applySizeContent(axis: AXIS, view: UIView) {
         //if the size depends of children, calculate the position of children
         if (view.positions[axis].endChanged) {
-            view.positions[axis].start = view.positions[axis].end - view.positions[axis].sizeValue
+            view.positions[axis].start = view.positions[axis].end - view.attrs[axis].sizeValue
             view.positions[axis].startChanged = true
         } else if (view.positions[axis].startChanged) {
             // TODO previous axis should be already asigned to calculate now the size correctly
             if (axis == AXIS.Y && view.positions[AXIS.X].startChanged && view.positions[AXIS.X].endChanged) {
                 const height = UIViewUtils.calculateHeightView(view, view.element, view.positions[axis].size)
-                view.positions[axis].sizeValue = height
-                view.positions[axis].end = view.positions[axis].start + view.positions[axis].sizeValue
+                view.attrs[axis].sizeValue = height
+                view.positions[axis].end = view.positions[axis].start + view.attrs[axis].sizeValue
                 view.positions[axis].endChanged = true
             } else {
-                view.positions[axis].end = view.positions[axis].start + view.positions[axis].sizeValue
+                view.positions[axis].end = view.positions[axis].start + view.attrs[axis].sizeValue
                 view.positions[axis].endChanged = true
             }
         }
@@ -307,8 +307,8 @@ export default class UICore {
         //if no size it is becase there is any child with fixed size, so we get the bigger child
         if (sizeChildren == 0) {
             for (const child of view.getUIChildren()) {
-                if (child.positions[axis].sizeValue > sizeChildren) {
-                    sizeChildren = child.positions[axis].sizeValue
+                if (child.attrs[axis].sizeValue > sizeChildren) {
+                    sizeChildren = child.attrs[axis].sizeValue
                 }
             }
         } else if (min < 0) {
@@ -357,15 +357,15 @@ export default class UICore {
     private applyPercent(axis: AXIS, view: UIView, parentView: UIView, width: number) {
         if (view.positions[axis].endChanged && !view.positions[axis].startChanged) {
             view.positions[axis].start =
-                view.positions[axis].end - (parentView.positions[axis].size * view.positions[axis].sizeValue) / 100
+                view.positions[axis].end - (parentView.positions[axis].size * view.attrs[axis].sizeValue) / 100
         } else {
             view.positions[axis].end =
-                view.positions[axis].start + (parentView.positions[axis].size * view.positions[axis].sizeValue) / 100
+                view.positions[axis].start + (parentView.positions[axis].size * view.attrs[axis].sizeValue) / 100
         }
 
         //move the percent if necessary
-        if (view.positions[axis].percentPos > 0) {
-            var percentWidth = (view.positions[axis].end - view.positions[axis].start) * view.positions[axis].percentPos
+        if (view.attrs[axis].percentPos > 0) {
+            var percentWidth = (view.positions[axis].end - view.positions[axis].start) * view.attrs[axis].percentPos
             view.positions[axis].start += percentWidth
             view.positions[axis].end += percentWidth
         }
@@ -383,7 +383,7 @@ export default class UICore {
     private assignCenter(axis: AXIS, view: UIView, size: number) {
         //horizontal
         if (view.attrs[axis].center && size > 0) {
-            var viewWidth = view.positions[axis].size > 0 ? view.positions[axis].size : view.positions[axis].sizeValue
+            var viewWidth = view.positions[axis].size > 0 ? view.positions[axis].size : view.attrs[axis].sizeValue
             view.positions[axis].start = Math.max(0, (size - viewWidth) / 2)
             view.positions[axis].end = Math.min(size, view.positions[axis].start + viewWidth)
             view.positions[axis].startChanged = true

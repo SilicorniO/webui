@@ -1,6 +1,4 @@
-export interface UIPosition {
-    sizeValue: number
-    percentPos: number
+export default interface UIPosition {
     size: number
     start: number
     end: number

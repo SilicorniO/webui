@@ -178,14 +178,14 @@ export default class UIViewDrawUtils {
             if (screenView.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
                 ele.style.width = screenView.positions[AXIS.X].size + "px"
             } else if (screenView.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
-                ele.style.width = screenView.positions[AXIS.X].sizeValue + "%"
+                ele.style.width = screenView.attrs[AXIS.X].sizeValue + "%"
             } else {
                 ele.style.width = width + "px"
             }
             if (screenView.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
                 ele.style.height = screenView.positions[AXIS.Y].size + "px"
             } else if (screenView.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
-                ele.style.height = screenView.positions[AXIS.Y].sizeValue + "%"
+                ele.style.height = screenView.attrs[AXIS.Y].sizeValue + "%"
             } else {
                 ele.style.height = height + "px"
             }
