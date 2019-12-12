@@ -150,6 +150,11 @@ export default class UIConfiguration {
     }
 
     public getDimen(name: string): number {
+        // check name if valid
+        if (name.length === 0) {
+            return 0
+        }
+
         if (this.selectedDimens[name]) {
             return this.selectedDimens[name]
         } else if (name && !isNaN(parseInt(name, 10))) {

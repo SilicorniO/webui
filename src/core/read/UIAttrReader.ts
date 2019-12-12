@@ -5,6 +5,7 @@ import UIAttributeValue from "./UIAttributeValue"
 import UIViewAttrs from "../../model/UIViewAttrs"
 import { UI_VISIBILITY } from "../../model/UIVisibility"
 import Log from "../../utils/log/Log"
+import UIConfiguration from "../../UIConfiguration"
 
 enum ATTR {
     WIDTH = "w",
@@ -42,7 +43,11 @@ enum ATTR {
 }
 
 export default class UIAttrReader {
-    public static readAttrs(element: HTMLElement, attributeMain: string, attributes: string[]): UIViewAttrs {
+    public static readAttrs(element: HTMLElement, config: UIConfiguration): UIViewAttrs {
+        // read configuration attributes
+        const attributeMain = config.attribute
+        const attributes = config.attributes
+
         // create axis UIAttr to return
         const viewAttrs = new UIViewAttrs()
 

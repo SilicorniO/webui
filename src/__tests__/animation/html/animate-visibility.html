@@ -17,24 +17,20 @@
         WebUI.start({
             viewColors: true,
             showLogs: true,
-            timeRedraw: 100,
-            events: function(event) {
-                if (event.name == 'end') {
-                    if (numEnds == 0) {
-                        numEnds += 1;
-
-                        var element1 = document.getElementById('element1');
-                        element1.ui.setVisibility("g");
-                        element1.ui.animateNextRefresh(0.1);
-
-                        var element2 = document.getElementById('element2');
-                        element2.ui.animateNextRefresh(1);
-
-                        WebUI.refresh();
-                    }
-                }
-            }
+            timeRedraw: 100
         });
+
+        setTimeout(function(){
+            console.log("After first timeout");
+
+            var element1 = document.getElementById('element1');
+            element1.ui.animateNextRefresh(0.1);
+            element1.ui.setVisibility("g");
+
+            var element2 = document.getElementById('element2');
+            element2.ui.animateNextRefresh(1);
+
+        }, 50);
 
     </script>
     

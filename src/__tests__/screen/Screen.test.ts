@@ -48,8 +48,6 @@ describe("Screen", () => {
         const screen = await PuppeteerUtils.evalUiElement(page, "screen")
         const content = await PuppeteerUtils.evalUiElement(page, "content")
 
-        console.log(bodyContent)
-        console.log(content)
         expect(bodyContent.height).toBe(content.height)
         expect(screen.height).toBe(content.height)
     })

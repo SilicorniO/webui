@@ -16,27 +16,25 @@ export default class RedrawTimer {
 
         //start the timer if not started
         if (!running) {
+            // launch time
             this.timerLauncher(timeMillis, cb)
         }
     }
 
     private timerLauncher(timeInMillis: number, cb: () => void) {
-        setTimeout(
-            function() {
-                //check time is after timer
-                var now = new Date().getTime()
-                if (now > this.time) {
-                    //clean the timer
-                    this.time = null
+        setTimeout(() => {
+            //check time is after timer
+            var now = new Date().getTime()
+            if (now > this.time) {
+                //clean the timer
+                this.time = null
 
-                    //redraw
-                    cb()
-                } else {
-                    //run timer again with rest of milliseconds
-                    this.timerLauncher(this.time - now, cb)
-                }
-            }.bind(this),
-            timeInMillis,
-        )
+                // callback
+                cb()
+            } else {
+                //run timer again with rest of milliseconds
+                this.timerLauncher(this.time - now, cb)
+            }
+        }, timeInMillis)
     }
 }

@@ -1,4 +1,4 @@
-import UIPrepare from "./UIPrepare"
+import UIPrepare from "./core/prepare/UIPrepare"
 import UIViewDrawUtils from "./utils/uiviewdraw/UIViewDrawUtils"
 import RedrawTimer from "./utils/redrawtimer/RedrawTimer"
 import UIConfiguration from "./UIConfiguration"
@@ -9,24 +9,21 @@ import UIConfigurationData from "./model/UIConfigurationData"
 import HtmlUtils from "./utils/html/HTMLUtils"
 import CounterUtils from "./utils/counter/CounterUtils"
 import UICalculator from "./core/calculate/UICalculator"
+import UIPrepareOrderUtils from "./core/prepare/UIPrepareOrderUtils"
+
+export type WebUIRedraw = (screen: UIView) => void
+
+export interface WebUIListener {
+    onScreenReinit: (screen: UIView) => void
+    onScreenRedraw: (screen: UIView) => void
+}
 
 /**
  * @constructor
  */
-class WebUI {
+class WebUI implements WebUIListener {
     //size of scrollbars to use as padding when views have scrollbars visible
     private scrollSize: number = 0
-
-    //list of screens
-    private screens: UIView[] = []
-
-    //ids of nodes changed
-    private nodesAdded: HTMLElement[] = []
-    private nodesUpdated: UIHTMLElement[] = []
-    private parentNodesRemoved: UIHTMLElement[] = []
-
-    //controllers
-    private uiPrepare: UIPrepare = new UIPrepare(this.refresh.bind(this))
 
     //configuration
     private configuration: UIConfiguration = new UIConfiguration()
@@ -34,32 +31,41 @@ class WebUI {
     //timer for repainting
     private redrawTimer: RedrawTimer = new RedrawTimer()
 
+    private screensToDraw: { [key: string]: UIView } = {}
+
+    onScreenReinit(screen: UIView) {
+        // init screen
+        this.initDom(screen.element)
+    }
+
+    onScreenRedraw(screen: UIView) {
+        // draw this screen
+        this.drawUIScreen(screen)
+
+        // add to the list of screens to draw
+        // this.screensToDraw[screen.id] = screen
+
+        // call to redraw
+        // this.redraw()
+    }
+
     //redraw function
     private redraw() {
-        //prepare nodes
-        var countNodesAdded = this.uiPrepare.addNodes(this.nodesAdded, this.screens, this.configuration)
-        var countNodesRemoved = this.uiPrepare.removeNodes(this.parentNodesRemoved)
-        var countNodesModified = this.uiPrepare.updateNodes(this.nodesUpdated, this.screens, this.configuration)
-        Log.log(
-            "Nodes added: " +
-                countNodesAdded +
-                " - Nodes removed: " +
-                countNodesRemoved +
-                " - Nodes modified: " +
-                countNodesModified,
-        )
+        // get a copy of the screens to draw
+        const screens: UIView[] = []
+        for (const id of Object.keys(this.screensToDraw)) {
+            screens.push(this.screensToDraw[id])
+        }
+        this.screensToDraw = {}
 
         this.redrawTimer.timer(() => {
             //draw
             Log.log(" -- Redraw -- ")
-            this.drawScreens()
+            for (const screen of screens) {
+                // draw this screen
+                this.drawUIScreen(screen)
+            }
         }, this.configuration.timeRedraw)
-    }
-
-    //window resize event
-    private resize() {
-        this.configuration.refreshScreenSize()
-        this.redraw()
     }
 
     /**
@@ -67,8 +73,10 @@ class WebUI {
      * @param {UIConfiguration} configuration
      */
     public start(configuration: UIConfigurationData) {
-        //clear to avoid problems if it was called previously
-        this.clearUI()
+        CounterUtils.startCounter("drawScreens")
+
+        //get the body element
+        var bodyElement = document.getElementsByTagName("BODY")[0] as HTMLElement
 
         //calculate the size of scrollbars
         if (this.scrollSize == 0) {
@@ -82,124 +90,28 @@ class WebUI {
         Log.uiShowLogs = this.configuration.showLogs
         Log.uiViewLogs = this.configuration.logsView
 
-        //start running on actual dom
-        this.drawScreens()
-
-        //listen dom events
-        this.listenDomEvents()
-    }
-
-    private listenDomEvents() {
-        //get the body element
-        var bodyElement = document.getElementsByTagName("BODY")[0]
-
-        //add event listener for window resize
-        window.removeEventListener("resize", this.resize)
-        window.addEventListener("resize", this.resize)
-
-        // Options for the observer (which mutations to observe)
-        var config = { characterData: true, attributes: true, childList: true, subtree: true }
-
-        // Callback function to execute when mutations are observed
-        var callback = (mutationsList: MutationRecord[]) => {
-            for (var mutation of mutationsList) {
-                if (mutation.type == "childList") {
-                    for (var i = 0; i < mutation.addedNodes.length; i++) {
-                        const nodeUi = mutation.addedNodes[i]
-                        if (nodeUi != null && nodeUi instanceof HTMLElement) {
-                            this.nodesAdded.push(nodeUi)
-                        }
-                    }
-                    for (var i = 0; i < mutation.removedNodes.length; i++) {
-                        const nodeUi = UIHTMLElement.get(UIHTMLElement.get(mutation.target))
-                        if (nodeUi != null) {
-                            this.parentNodesRemoved.push(nodeUi)
-                        }
-                    }
-                    this.redraw()
-                } else if (mutation.type == "attributes") {
-                    var attributeName = mutation.attributeName
-                    if (
-                        attributeName == "id" ||
-                        attributeName == "class" ||
-                        attributeName == this.configuration.attribute ||
-                        this.configuration.attributes.includes(attributeName)
-                    ) {
-                        this.nodesUpdated.push(UIHTMLElement.get(mutation.target))
-                        this.redraw()
-                    }
-                } else if (mutation.type == "characterData") {
-                    if (mutation.target.parentNode) {
-                        const nodeUi = UIHTMLElement.get(mutation.target.parentNode)
-                        if (nodeUi != null) {
-                            this.nodesUpdated.push(nodeUi)
-                        }
-                    }
-                    this.redraw()
-                }
-            }
-        }
-
-        // Create an observer instance linked to the callback function
-        var observer = new MutationObserver(callback)
-
-        // Start observing the target node for configured mutations
-        observer.observe(bodyElement, config)
-    }
-
-    private clearUI() {
-        //delete the UI element and childrens
-        var clearUI = (element: HTMLElement) => {
-            const uiElement = UIHTMLElement.get(element)
-            if (uiElement != null) {
-                delete (element as any).ui
-                var viewChildNodes = element.childNodes
-                if (viewChildNodes) {
-                    for (var i = 0; i < viewChildNodes.length; i++) {
-                        clearUI(viewChildNodes[i] as HTMLElement)
-                    }
-                }
-            }
-        }
-
-        //for each screen delete the UI element and its children
-        if (this.screens) {
-            this.screens.forEach(function(screen) {
-                clearUI(screen.element)
-            })
-
-            //delete all screens
-            this.screens = []
-        }
-    }
-
-    /**
-     * Refresh the UI framework with the identifier saved if there was one
-     **/
-    private refresh() {
-        this.redraw()
-    }
-
-    /**
-     * Execute UI
-     **/
-    private drawScreens() {
-        //start genral counter
-        CounterUtils.startCounter("drawScreens")
-
-        //prepare all dom from body for the first time
-        if (this.screens.length == 0) {
-            var bodyElement = document.getElementsByTagName("BODY")[0]
-            this.uiPrepare.generateUIViews(bodyElement as HTMLElement, this.configuration, this.screens, null)
-        }
-
-        //draw all screens
-        for (var i = 0; i < this.screens.length; i++) {
-            //finish rest of calculations
-            this.drawUIScreen(this.screens[i])
-        }
+        // launch from body, only first time
+        this.initDom(bodyElement)
 
         Log.log("Time drawing screens: " + CounterUtils.endCounter("drawScreens"))
+    }
+
+    private initDom(element: HTMLElement) {
+        // clear to avoid problems if it was called previously
+        WebUI.clearUI(element)
+
+        // generate views
+        UIPrepare.generateUIViews(element, this.configuration, this)
+    }
+
+    private static clearUI(element: Node) {
+        //delete the UI element and childrens
+        delete (element as any).ui
+
+        // delete the UI from children
+        element.childNodes.forEach(childNode => {
+            WebUI.clearUI(childNode)
+        })
     }
 
     private drawUIScreen(screen: UIView) {
@@ -223,15 +135,15 @@ class WebUI {
 
         if (screen.hasToBeCalculated()) {
             //update the size of the screen
-            var screenSizeChanged = this.uiPrepare.loadSizeScreen(screen)
+            var screenSizeChanged = UIPrepare.loadSizeScreen(screen)
 
             //load sizes of views
-            this.uiPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged)
+            UIPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged)
             timerLoadSizes = CounterUtils.endCounter("loadSizes")
 
             //order views
             CounterUtils.startCounter("orderViews")
-            this.uiPrepare.orderViews(screen)
+            UIPrepareOrderUtils.orderViews(screen)
             timerOrderViews = CounterUtils.endCounter("orderViews")
 
             timerPrepare = CounterUtils.endCounter("prepare")
@@ -254,6 +166,9 @@ class WebUI {
 
         //resize screen if necessary
         UIViewDrawUtils.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY)
+
+        // apply events
+        screen.evalEvents()
 
         timerDraw = CounterUtils.endCounter("draw")
 
