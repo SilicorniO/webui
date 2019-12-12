@@ -1,6 +1,9 @@
 import Log from "../log/Log"
-import UIView, { AXIS, UI_SIZE, UI_VIEW_ID, UI_VISIBILITY } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import UIConfiguration from "../../UIConfiguration"
+import { AXIS } from "../../model/UIAxis"
+import { UI_SIZE, UI_VIEW_ID } from "../../model/UIAttr"
+import { UI_VISIBILITY } from "../../model/UIVisibility"
 
 export interface UIViewDrawPosition {
     maxX: number
@@ -175,14 +178,14 @@ export default class UIViewDrawUtils {
             if (screenView.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
                 ele.style.width = screenView.positions[AXIS.X].size + "px"
             } else if (screenView.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
-                ele.style.width = screenView.attrsCalc[AXIS.X].sizeValue + "%"
+                ele.style.width = screenView.positions[AXIS.X].sizeValue + "%"
             } else {
                 ele.style.width = width + "px"
             }
             if (screenView.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
                 ele.style.height = screenView.positions[AXIS.Y].size + "px"
             } else if (screenView.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
-                ele.style.height = screenView.attrsCalc[AXIS.Y].sizeValue + "%"
+                ele.style.height = screenView.positions[AXIS.Y].sizeValue + "%"
             } else {
                 ele.style.height = height + "px"
             }

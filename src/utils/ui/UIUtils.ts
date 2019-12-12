@@ -1,5 +1,6 @@
-import UIView, { UIAttributeValue } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import UIHTMLElement from "../../model/UIHTMLElement"
+import { UIAttributeValue } from "../../model/UIAttributeValue"
 
 /**
  * @constructor

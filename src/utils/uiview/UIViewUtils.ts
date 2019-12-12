@@ -1,4 +1,4 @@
-import UIView, { AXIS } from "../../model/UIView"
+import UIView from "../../model/UIView"
 
 /**
  * @constructor
@@ -167,37 +167,5 @@ export default class UIViewUtils {
         }
 
         return aViews
-    }
-
-    /**
-     * Search views wich have the given view as dependency.
-     * Only search in same parent views
-     * @param {UIView} view UIView reference
-     * @param {boolean} hor TRUE for searching horizontal dependency
-     * @param {boolean} ver TRUE for searching vertical dependency
-     * @return {Array<UIView>} Array of views with dependency of the given view
-     */
-    public static getViewsWithDependencyForView(view: UIView, hor: boolean, ver: boolean): UIView[] {
-        //generate the array with the views to return
-        var dependencyViews: UIView[] = []
-
-        //check has parent, else we return empty array
-        if (!view.parent) {
-            return dependencyViews
-        }
-
-        //get the views of the parent
-        var viewId = view.id
-        for (const parentChild of view.parent.getUIChildren()) {
-            if (
-                (hor && parentChild.dependencies[AXIS.X].includes(viewId)) ||
-                (ver && parentChild.dependencies[AXIS.Y].includes(viewId))
-            ) {
-                dependencyViews.push(parentChild)
-            }
-        }
-
-        //return the list of views with dependencies
-        return dependencyViews
     }
 }

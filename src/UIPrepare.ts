@@ -1,9 +1,11 @@
-import UIView, { UI_VIEW_ID, AXIS, UI_SIZE, UI_REF_LIST } from "./model/UIView"
+import UIView from "./model/UIView"
 import Log from "./utils/log/Log"
 import UIViewUtils from "./utils/uiview/UIViewUtils"
 import UIUtils from "./utils/ui/UIUtils"
 import UIConfiguration from "./UIConfiguration"
 import UIHTMLElement from "./model/UIHTMLElement"
+import { AXIS } from "./model/UIAxis"
+import { UI_REF_LIST, UI_VIEW_ID, UI_SIZE } from "./model/UIAttr"
 
 export default class UIPrepare {
     //save the refresh function
@@ -68,7 +70,7 @@ export default class UIPrepare {
         for (const child of parent.getUIChildren()) {
             var numDependencies = 0
 
-            var referencesAxis = hor ? child.getReference(AXIS.X) : child.getReference(AXIS.Y)
+            var referencesAxis = hor ? child.getAttrs(AXIS.X) : child.getAttrs(AXIS.Y)
             for (const key of UI_REF_LIST) {
                 let reference = referencesAxis[key]
 
@@ -180,11 +182,11 @@ export default class UIPrepare {
 
                 if (view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded)) {
                     if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.attrsCalc[AXIS.X].sizeValue = UIViewUtils.calculateWidthView(view, ele)
+                        view.positions[AXIS.X].sizeValue = UIViewUtils.calculateWidthView(view, ele)
                     }
 
                     if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.attrsCalc[AXIS.Y].sizeValue = UIViewUtils.calculateHeightView(view, ele)
+                        view.positions[AXIS.Y].sizeValue = UIViewUtils.calculateHeightView(view, ele)
                     }
 
                     //translate paddings and margins
@@ -220,9 +222,9 @@ export default class UIPrepare {
         //apply width and height if they are defined
         if (screen.attrs[AXIS.X].size != UI_SIZE.SIZE_CONTENT) {
             if (screen.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
-                ele.style.width = screen.attrsCalc[AXIS.X].sizeValue + "px"
+                ele.style.width = screen.positions[AXIS.X].sizeValue + "px"
             } else if (screen.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
-                ele.style.width = screen.attrsCalc[AXIS.X].sizeValue + "%"
+                ele.style.width = screen.positions[AXIS.X].sizeValue + "%"
             }
 
             var offsetWidth = ele.offsetWidth
@@ -233,9 +235,9 @@ export default class UIPrepare {
         }
         if (screen.attrs[AXIS.Y].size != UI_SIZE.SIZE_CONTENT) {
             if (screen.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
-                ele.style.height = screen.attrsCalc[AXIS.Y].sizeValue + "px"
+                ele.style.height = screen.positions[AXIS.Y].sizeValue + "px"
             } else if (screen.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
-                ele.style.height = screen.attrsCalc[AXIS.Y].sizeValue + "%"
+                ele.style.height = screen.positions[AXIS.Y].sizeValue + "%"
             }
 
             screen.positions[AXIS.Y].size = ele.offsetHeight

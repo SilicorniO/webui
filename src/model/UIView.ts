@@ -2,108 +2,11 @@ import Log from "../utils/log/Log"
 import UIUtils from "../utils/ui/UIUtils"
 import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
-
-export enum UI_VISIBILITY {
-    VISIBLE = "v",
-    INVISIBLE = "i",
-    GONE = "g",
-}
-
-export enum UI_VIEW_ID {
-    NONE = "",
-    SCREEN = "s",
-    PARENT = "p",
-    LAST = "l",
-}
-
-export type UIViewId = UI_VIEW_ID | string
-
-export enum UI_SIZE {
-    SIZE_CONTENT = "sc",
-    SCREEN = "s",
-    PERCENTAGE = "sp",
-}
-
-export enum UI_REF {
-    START_START,
-    START_END,
-    END_END,
-    END_START,
-}
-
-export const UI_REF_LIST: UI_REF[] = [UI_REF.START_START, UI_REF.START_END, UI_REF.END_END, UI_REF.END_START]
-
-export interface ViewRef {
-    [UI_REF.START_START]: UIViewId
-    [UI_REF.START_END]: UIViewId
-    [UI_REF.END_END]: UIViewId
-    [UI_REF.END_START]: UIViewId
-}
-
-export enum AXIS {
-    X = "x",
-    Y = "y",
-}
-
-export const AXIS_LIST: AXIS[] = [AXIS.X, AXIS.Y]
-
-export interface UIRefAxis {
-    [AXIS.X]: ViewRef
-    [AXIS.Y]: ViewRef
-}
-
-export interface UIAttr {
-    size: string
-    scroll: boolean
-    center: boolean
-    marginStart: string
-    marginEnd: string
-    paddingStart: string
-    paddingEnd: string
-}
-
-export interface UIAttrAxis {
-    [AXIS.X]: UIAttr
-    [AXIS.Y]: UIAttr
-}
-
-export interface UIAttrCalc {
-    sizeValue: number
-    percentPos: number
-}
-
-export interface UIAttrCalcAxis {
-    [AXIS.X]: UIAttrCalc
-    [AXIS.Y]: UIAttrCalc
-}
-
-export interface UIPosition {
-    size: number
-    start: number
-    end: number
-    startChanged: boolean
-    endChanged: boolean
-    scrollApplied: boolean
-    marginStart: number
-    marginEnd: number
-    paddingStart: number
-    paddingEnd: number
-}
-
-export interface UIPositionAxis {
-    [AXIS.X]: UIPosition
-    [AXIS.Y]: UIPosition
-}
-
-export interface UIChildrenOrderAxis {
-    [AXIS.X]: UIView[]
-    [AXIS.Y]: UIView[]
-}
-
-export interface UIDependenciesAxis {
-    [AXIS.X]: string[]
-    [AXIS.Y]: string[]
-}
+import { UIAttrAxis, UI_REF, UI_SIZE, UIAttr, UI_VIEW_ID, UI_REF_LIST } from "./UIAttr"
+import { AXIS, AXIS_LIST, UIAxisArray, UIAxis } from "./UIAxis"
+import { UIAttributeValue } from "./UIAttributeValue"
+import { UIPosition } from "./UIPosition"
+import { UI_VISIBILITY } from "./UIVisibility"
 
 enum ATTR {
     WIDTH = "w",
@@ -140,48 +43,41 @@ enum ATTR {
     VISIBILITY = "v",
 }
 
-export interface UIAttributeValue {
-    attr: string
-    value?: string
-}
-
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
 
+    // identifier
     id: string
+
+    // dom element
     element: UIHTMLElement
+
+    // connections with parent and screen
     parent: UIView
     screen: UIView
 
-    childrenOrder: UIChildrenOrderAxis = {
+    // calculated children
+    childrenInOrder: boolean = false
+    childrenOrder: UIAxisArray<UIView> = {
         [AXIS.X]: [],
         [AXIS.Y]: [],
     }
 
-    order: number = 0
+    // used for order of views
     orderNum: number = 0
-    dependencies: UIDependenciesAxis = {
+
+    // dependencies used to order views
+    dependencies: UIAxisArray<string> = {
         [AXIS.X]: [],
         [AXIS.Y]: [],
-    }
-
-    public refs: UIRefAxis = {
-        [AXIS.X]: {
-            [UI_REF.START_START]: "",
-            [UI_REF.START_END]: "",
-            [UI_REF.END_END]: "",
-            [UI_REF.END_START]: "",
-        },
-        [AXIS.Y]: {
-            [UI_REF.START_START]: "",
-            [UI_REF.START_END]: "",
-            [UI_REF.END_END]: "",
-            [UI_REF.END_START]: "",
-        },
     }
 
     public attrs: UIAttrAxis = {
         [AXIS.X]: {
+            [UI_REF.START_START]: "",
+            [UI_REF.START_END]: "",
+            [UI_REF.END_END]: "",
+            [UI_REF.END_START]: "",
             size: UI_SIZE.SIZE_CONTENT,
             scroll: false,
             center: false,
@@ -191,6 +87,10 @@ export default class UIView {
             paddingEnd: "0",
         },
         [AXIS.Y]: {
+            [UI_REF.START_START]: "",
+            [UI_REF.START_END]: "",
+            [UI_REF.END_END]: "",
+            [UI_REF.END_START]: "",
             size: UI_SIZE.SIZE_CONTENT,
             scroll: false,
             center: false,
@@ -200,28 +100,13 @@ export default class UIView {
             paddingEnd: "0",
         },
     }
-
-    public attrsCalc: UIAttrCalcAxis = {
-        [AXIS.X]: {
-            sizeValue: 0,
-            percentPos: 0,
-        },
-        [AXIS.Y]: {
-            sizeValue: 0,
-            percentPos: 0,
-        },
-    }
-
-    // visibility
-    visibility: UI_VISIBILITY = UI_VISIBILITY.VISIBLE
-
-    // animations
-    animationDurations: number[] = []
 
     //----- calculated -----
 
-    public positions: UIPositionAxis = {
+    public positions: UIAxis<UIPosition> = {
         [AXIS.X]: {
+            sizeValue: 0,
+            percentPos: 0,
             size: 0,
             start: 0,
             end: 0,
@@ -234,6 +119,8 @@ export default class UIView {
             paddingEnd: 0,
         },
         [AXIS.Y]: {
+            sizeValue: 0,
+            percentPos: 0,
             size: 0,
             start: 0,
             end: 0,
@@ -250,7 +137,12 @@ export default class UIView {
     //----- Flags for changes -----
     sizeLoaded: boolean = false
     positionLoaded: boolean = false
-    childrenInOrder: boolean = false
+
+    // visibility
+    visibility: UI_VISIBILITY = UI_VISIBILITY.VISIBLE
+
+    // animations
+    animationDurations: number[] = []
 
     /**
      * Create a view object reading the HTML of the element
@@ -291,16 +183,16 @@ export default class UIView {
     public setSize(axis: AXIS, value: string) {
         if (value == UI_SIZE.SIZE_CONTENT) {
             this.attrs[axis].size = value
-            this.attrsCalc[axis].sizeValue = 0
+            this.positions[axis].sizeValue = 0
         } else if (String(value).indexOf("%") != -1) {
             var indexPercent = value.indexOf("%")
-            this.attrsCalc[axis].sizeValue = parseFloat(value.substring(0, indexPercent))
+            this.positions[axis].sizeValue = parseFloat(value.substring(0, indexPercent))
             if (indexPercent < value.length - 1) {
-                this.attrsCalc[axis].percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
+                this.positions[axis].percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)
             }
             this.attrs[axis].size = UI_SIZE.PERCENTAGE
         } else {
-            this.attrsCalc[axis].sizeValue = parseInt(value, 10)
+            this.positions[axis].sizeValue = parseInt(value, 10)
             this.attrs[axis].size = UI_SIZE.SCREEN
         }
         this.sizeLoaded = false
@@ -309,12 +201,12 @@ export default class UIView {
     // ----- REFERENCES -----
 
     public setReference(axis: AXIS, ref: UI_REF, id: string) {
-        this.refs[axis][ref] = id
+        this.attrs[axis][ref] = id
         this.sizeLoaded = false
     }
 
-    public getReference(axis: AXIS): ViewRef {
-        return this.refs[axis]
+    public getAttrs(axis: AXIS): UIAttr {
+        return this.attrs[axis]
     }
 
     // ----- SCROLL -----
@@ -532,23 +424,12 @@ export default class UIView {
     }
 
     public cleanUI() {
-        this.refs = {
-            [AXIS.X]: {
-                [UI_REF.START_START]: "",
-                [UI_REF.START_END]: "",
-                [UI_REF.END_END]: "",
-                [UI_REF.END_START]: "",
-            },
-            [AXIS.Y]: {
-                [UI_REF.START_START]: "",
-                [UI_REF.START_END]: "",
-                [UI_REF.END_END]: "",
-                [UI_REF.END_START]: "",
-            },
-        }
-
         this.attrs = {
             [AXIS.X]: {
+                [UI_REF.START_START]: "",
+                [UI_REF.START_END]: "",
+                [UI_REF.END_END]: "",
+                [UI_REF.END_START]: "",
                 size: UI_SIZE.SIZE_CONTENT,
                 scroll: false,
                 center: false,
@@ -558,6 +439,10 @@ export default class UIView {
                 paddingEnd: "0",
             },
             [AXIS.Y]: {
+                [UI_REF.START_START]: "",
+                [UI_REF.START_END]: "",
+                [UI_REF.END_END]: "",
+                [UI_REF.END_START]: "",
                 size: UI_SIZE.SIZE_CONTENT,
                 scroll: false,
                 center: false,
@@ -583,21 +468,21 @@ export default class UIView {
             "[" +
             this.id +
             "]: ll:" +
-            this.refs[AXIS.X][UI_REF.START_START] +
+            this.attrs[AXIS.X][UI_REF.START_START] +
             ", lr:" +
-            this.refs[AXIS.X][UI_REF.START_END] +
+            this.attrs[AXIS.X][UI_REF.START_END] +
             ", rr:" +
-            this.refs[AXIS.X][UI_REF.END_END] +
+            this.attrs[AXIS.X][UI_REF.END_END] +
             ", rl:" +
-            this.refs[AXIS.X][UI_REF.END_START] +
+            this.attrs[AXIS.X][UI_REF.END_START] +
             ", tt:" +
-            this.refs[AXIS.Y][UI_REF.START_START] +
+            this.attrs[AXIS.Y][UI_REF.START_START] +
             ",tb: " +
-            this.refs[AXIS.Y][UI_REF.START_END] +
+            this.attrs[AXIS.Y][UI_REF.START_END] +
             ", bb:" +
-            this.refs[AXIS.Y][UI_REF.END_END] +
+            this.attrs[AXIS.Y][UI_REF.END_END] +
             ", bt:" +
-            this.refs[AXIS.Y][UI_REF.END_START] +
+            this.attrs[AXIS.Y][UI_REF.END_START] +
             ", ml:" +
             this.positions[AXIS.X].marginStart +
             ", mr:" +
@@ -659,12 +544,12 @@ export default class UIView {
             this.readUIAttribute(attributeValue)
         }
 
-        const referencesXEmpty = UIView.isReferenceEmpty(this.getReference(AXIS.X))
+        const referencesXEmpty = UIView.isReferenceEmpty(this.getAttrs(AXIS.X))
         if (referencesXEmpty && !this.attrs[AXIS.X].center) {
             this.setReference(AXIS.X, UI_REF.START_START, UI_VIEW_ID.PARENT)
         }
 
-        const referencesYEmpty = UIView.isReferenceEmpty(this.getReference(AXIS.Y))
+        const referencesYEmpty = UIView.isReferenceEmpty(this.getAttrs(AXIS.Y))
         if (referencesYEmpty && !this.attrs[AXIS.Y].center) {
             this.setReference(AXIS.Y, UI_REF.START_START, UI_VIEW_ID.PARENT)
         }
@@ -773,9 +658,9 @@ export default class UIView {
         }
     }
 
-    private static isReferenceEmpty(reference: ViewRef): boolean {
+    private static isReferenceEmpty(attrs: UIAttr): boolean {
         for (const id of UI_REF_LIST) {
-            if (reference[id].length > 0) {
+            if (attrs[id].length > 0) {
                 return false
             }
         }
