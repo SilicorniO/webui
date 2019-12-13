@@ -1,6 +1,5 @@
-import UIPrepare from "./core/prepare/UIPrepare"
-import UIViewDrawUtils from "./utils/uiviewdraw/UIViewDrawUtils"
-import RedrawTimer from "./utils/redrawtimer/RedrawTimer"
+import UIPreparer from "./core/prepare/UIPreparer"
+import CallbackTimer from "./utils/callbacktimer/CallbackTimer"
 import UIConfiguration from "./UIConfiguration"
 import Log from "./utils/log/Log"
 import UIView from "./model/UIView"
@@ -9,6 +8,7 @@ import HtmlUtils from "./utils/html/HTMLUtils"
 import CounterUtils from "./utils/counter/CounterUtils"
 import UICalculator from "./core/calculate/UICalculator"
 import UIPrepareOrderUtils from "./core/prepare/UIPrepareOrderUtils"
+import UIDrawController from "./core/draw/UIDrawController"
 
 export type WebUIRedraw = (screen: UIView) => void
 
@@ -28,7 +28,7 @@ class WebUI implements WebUIListener {
     private configuration: UIConfiguration = new UIConfiguration()
 
     //timer for repainting
-    private redrawTimer: RedrawTimer = new RedrawTimer()
+    private redrawTimer: CallbackTimer = new CallbackTimer()
 
     private screensToDraw: { [key: string]: UIView } = {}
 
@@ -107,7 +107,7 @@ class WebUI implements WebUIListener {
         WebUI.clearUI(element)
 
         // generate views
-        UIPrepare.generateUIViews(element, this.configuration, this)
+        UIPreparer.generateUIViews(element, this.configuration, this)
     }
 
     private static clearUI(element: Node) {
@@ -143,10 +143,10 @@ class WebUI implements WebUIListener {
 
         if (screen.hasToBeCalculated()) {
             //update the size of the screen
-            var screenSizeChanged = UIPrepare.loadSizeScreen(screen)
+            var screenSizeChanged = UIPreparer.loadSizeScreen(screen)
 
             //load sizes of views
-            UIPrepare.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged)
+            UIPreparer.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged)
             timerLoadSizes = CounterUtils.endCounter("loadSizes")
 
             //order views
@@ -168,12 +168,11 @@ class WebUI implements WebUIListener {
         //---- DRAW -----
         CounterUtils.startCounter("draw")
 
-        //apply position and sizes
-        var childrenSizes = UIViewDrawUtils.applyPositions(screen, this.configuration.viewColors)
-        UIViewDrawUtils.applyVisibility(screen, null, this.configuration, !screen.hasToBeCalculated())
+        // prepare to draw, generate draw objects
+        UIDrawController.generateDrawsOfScreen(screen, this.configuration)
 
-        //resize screen if necessary
-        UIViewDrawUtils.applySizeScreen(screen, childrenSizes.maxX, childrenSizes.maxY)
+        // apply draw objects
+        UIDrawController.applyDrawsToScreen(screen, this.configuration)
 
         // apply events
         screen.evalEvents()

@@ -1,7 +1,6 @@
 import UIView from "../../model/UIView"
 import { WebUIListener } from "../../WebUI"
 import UIConfiguration from "../../UIConfiguration"
-import UIHTMLElement from "../../model/UIHTMLElement"
 import { UI_SIZE } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
 

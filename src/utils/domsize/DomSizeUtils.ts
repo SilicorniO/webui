@@ -3,7 +3,7 @@ import UIView from "../../model/UIView"
 /**
  * @constructor
  */
-export default class UIViewUtils {
+export default class DomSizeUtils {
     /**
      * Update the width of the view received
      * @param view UIView to change the height

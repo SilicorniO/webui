@@ -1,7 +1,7 @@
 import UIView from "../../model/UIView"
 import { AXIS } from "../../model/UIAxis"
 import { UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
-import UIViewUtils from "../../utils/uiview/UIViewUtils"
+import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import Log from "../../utils/log/Log"
 
@@ -93,7 +93,7 @@ export default class UIPrepareOrderUtils {
         const childElements = parent.getChildElements()
 
         //array of references of views to search them faster
-        var indexes = UIViewUtils.generateIndexes(UIHTMLElement.convertToUIView(childElements))
+        var indexes = DomSizeUtils.generateIndexes(UIHTMLElement.convertToUIView(childElements))
 
         //search dependencies until we have all children with them
         let allViewsSet: boolean = true

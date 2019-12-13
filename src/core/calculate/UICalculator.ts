@@ -1,5 +1,5 @@
 import UIView from "../../model/UIView"
-import UIViewUtils from "../../utils/uiview/UIViewUtils"
+import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import { AXIS } from "../../model/UIAxis"
 import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
@@ -8,8 +8,8 @@ import UIPosition from "../../model/UIPosition"
 export default class UICalculator {
     public static calculateScreen(screen: UIView, scrollSize: number) {
         //generate list of views and indexes for quick access
-        var arrayViews = UIViewUtils.generateArrayViews(screen)
-        var indexes = UIViewUtils.generateIndexes(arrayViews)
+        var arrayViews = DomSizeUtils.generateArrayViews(screen)
+        var indexes = DomSizeUtils.generateIndexes(arrayViews)
 
         var viewsRestored
 
@@ -248,7 +248,7 @@ export default class UICalculator {
         } else if (view.positions[axis].startChanged) {
             // TODO previous axis should be already asigned to calculate now the size correctly
             if (axis == AXIS.Y && view.positions[AXIS.X].startChanged && view.positions[AXIS.X].endChanged) {
-                const height = UIViewUtils.calculateHeightView(view, view.element, view.positions[AXIS.X].size)
+                const height = DomSizeUtils.calculateHeightView(view, view.element, view.positions[AXIS.X].size)
                 view.attrs[axis].sizeValue = height
                 view.positions[axis].end = view.positions[axis].start + view.attrs[axis].sizeValue
                 view.positions[axis].endChanged = true

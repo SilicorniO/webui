@@ -1,12 +1,12 @@
 import UIView from "../../model/UIView"
-import UIViewUtils from "../../utils/uiview/UIViewUtils"
+import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIConfiguration from "../../UIConfiguration"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import { AXIS } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
 import { WebUIListener } from "../../WebUI"
 
-export default class UIPrepare {
+export default class UIPreparer {
     /**
      * Load the sizes of all views and translate paddings and margins to dimens
      * @param {Array<*>} elements Array of dom nodes to load size
@@ -25,11 +25,11 @@ export default class UIPrepare {
 
                 if (view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded)) {
                     if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.attrs[AXIS.X].sizeValue = UIViewUtils.calculateWidthView(view, ele)
+                        view.attrs[AXIS.X].sizeValue = DomSizeUtils.calculateWidthView(view, ele)
                     }
 
                     if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.attrs[AXIS.Y].sizeValue = UIViewUtils.calculateHeightView(view, ele)
+                        view.attrs[AXIS.Y].sizeValue = DomSizeUtils.calculateHeightView(view, ele)
                     }
 
                     //translate paddings and margins
@@ -129,7 +129,7 @@ export default class UIPrepare {
         // generate views of all children
         element.childNodes.forEach(child => {
             if (child instanceof HTMLElement) {
-                UIPrepare.generateUIViews(child, config, webUIListener, parentChildren, screenChildren)
+                UIPreparer.generateUIViews(child, config, webUIListener, parentChildren, screenChildren)
             }
         })
 
