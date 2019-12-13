@@ -9,7 +9,7 @@ import UIViewAttrs from "./UIViewAttrs"
 import UIAttrReader, { ATTR } from "../core/read/UIAttrReader"
 import { WebUIListener } from "../WebUI"
 import UIViewEventsManager from "../core/events/UIViewEventsManager"
-import UIAttributeValue from "../core/read/UIAttributeValue"
+import UIAttributeValue, { UIAttributeValueArray } from "../core/read/UIAttributeValue"
 
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
@@ -131,10 +131,10 @@ export default class UIView {
 
     // ----- SET ATTRIBUTE -----
 
-    public setAttrs(attributes: UIAttributeValue[], animationDuration?: number) {
+    public setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number) {
         // apply attributes
         for (const attribute of attributes) {
-            UIAttrReader.readUIAttribute(this.attrs, attribute, this.id)
+            this.applyAttribute(attribute[0], attribute[1])
         }
 
         // apply animation
@@ -146,14 +146,7 @@ export default class UIView {
 
     public setAttr(attribute: ATTR, value?: string | number | boolean, animationDuration?: number) {
         // apply attribute
-        UIAttrReader.readUIAttribute(
-            this.attrs,
-            {
-                attr: attribute,
-                value,
-            },
-            this.id,
-        )
+        this.applyAttribute(attribute, value)
 
         // apply animation
         this.animateNextRefresh(animationDuration)
@@ -162,7 +155,17 @@ export default class UIView {
         this.eventsManager.launchResizeEvent()
     }
 
-    private applyAttribute(attribute: UIAttributeValue) {}
+    private applyAttribute(attribute: ATTR, value?: string | number | boolean) {
+        // apply attribute
+        UIAttrReader.readUIAttribute(
+            this.attrs,
+            {
+                attr: attribute,
+                value,
+            },
+            this.id,
+        )
+    }
 
     // ----- REFERENCES -----
 

@@ -8,6 +8,7 @@ import Log from "../../utils/log/Log"
 import UIConfiguration from "../../UIConfiguration"
 
 export enum ATTR {
+    NONE = "",
     WIDTH = "w",
     FULL_WIDTH = "fw",
     HEIGHT = "h",
@@ -203,7 +204,7 @@ export default class UIAttrReader {
             viewAttrs.x.scroll = bValue
         } else if (attr === ATTR.VISIBILITY) {
             viewAttrs.visibility = (sValue as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
-        } else if (attr.length > 0) {
+        } else if (attr != ATTR.NONE) {
             Log.logW("Attribute unknown: " + attr + " in view " + viewId)
         }
     }

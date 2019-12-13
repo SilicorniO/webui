@@ -1,0 +1,34 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="element" ui="">Testing set attributes</div>
+    </div>
+    
+    <script>
+    let changed = false
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs',
+        timeRedraw: 0,
+        events: function(event){
+            if (event.name == "end" && !changed) {
+                changed = true; // to do it only once
+                var element = document.getElementById("element");
+                element.ui.setAttrs([
+                    ["fw", ""],
+                    ["h", 200]
+                ]);
+            }
+        }
+    });
+
+    </script>
+    
+</body>
+</html>

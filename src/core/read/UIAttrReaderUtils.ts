@@ -1,5 +1,6 @@
 import UIAttributeValue from "./UIAttributeValue"
 import UIAttr, { UI_REF_LIST } from "../../model/UIAttr"
+import { ATTR } from "./UIAttrReader"
 
 export default class UIAttrReaderUtils {
     /**
@@ -22,12 +23,12 @@ export default class UIAttrReaderUtils {
             var aValue = aValues[i].split(":")
             if (aValue.length == 2) {
                 aAttributes.push({
-                    attr: aValue[0],
+                    attr: aValue[0] as ATTR,
                     value: aValue[1],
                 })
             } else if (aValue.length == 1) {
                 aAttributes.push({
-                    attr: aValue[0],
+                    attr: aValue[0] as ATTR,
                 })
             }
         }

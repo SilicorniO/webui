@@ -238,7 +238,7 @@ For example:
 
 The function you can use this two methods that can be called from a UI-View.
 -   **setAttr:** `setAttr(attribute: ATTR, value?: string | number | boolean)` The attribute is the parameter defined in #2.
--   **setAttrs:** `setAttrs(attributes: UIAttributeValue[], animationDuration?: number)` The UIAttributeVale is an object with: "attr" and "value" as the method "setAttr".
+-   **setAttrs:** `setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number)` The UIAttributeValueArray is an array with: "attr" (0) and "value" (1) as the method "setAttr".
 
 You can change directly the "ui" attribute of the element and changes will be applied automatically, but it requires to parse the parameters and it is worse for performance than do the change with javascript.
 
@@ -268,6 +268,29 @@ It is possible to animate the changes in the views automatically. You can do it 
 ### 7. Examples
 
 Please, to learn more, check the examples in [src/__tests__](src/__tests__) folder. You can clone the project and execute the examples directly in your browser.
+
+-   **Animation:** Animation examples.
+-   **Attribute:** Playing with attribute "ui".
+-   **Dom:** Test automatic events when DOM is changed.
+-   **Events:** Events received when start WebUI is executed.
+-   **List:** How to make a list with WebUI.
+-   **Margin:** Mading of views.
+-   **Padding:** Pading inside views.
+-   **Performance:** Performance tests.
+-   **Position:** How to work with contraints.
+-   **Responsive:** Different UI for desktop, tablet, mobile or define a different device.
+-   **Screen:** Useful to add WebUI in parts of your existing code.
+-   **Scrolls:** Horizontal and vertical scroll.
+-   **Size:** How to set a size to an element.
+-   **Table:** Tables created with WebUI.
+-   **Text:** Playing with size of texts.
+-   **Visibility:** Show and hide elements. They can be processed or not.
+
+### 8. F.A.Q. links to examples
+
+This section will be filled with questions asked by users.
+
+-   How to start using WebUI in existing website - [Example](src/__tests__/screen/html/subscreen.html)
 
 ## Config
 
@@ -340,24 +363,16 @@ You can config webui before running
 
 ## License
 
-    MIT License
+Copyright 2019 SilicorniO
 
-Copyright (c) 2017 SilicorniO
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+   http://www.apache.org/licenses/LICENSE-2.0
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
