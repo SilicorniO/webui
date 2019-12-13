@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --config webpack.dev.js",
+    "dist": "webpack --config webpack.prod.js",
     "lint": "tsc --noEmit && eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
     "test": "npx jest --runInBand",
     "test:coverage": "npx jest --coverage --runInBand"
@@ -44,6 +45,7 @@
     "typescript": "3.7.2",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10",
-    "webpack-dev-server": "3.9.0"
+    "webpack-dev-server": "3.9.0",
+    "webpack-merge": "4.2.2"
   }
 }
