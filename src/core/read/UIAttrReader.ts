@@ -7,7 +7,7 @@ import { UI_VISIBILITY } from "../../model/UIVisibility"
 import Log from "../../utils/log/Log"
 import UIConfiguration from "../../UIConfiguration"
 
-enum ATTR {
+export enum ATTR {
     WIDTH = "w",
     FULL_WIDTH = "fw",
     HEIGHT = "h",
@@ -107,63 +107,64 @@ export default class UIAttrReader {
      * @param attr attribute
      * @param value value of attribute
      */
-    private static readUIAttribute(viewAttrs: UIViewAttrs, attributeValue: UIAttributeValue, viewId: string) {
+    public static readUIAttribute(viewAttrs: UIViewAttrs, attributeValue: UIAttributeValue, viewId: string) {
         const attr = attributeValue.attr
-        const value = attributeValue.value
+        const sValue = "" + attributeValue.value
+        const bValue = attributeValue.value !== false
 
         if (attr === ATTR.WIDTH) {
-            viewAttrs.x.setSize(value)
+            viewAttrs.x.setSize(sValue)
         } else if (attr === ATTR.FULL_WIDTH) {
             viewAttrs.x.setSize("100%")
         } else if (attr === ATTR.HEIGHT) {
-            viewAttrs.y.setSize(value)
+            viewAttrs.y.setSize(sValue)
         } else if (attr === ATTR.FULL_HEIGHT) {
             viewAttrs.y.setSize("100%")
         } else if (attr === ATTR.LEFT) {
-            viewAttrs.x.setRef(UI_REF.START_START, value)
+            viewAttrs.x.setRef(UI_REF.START_START, sValue)
         } else if (attr === ATTR.RIGHT) {
-            viewAttrs.x.setRef(UI_REF.END_END, value)
+            viewAttrs.x.setRef(UI_REF.END_END, sValue)
         } else if (attr === ATTR.TOP) {
-            viewAttrs.y.setRef(UI_REF.START_START, value)
+            viewAttrs.y.setRef(UI_REF.START_START, sValue)
         } else if (attr === ATTR.BOTTOM) {
-            viewAttrs.y.setRef(UI_REF.END_END, value)
+            viewAttrs.y.setRef(UI_REF.END_END, sValue)
         } else if (attr === ATTR.AT_LEFT) {
-            viewAttrs.x.setRef(UI_REF.END_START, value)
+            viewAttrs.x.setRef(UI_REF.END_START, sValue)
         } else if (attr === ATTR.AT_LEFT_EQUAL) {
-            viewAttrs.x.setRef(UI_REF.END_START, value)
-            viewAttrs.y.setRef(UI_REF.START_START, value)
-            viewAttrs.y.setRef(UI_REF.END_END, value)
+            viewAttrs.x.setRef(UI_REF.END_START, sValue)
+            viewAttrs.y.setRef(UI_REF.START_START, sValue)
+            viewAttrs.y.setRef(UI_REF.END_END, sValue)
         } else if (attr === ATTR.AT_RIGHT) {
-            viewAttrs.x.setRef(UI_REF.START_END, value)
+            viewAttrs.x.setRef(UI_REF.START_END, sValue)
         } else if (attr === ATTR.AT_RIGHT_EQUAL) {
-            viewAttrs.x.setRef(UI_REF.START_END, value)
-            viewAttrs.y.setRef(UI_REF.START_START, value)
-            viewAttrs.y.setRef(UI_REF.END_END, value)
+            viewAttrs.x.setRef(UI_REF.START_END, sValue)
+            viewAttrs.y.setRef(UI_REF.START_START, sValue)
+            viewAttrs.y.setRef(UI_REF.END_END, sValue)
         } else if (attr === ATTR.AT_TOP) {
-            viewAttrs.y.setRef(UI_REF.END_START, value)
+            viewAttrs.y.setRef(UI_REF.END_START, sValue)
         } else if (attr === ATTR.AT_TOP_EQUAL) {
-            viewAttrs.y.setRef(UI_REF.END_START, value)
-            viewAttrs.x.setRef(UI_REF.START_START, value)
-            viewAttrs.x.setRef(UI_REF.END_END, value)
+            viewAttrs.y.setRef(UI_REF.END_START, sValue)
+            viewAttrs.x.setRef(UI_REF.START_START, sValue)
+            viewAttrs.x.setRef(UI_REF.END_END, sValue)
         } else if (attr === ATTR.AT_BOTTOM) {
-            viewAttrs.y.setRef(UI_REF.START_END, value)
+            viewAttrs.y.setRef(UI_REF.START_END, sValue)
         } else if (attr === ATTR.AT_BOTTOM_EQUAL) {
-            viewAttrs.y.setRef(UI_REF.START_END, value)
-            viewAttrs.x.setRef(UI_REF.START_START, value)
-            viewAttrs.x.setRef(UI_REF.END_END, value)
+            viewAttrs.y.setRef(UI_REF.START_END, sValue)
+            viewAttrs.x.setRef(UI_REF.START_START, sValue)
+            viewAttrs.x.setRef(UI_REF.END_END, sValue)
         } else if (attr === ATTR.MARGIN_LEFT) {
-            viewAttrs.x.marginStart = value
+            viewAttrs.x.marginStart = sValue
         } else if (attr === ATTR.MARGIN_RIGHT) {
-            viewAttrs.x.marginEnd = value
+            viewAttrs.x.marginEnd = sValue
         } else if (attr === ATTR.MARGIN_TOP) {
-            viewAttrs.y.marginStart = value
+            viewAttrs.y.marginStart = sValue
         } else if (attr === ATTR.MARGIN_BOTTOM) {
-            viewAttrs.y.marginEnd = value
+            viewAttrs.y.marginEnd = sValue
         } else if (attr === ATTR.MARGIN) {
-            var mValues = value.split(",")
+            var mValues = sValue.split(",")
             if (mValues.length === 1) {
-                viewAttrs.x.setMargin(value)
-                viewAttrs.y.setMargin(value)
+                viewAttrs.x.setMargin(sValue)
+                viewAttrs.y.setMargin(sValue)
             } else if (mValues.length === 4) {
                 viewAttrs.x.marginStart = mValues[0]
                 viewAttrs.y.marginStart = mValues[1]
@@ -171,18 +172,18 @@ export default class UIAttrReader {
                 viewAttrs.y.marginEnd = mValues[3]
             }
         } else if (attr === ATTR.PADDING_LEFT) {
-            viewAttrs.x.paddingStart = value
+            viewAttrs.x.paddingStart = sValue
         } else if (attr === ATTR.PADDING_RIGHT) {
-            viewAttrs.x.paddingEnd = value
+            viewAttrs.x.paddingEnd = sValue
         } else if (attr === ATTR.PADDING_TOP) {
-            viewAttrs.y.paddingStart = value
+            viewAttrs.y.paddingStart = sValue
         } else if (attr === ATTR.PADDING_BOTTOM) {
-            viewAttrs.y.paddingEnd = value
+            viewAttrs.y.paddingEnd = sValue
         } else if (attr === ATTR.PADDING) {
-            var pValues = value.split(",")
+            var pValues = sValue.split(",")
             if (pValues.length === 1) {
-                viewAttrs.x.setPadding(value)
-                viewAttrs.y.setPadding(value)
+                viewAttrs.x.setPadding(sValue)
+                viewAttrs.y.setPadding(sValue)
             } else if (pValues.length === 4) {
                 viewAttrs.x.paddingStart = mValues[0]
                 viewAttrs.y.paddingStart = mValues[1]
@@ -190,18 +191,18 @@ export default class UIAttrReader {
                 viewAttrs.y.paddingEnd = mValues[3]
             }
         } else if (attr === ATTR.CENTER_VERTICAL) {
-            viewAttrs.y.center = true
+            viewAttrs.y.center = bValue
         } else if (attr === ATTR.CENTER_HORIZONTAL) {
-            viewAttrs.x.center = true
+            viewAttrs.x.center = bValue
         } else if (attr === ATTR.CENTER) {
-            viewAttrs.x.center = true
-            viewAttrs.y.center = true
+            viewAttrs.x.center = bValue
+            viewAttrs.y.center = bValue
         } else if (attr === ATTR.SCROLL_VERTICAL) {
-            viewAttrs.y.scroll = true
+            viewAttrs.y.scroll = bValue
         } else if (attr === ATTR.SCROLL_HORIZONTAL) {
-            viewAttrs.x.scroll = true
+            viewAttrs.x.scroll = bValue
         } else if (attr === ATTR.VISIBILITY) {
-            viewAttrs.visibility = (value as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
+            viewAttrs.visibility = (sValue as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
         } else if (attr.length > 0) {
             Log.logW("Attribute unknown: " + attr + " in view " + viewId)
         }

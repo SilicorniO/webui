@@ -6,9 +6,10 @@ import UIPosition from "./UIPosition"
 import UIDraw from "./UIDraw"
 import { UI_VISIBILITY } from "./UIVisibility"
 import UIViewAttrs from "./UIViewAttrs"
-import UIAttrReader from "../core/read/UIAttrReader"
+import UIAttrReader, { ATTR } from "../core/read/UIAttrReader"
 import { WebUIListener } from "../WebUI"
 import UIViewEventsManager from "../core/events/UIViewEventsManager"
+import UIAttributeValue from "../core/read/UIAttributeValue"
 
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
@@ -108,6 +109,8 @@ export default class UIView {
         }
     }
 
+    // ----- EVENTS ----
+
     public evalEvents() {
         this.eventsManager.evalEvents()
 
@@ -126,15 +129,40 @@ export default class UIView {
         }
     }
 
-    public setWidth(value: string | number) {
-        this.attrs[AXIS.X].setSize("" + value)
+    // ----- SET ATTRIBUTE -----
+
+    public setAttrs(attributes: UIAttributeValue[], animationDuration?: number) {
+        // apply attributes
+        for (const attribute of attributes) {
+            UIAttrReader.readUIAttribute(this.attrs, attribute, this.id)
+        }
+
+        // apply animation
+        this.animateNextRefresh(animationDuration)
+
+        // launch resize event
         this.eventsManager.launchResizeEvent()
     }
 
-    public setHeight(value: string | number) {
-        this.attrs[AXIS.Y].setSize("" + value)
+    public setAttr(attribute: ATTR, value?: string | number | boolean, animationDuration?: number) {
+        // apply attribute
+        UIAttrReader.readUIAttribute(
+            this.attrs,
+            {
+                attr: attribute,
+                value,
+            },
+            this.id,
+        )
+
+        // apply animation
+        this.animateNextRefresh(animationDuration)
+
+        // launch resize event
         this.eventsManager.launchResizeEvent()
     }
+
+    private applyAttribute(attribute: UIAttributeValue) {}
 
     // ----- REFERENCES -----
 
@@ -142,98 +170,7 @@ export default class UIView {
         return this.attrs[axis]
     }
 
-    // ----- SCROLL -----
-
-    public setScrollVertical(value: boolean) {
-        this.attrs[AXIS.Y].scroll = value
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setScrollHorizontal(value: boolean) {
-        this.attrs[AXIS.X].scroll = value
-        this.eventsManager.launchResizeEvent()
-    }
-
-    // ----- CENTER -----
-
-    public setCenter(axis: AXIS, value: boolean) {
-        this.attrs[axis].center = value
-        this.eventsManager.launchResizeEvent()
-    }
-
-    // ----- MARGIN ------
-
-    public setMargin(margin: string, axis?: AXIS) {
-        if (axis != null) {
-            this.attrs[AXIS.X].setMargin(margin)
-            this.attrs[AXIS.Y].setMargin(margin)
-        } else {
-            this.attrs[axis].setMargin(margin)
-        }
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setMarginLeft(margin: string | number) {
-        this.attrs[AXIS.X].marginStart = "" + margin
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setMarginTop(margin: string | number) {
-        this.attrs[AXIS.Y].marginStart = "" + margin
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setMarginRight(margin: string | number) {
-        this.attrs[AXIS.X].marginEnd = "" + margin
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setMarginBottom(margin: string | number) {
-        this.attrs[AXIS.Y].marginEnd = "" + margin
-        this.eventsManager.launchResizeEvent()
-    }
-
-    // ----- PADDING -----
-
-    public setPadding(padding: string, axis?: AXIS) {
-        if (axis != null) {
-            this.attrs[AXIS.X].setPadding(padding)
-            this.attrs[AXIS.Y].setPadding(padding)
-        } else {
-            this.attrs[axis].setPadding(padding)
-        }
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setPaddingLeft(padding: string | number) {
-        this.attrs[AXIS.X].paddingStart = "" + padding
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setPaddingTop(padding: string | number) {
-        this.attrs[AXIS.Y].paddingStart = "" + padding
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setPaddingRight(padding: string | number) {
-        this.attrs[AXIS.X].paddingEnd = "" + padding
-        this.eventsManager.launchResizeEvent()
-    }
-
-    public setPaddingBottom(padding: string | number) {
-        this.attrs[AXIS.Y].paddingEnd = "" + padding
-        this.eventsManager.launchResizeEvent()
-    }
-
     // ----- VISIBILITY -----
-
-    public setVisibility(visibility: UI_VISIBILITY) {
-        if (visibility != UI_VISIBILITY.GONE && this.attrs.visibility == UI_VISIBILITY.GONE) {
-            this.sizeLoaded = false
-        }
-        this.attrs.visibility = visibility
-        this.eventsManager.launchResizeEvent()
-    }
 
     public cleanSizeLoaded() {
         //clean the sizeLoaded of this view
@@ -252,8 +189,11 @@ export default class UIView {
         return this.attrs.visibility != UI_VISIBILITY.GONE
     }
 
-    public animateNextRefresh(animationDuration: number) {
-        // this.animationDurations.push(animationDuration);
+    private animateNextRefresh(animationDuration?: number) {
+        // check animation duration is valid
+        if (animationDuration == null) {
+            return
+        }
 
         //animate all views from parent
         if (this.parent) {
@@ -342,15 +282,6 @@ export default class UIView {
     public cleanUI() {
         this.attrs[AXIS.X].clean()
         this.attrs[AXIS.Y].clean()
-    }
-
-    public applyDimens(coreConfig: UIConfiguration) {
-        for (const axis of AXIS_LIST) {
-            this.positions[axis].paddingStart = coreConfig.getDimen(this.attrs[axis].paddingStart)
-            this.positions[axis].paddingEnd = coreConfig.getDimen(this.attrs[axis].paddingEnd)
-            this.positions[axis].marginStart = coreConfig.getDimen(this.attrs[axis].marginStart)
-            this.positions[axis].marginEnd = coreConfig.getDimen(this.attrs[axis].marginEnd)
-        }
     }
 
     // ----- TO STRING ------

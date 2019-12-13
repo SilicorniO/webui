@@ -21,18 +21,15 @@
         console.log("After first timeout");
 
         var element1 = document.getElementById('element1');
-        element1.ui.animateNextRefresh(0.1);
-        element1.ui.setWidth(300);
+        element1.ui.setAttr("w", 300, 0.1);
 
         var element2 = document.getElementById('element2');
-        element2.ui.animateNextRefresh(0.1);
-        element2.ui.setWidth(50);
+        element2.ui.setAttr("w", 50, 0.1);
 
         setTimeout(function(){
             console.log("After second timeout");
             
-            element2.ui.animateNextRefresh(0.1);
-            element2.ui.setMarginLeft(200);
+            element2.ui.setAttr("ml", 200, 0.1);
 
         }, 50);
 

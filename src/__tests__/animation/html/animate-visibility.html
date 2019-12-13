@@ -24,11 +24,7 @@
             console.log("After first timeout");
 
             var element1 = document.getElementById('element1');
-            element1.ui.animateNextRefresh(0.1);
-            element1.ui.setVisibility("g");
-
-            var element2 = document.getElementById('element2');
-            element2.ui.animateNextRefresh(1);
+            element1.ui.setAttr("v", "g", 0.1);
 
         }, 50);
 

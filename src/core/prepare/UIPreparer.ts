@@ -2,7 +2,7 @@ import UIView from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIConfiguration from "../../UIConfiguration"
 import UIHTMLElement from "../../model/UIHTMLElement"
-import { AXIS } from "../../model/UIAxis"
+import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
 import { WebUIListener } from "../../WebUI"
 
@@ -33,7 +33,7 @@ export default class UIPreparer {
                     }
 
                     //translate paddings and margins
-                    view.applyDimens(coreConfig)
+                    this.applyDimensToView(view, coreConfig)
 
                     //mark the sizeLoaded flag of this view as true
                     view.sizeLoaded = true
@@ -41,6 +41,15 @@ export default class UIPreparer {
 
                 this.loadSizes(view.getChildElements(), coreConfig, forceSizeLoaded || !view.sizeLoaded)
             }
+        }
+    }
+
+    private static applyDimensToView(view: UIView, configuration: UIConfiguration) {
+        for (const axis of AXIS_LIST) {
+            view.positions[axis].paddingStart = configuration.getDimen(view.attrs[axis].paddingStart)
+            view.positions[axis].paddingEnd = configuration.getDimen(view.attrs[axis].paddingEnd)
+            view.positions[axis].marginStart = configuration.getDimen(view.attrs[axis].marginStart)
+            view.positions[axis].marginEnd = configuration.getDimen(view.attrs[axis].marginEnd)
         }
     }
 
