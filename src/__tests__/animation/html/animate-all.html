@@ -1,0 +1,78 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="content" ui="fw;fh">
+        </div>
+        <div id="buttons" ui="">
+            <a href="#" onClick="nextExecution()">execute</a>
+        </div>
+    </div>
+    
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        timeRedraw: 2000,
+    });
+
+    var TIMEOUT = 100
+    var ANIMATION_TIME = 1.0
+    var content = document.getElementById("content")
+    var element = null
+    var text = null
+    var executions = [
+        // add element at center
+        function() {
+            // create square
+            element = document.createElement("div");
+            element.id = "element";
+            element.style.backgroundColor = "#EFB7C0"
+            element.setAttribute("ui", "w:200;h:200;c");
+
+            // create and append text
+            text = document.createElement("span");
+            text.id = "text"
+            text.innerHTML = "CENTER"
+            text.setAttribute("ui", "c")
+            element.appendChild(text)
+
+            // append element
+            content.appendChild(element);
+        },
+        // move element to top left
+        function() {
+            element = document.getElementById("element")
+            element.ui.setAttr("c", false, ANIMATION_TIME)
+            text.innerHTML = "TOP-LEFT"
+        }
+    ]
+
+    // execute all functions
+    function nextExecution() {
+        // check to stop
+        if (executions.length == 0) {
+            return
+        }
+
+        // get next execution
+        var execution = executions[0]
+        executions.splice(0, 1)
+
+        execution()
+
+        // execute
+        // setTimeout(function(){
+        //     nextExecution()
+        // }, TIMEOUT)
+
+    }
+    // nextExecution()
+    </script>
+    
+</body>
+</html>

@@ -10,7 +10,7 @@
             <span id="elementContent">Text</span>
         </div>
         <div id="buttons" ui="ab:l">
-            <a id="changContent" href="#" onClick="changContent()" ui="">Change content</a>
+            <a id="changeContent" href="#" onClick="changeContent()" ui="">Change content</a>
         </div>
     </div>
     
@@ -24,7 +24,7 @@
     
     var elementContent = document.getElementById('elementContent');
 
-    function changContent(){
+    function changeContent(){
         elementContent.innerHTML = "Text with more length to check resize";
     }
     

@@ -57,14 +57,14 @@ class WebUI implements WebUIListener {
 
     //redraw function
     private redraw() {
-        // get a copy of the screens to draw
-        const screens: UIView[] = []
-        for (const id of Object.keys(this.screensToDraw)) {
-            screens.push(this.screensToDraw[id])
-        }
-        this.screensToDraw = {}
-
         this.redrawTimer.timer(() => {
+            // get a copy of the screens to draw
+            const screens: UIView[] = []
+            for (const id of Object.keys(this.screensToDraw)) {
+                screens.push(this.screensToDraw[id])
+            }
+            this.screensToDraw = {}
+
             //draw
             Log.log(" -- Redraw -- ")
             for (const screen of screens) {
@@ -179,9 +179,6 @@ class WebUI implements WebUIListener {
 
         timerDraw = CounterUtils.endCounter("draw")
 
-        //call to listener with end event
-        this.configuration.sendEndEvent()
-
         //end counter
         timerAll = CounterUtils.endCounter("all")
 
@@ -202,6 +199,9 @@ class WebUI implements WebUIListener {
                 timerOrderViews +
                 "ms",
         )
+
+        //call to listener with end event
+        this.configuration.sendEndEvent()
     }
 }
 

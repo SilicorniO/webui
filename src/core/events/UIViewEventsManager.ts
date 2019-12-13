@@ -3,21 +3,25 @@ import { WebUIListener } from "../../WebUI"
 import UIConfiguration from "../../UIConfiguration"
 import { UI_SIZE } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
+import UIAttrReader from "../read/UIAttrReader"
 
 export default class UIViewEventsManager {
     // associated screen
     private view: UIView
 
     // associated listener for redraw events
-    webUIListener: WebUIListener
+    private webUIListener: WebUIListener
 
     // associated configuration
     private configuration: UIConfiguration
 
     // observers
-    observerAttributes: MutationObserver | null = null
-    observerCharacterData: MutationObserver | null = null
-    observerAddRemoveNodes: MutationObserver | null = null
+    private observerAttributes: MutationObserver | null = null
+    private observerCharacterData: MutationObserver | null = null
+    private observerAddRemoveNodes: MutationObserver | null = null
+
+    // flag to disable next ui attribute mutation
+    private dismissNextUiAttributeMutation: boolean = false
 
     constructor(view: UIView, webUIListener: WebUIListener, configuration: UIConfiguration) {
         this.view = view
@@ -41,9 +45,33 @@ export default class UIViewEventsManager {
         this.disableListenResizeEvents()
     }
 
-    public launchResizeEvent() {
+    public onChangeAttribute() {
+        this.dismissNextUiAttributeMutation = true
+        this.view.element.setAttribute(this.configuration.attribute, UIAttrReader.generateUiAttr(this.view.attrs))
+
+        this.launchResizeEvent()
+    }
+
+    public onLoadElement() {
+        this.launchResizeEvent()
+    }
+
+    public onRefresh(initialize: boolean = false) {
+        if (initialize) {
+            this.launchReinitEvent()
+        } else {
+            this.launchResizeEvent()
+        }
+    }
+
+    private launchResizeEvent() {
         this.view.sizeLoaded = false
         this.webUIListener.onScreenRedraw(this.view.screen || this.view)
+    }
+
+    private launchReinitEvent() {
+        // send re-init event
+        this.webUIListener.onScreenReinit(this.view.screen || this.view)
     }
 
     // ----- PRIVATE -----
@@ -63,8 +91,14 @@ export default class UIViewEventsManager {
                         attributeName == this.configuration.attribute ||
                         this.configuration.attributes.includes(attributeName)
                     ) {
+                        // check if we have to dismiss it because it is our change
+                        if (attributeName == this.configuration.attribute && this.dismissNextUiAttributeMutation) {
+                            this.dismissNextUiAttributeMutation = false
+                            return
+                        }
+
                         Log.log(`Event 'attributes' being processed for view ${this.view.id}`)
-                        this.webUIListener.onScreenReinit(this.view.screen || this.view)
+                        this.launchReinitEvent()
                     }
                 }
             }
@@ -72,7 +106,7 @@ export default class UIViewEventsManager {
 
         // start observing the target node for configured mutations
         this.observerAttributes = observerAttributes
-        observerAttributes.observe(this.view.element, { attributes: true, subtree: false })
+        observerAttributes.observe(this.view.element, { attributes: true })
     }
 
     private disableListenAttributes() {
@@ -103,7 +137,7 @@ export default class UIViewEventsManager {
 
         // start observing the target node for configured mutations
         this.observerCharacterData = observerCharacterData
-        observerCharacterData.observe(this.view.element, { characterData: true, subtree: true })
+        observerCharacterData.observe(this.view.element, { characterData: true })
     }
 
     private disableListenCharacterData() {
@@ -127,7 +161,7 @@ export default class UIViewEventsManager {
             for (var mutation of mutationsList) {
                 if (mutation.type == "childList") {
                     Log.log(`Event 'childList' being processed for view ${this.view.id}`)
-                    this.webUIListener.onScreenReinit(this.view.screen || this.view)
+                    this.launchReinitEvent()
                 }
             }
         })

@@ -52,7 +52,7 @@ export default class UIDrawer {
         if (draw.transition.length > 0 && !draw.transitionForever) {
             //remove transition after the end of the animation
             var endTranstion = (event: any) => {
-                Log.log(event)
+                Log.log("Removing transition after ending")
                 element.style.transition = ""
                 element.removeEventListener("transitionend", endTranstion)
             }

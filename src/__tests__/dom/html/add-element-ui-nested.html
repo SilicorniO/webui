@@ -1,0 +1,47 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="content" ui="fw;fh">
+        </div>
+    </div>
+    
+    <script>
+        var executed = false
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            timeRedraw: 0,
+            events: function(event) {
+                if (event.name == "end" && !executed) {
+                    executed = true
+
+                    // create square
+                    element = document.createElement("div");
+                    element.id = "element";
+                    element.style.backgroundColor = "#EFB7C0"
+                    element.setAttribute("ui", "w:200;h:200");
+
+                    // create and append text
+                    text = document.createElement("span");
+                    text.id = "text"
+                    text.innerHTML = "text"
+                    text.setAttribute("ui", "")
+
+                    // append element
+                    content.appendChild(element);
+
+                    // append text
+                    element.appendChild(text)
+
+                }
+            }
+        });
+    </script>
+    
+</body>
+</html>

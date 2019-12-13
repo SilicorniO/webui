@@ -67,6 +67,20 @@ describe("Dom", () => {
         expect(element2.left).toBe(MARGIN_MEDIUM)
     })
 
+    test("Add element UI nested", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "add-element-ui-nested")
+
+        // add one element
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const text = await PuppeteerUtils.evalUiElement(page, "text")
+        expect(element.top).toBe(0)
+        expect(element.left).toBe(0)
+        expect(element.width).toBe(200)
+        expect(element.height).toBe(200)
+        expect(text.top).toBe(0)
+        expect(text.left).toBe(0)
+    })
+
     test("Remove element", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "remove-element")
 
@@ -116,8 +130,26 @@ describe("Dom", () => {
         const elementWidth = element.width
 
         // add one element
-        await page.click("#changContent")
+        await page.click("#changeContent")
         element = await PuppeteerUtils.evalUiElement(page, "element")
         expect(element.width).toBeGreaterThan(elementWidth)
+    })
+
+    test("Change element ui content", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-ui-content")
+
+        // check position
+        let text = await PuppeteerUtils.evalUiElement(page, "text")
+        const textWidth = text.width
+        const textHeight = text.height
+
+        // add one element
+        await page.click("#changeElement")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        text = await PuppeteerUtils.evalUiElement(page, "text")
+        expect(element.left).toBe(0)
+        expect(element.top).toBe(0)
+        expect(text.width).toBeGreaterThan(textWidth)
+        expect(text.height).toBe(textHeight)
     })
 })

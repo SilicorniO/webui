@@ -104,7 +104,7 @@ export default class UIView {
         //if it is an image we prepare to refresh when image is loaded
         if (element.tagName != null && element.tagName.toLowerCase() == "img") {
             element.onload = () => {
-                this.eventsManager.launchResizeEvent()
+                this.eventsManager.onLoadElement()
             }
         }
     }
@@ -129,6 +129,12 @@ export default class UIView {
         }
     }
 
+    // ----- REFRESH -----
+
+    public forceRefresh(initialize: boolean = false) {
+        this.eventsManager.onRefresh(initialize)
+    }
+
     // ----- SET ATTRIBUTE -----
 
     public setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number) {
@@ -141,7 +147,7 @@ export default class UIView {
         this.animateNextRefresh(animationDuration)
 
         // launch resize event
-        this.eventsManager.launchResizeEvent()
+        this.eventsManager.onChangeAttribute()
     }
 
     public setAttr(attribute: ATTR, value?: string | number | boolean, animationDuration?: number) {
@@ -152,7 +158,7 @@ export default class UIView {
         this.animateNextRefresh(animationDuration)
 
         // launch resize event
-        this.eventsManager.launchResizeEvent()
+        this.eventsManager.onChangeAttribute()
     }
 
     private applyAttribute(attribute: ATTR, value?: string | number | boolean) {

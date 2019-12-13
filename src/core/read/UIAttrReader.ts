@@ -1,4 +1,4 @@
-import { UI_REF, UI_VIEW_ID } from "../../model/UIAttr"
+import { UI_REF, UI_VIEW_ID, UI_SIZE } from "../../model/UIAttr"
 import UIAttrReaderUtils from "./UIAttrReaderUtils"
 import UIView from "../../model/UIView"
 import UIAttributeValue from "./UIAttributeValue"
@@ -207,5 +207,104 @@ export default class UIAttrReader {
         } else if (attr != ATTR.NONE) {
             Log.logW("Attribute unknown: " + attr + " in view " + viewId)
         }
+    }
+
+    public static generateUiAttr(viewAttrs: UIViewAttrs): string {
+        // string attribute to add all parameters
+        const attrs: string[] = []
+
+        // check all parameters
+        // size
+        if (viewAttrs.x.size == UI_SIZE.SCREEN) {
+            attrs.push(`${ATTR.WIDTH}:${viewAttrs.x.sizeValue}`)
+        } else if (viewAttrs.x.size == UI_SIZE.PERCENTAGE) {
+            const percentPos = viewAttrs.x.percentPos > 0 ? "" + viewAttrs.x.percentPos : ""
+            attrs.push(`${ATTR.WIDTH}:${viewAttrs.x.sizeValue}%${percentPos}`)
+        }
+        if (viewAttrs.y.size == UI_SIZE.SCREEN) {
+            attrs.push(`${ATTR.HEIGHT}:${viewAttrs.y.sizeValue}`)
+        } else if (viewAttrs.y.size == UI_SIZE.PERCENTAGE) {
+            const percentPos = viewAttrs.y.percentPos > 0 ? "" + viewAttrs.y.percentPos : ""
+            attrs.push(`${ATTR.HEIGHT}:${viewAttrs.y.sizeValue}%${percentPos}`)
+        }
+
+        // references
+        if (viewAttrs.x.startStart.length > 0) {
+            attrs.push(`${ATTR.LEFT}:${viewAttrs.x.startStart}`)
+        }
+        if (viewAttrs.x.startEnd.length > 0) {
+            attrs.push(`${ATTR.RIGHT}:${viewAttrs.x.startEnd}`)
+        }
+        if (viewAttrs.y.startStart.length > 0) {
+            attrs.push(`${ATTR.TOP}:${viewAttrs.y.startStart}`)
+        }
+        if (viewAttrs.y.startEnd.length > 0) {
+            attrs.push(`${ATTR.BOTTOM}:${viewAttrs.y.startEnd}`)
+        }
+
+        // margin
+        if (viewAttrs.x.marginStart.length > 0) {
+            attrs.push(`${ATTR.MARGIN_LEFT}:${viewAttrs.x.marginStart}`)
+        }
+        if (viewAttrs.x.marginEnd.length > 0) {
+            attrs.push(`${ATTR.MARGIN_RIGHT}:${viewAttrs.x.marginEnd}`)
+        }
+        if (viewAttrs.y.marginStart.length > 0) {
+            attrs.push(`${ATTR.MARGIN_TOP}:${viewAttrs.y.marginStart}`)
+        }
+        if (viewAttrs.y.marginEnd.length > 0) {
+            attrs.push(`${ATTR.MARGIN_BOTTOM}:${viewAttrs.y.marginEnd}`)
+        }
+
+        // padding
+        if (viewAttrs.x.paddingStart.length > 0) {
+            attrs.push(`${ATTR.PADDING_LEFT}:${viewAttrs.x.paddingStart}`)
+        }
+        if (viewAttrs.x.paddingEnd.length > 0) {
+            attrs.push(`${ATTR.PADDING_RIGHT}:${viewAttrs.x.paddingEnd}`)
+        }
+        if (viewAttrs.y.paddingStart.length > 0) {
+            attrs.push(`${ATTR.PADDING_TOP}:${viewAttrs.y.paddingStart}`)
+        }
+        if (viewAttrs.y.paddingEnd.length > 0) {
+            attrs.push(`${ATTR.PADDING_BOTTOM}:${viewAttrs.y.paddingEnd}`)
+        }
+
+        // center
+        if (viewAttrs.x.center) {
+            attrs.push(`${ATTR.CENTER_HORIZONTAL}`)
+        }
+        if (viewAttrs.y.center) {
+            attrs.push(`${ATTR.CENTER_VERTICAL}`)
+        }
+
+        // scroll
+        if (viewAttrs.x.scroll) {
+            attrs.push(`${ATTR.SCROLL_HORIZONTAL}`)
+        }
+        if (viewAttrs.y.scroll) {
+            attrs.push(`${ATTR.SCROLL_VERTICAL}`)
+        }
+
+        // visibility
+        if (viewAttrs.visibility == UI_VISIBILITY.GONE) {
+            attrs.push(`${ATTR.VISIBILITY}:${UI_VISIBILITY.GONE}`)
+        } else if (viewAttrs.visibility == UI_VISIBILITY.INVISIBLE) {
+            attrs.push(`${ATTR.VISIBILITY}:${UI_VISIBILITY.INVISIBLE}`)
+        }
+
+        // check we have more than one
+        if (attrs.length === 0) {
+            return ""
+        }
+
+        // convert attributes to text
+        let sAttrs = attrs[0]
+        for (let i = 1; i < attrs.length; i += 1) {
+            sAttrs += ";" + attrs[i]
+        }
+
+        // return generated attribute
+        return sAttrs
     }
 }

@@ -48,6 +48,14 @@ describe("Position", () => {
         expect(element.left).toBe((screen.width - element.width) / 2)
     })
 
+    test("Center false javascript", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "center-false-js")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.top).toBe(0)
+        expect(element.left).toBe(0)
+    })
+
     test("Top center", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "top-center")
         const element = await PuppeteerUtils.evalUiElement(page, "element")
