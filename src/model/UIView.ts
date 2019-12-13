@@ -9,7 +9,17 @@ import UIViewAttrs from "./UIViewAttrs"
 import UIAttrReader, { ATTR } from "../core/read/UIAttrReader"
 import { WebUIListener } from "../WebUI"
 import UIViewEventsManager from "../core/events/UIViewEventsManager"
-import UIAttributeValue, { UIAttributeValueArray } from "../core/read/UIAttributeValue"
+import { UIAttributeValueArray } from "../core/read/UIAttributeValue"
+import UIViewStateManager from "../core/state/UIViewStateManager"
+
+export enum UIViewState {
+    NOT_STARTED = 0,
+    DOM_PREPARED = 1,
+    PREPARED = 2,
+    ORGANIZED = 3,
+    VALUES_CALCULATED = 4,
+    DRAW_DEFINED = 5,
+}
 
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
@@ -49,18 +59,16 @@ export default class UIView {
     public attrs: UIViewAttrs = new UIViewAttrs()
 
     // ----- calculated -----
-
     public positions: UIAxis<UIPosition> = {
         [AXIS.X]: new UIPosition(),
         [AXIS.Y]: new UIPosition(),
     }
 
     // ----- Object to draw -----
-
     public draw: UIDraw
 
     // ----- Flags for changes -----
-    sizeLoaded: boolean = false
+    private stateManager: UIViewStateManager
 
     // animations
     animationDurations: number[] = []
@@ -97,6 +105,7 @@ export default class UIView {
 
         // initialize events manager
         this.eventsManager = new UIViewEventsManager(this, webUIListener, configuration)
+        this.stateManager = new UIViewStateManager(this)
 
         // initialize opacity to 0 to show it when it has the position
         element.style.opacity = "0"
@@ -107,6 +116,20 @@ export default class UIView {
                 this.eventsManager.onLoadElement()
             }
         }
+    }
+
+    // ----- STATE ----
+
+    public setState(state: UIViewState) {
+        this.stateManager.setState(state)
+    }
+
+    public changeState(state: UIViewState) {
+        this.stateManager.changeState(state)
+    }
+
+    public getState(): UIViewState {
+        return this.stateManager.getState()
     }
 
     // ----- EVENTS ----
@@ -181,22 +204,11 @@ export default class UIView {
 
     // ----- VISIBILITY -----
 
-    public cleanSizeLoaded() {
-        //clean the sizeLoaded of this view
-        this.sizeLoaded = false
-
-        //if it has parent and the size depend of children we clean it too
-        if (
-            this.parent != null &&
-            (this.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT || this.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT)
-        ) {
-            this.parent.cleanSizeLoaded()
-        }
+    public isGone(): boolean {
+        return this.attrs.visibility == UI_VISIBILITY.GONE
     }
 
-    public hasToBeCalculated(): boolean {
-        return this.attrs.visibility != UI_VISIBILITY.GONE
-    }
+    // Animations
 
     private animateNextRefresh(animationDuration?: number) {
         // check animation duration is valid
@@ -266,7 +278,7 @@ export default class UIView {
             if (child != null) {
                 if (child.id == this.id) {
                     return previousView
-                } else if (child.ui.hasToBeCalculated()) {
+                } else if (!child.ui.isGone()) {
                     previousView = child.ui
                 }
             }
@@ -277,12 +289,6 @@ export default class UIView {
     }
 
     // ----- CLEAN ------
-
-    public cleanAllAxis() {
-        for (const axis of AXIS_LIST) {
-            this.clean(axis)
-        }
-    }
 
     public clean(axis: AXIS) {
         this.positions[axis].clean()

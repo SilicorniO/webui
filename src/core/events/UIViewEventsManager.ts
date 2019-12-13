@@ -1,4 +1,4 @@
-import UIView from "../../model/UIView"
+import UIView, { UIViewState } from "../../model/UIView"
 import { WebUIListener } from "../../WebUI"
 import UIConfiguration from "../../UIConfiguration"
 import { UI_SIZE } from "../../model/UIAttr"
@@ -65,13 +65,14 @@ export default class UIViewEventsManager {
     }
 
     private launchResizeEvent() {
-        this.view.sizeLoaded = false
+        this.view.changeState(UIViewState.NOT_STARTED)
         this.webUIListener.onScreenRedraw(this.view.screen || this.view)
     }
 
     private launchReinitEvent() {
         // send re-init event
-        this.webUIListener.onScreenReinit(this.view.screen || this.view)
+        this.view.changeState(UIViewState.NOT_STARTED)
+        this.webUIListener.onScreenRedraw(this.view.screen || this.view)
     }
 
     // ----- PRIVATE -----

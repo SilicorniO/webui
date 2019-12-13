@@ -1,14 +1,18 @@
-import UIView from "../../model/UIView"
+import UIView, { UIViewState } from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
-import { AXIS } from "../../model/UIAxis"
+import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
 import UIPosition from "../../model/UIPosition"
 
 export default class UICalculator {
-    public static calculateScreen(screen: UIView, scrollSize: number) {
+    public static calculate(view: UIView, scrollSize: number) {
+        if (view.getState() >= UIViewState.VALUES_CALCULATED) {
+            return
+        }
+
         //generate list of views and indexes for quick access
-        var arrayViews = DomSizeUtils.generateArrayViews(screen)
+        var arrayViews = DomSizeUtils.generateArrayViews(view)
         var indexes = DomSizeUtils.generateIndexes(arrayViews)
 
         var viewsRestored
@@ -17,33 +21,33 @@ export default class UICalculator {
             //clean array
             viewsRestored = new Array()
 
-            //clean all views except the screen
-            for (var i = 1; i < arrayViews.length; i++) {
-                arrayViews[i].cleanAllAxis()
-            }
-
             //calculate views
             this.calculateViews(
                 AXIS.X,
-                screen.childrenOrder[AXIS.X],
-                screen,
+                view.childrenOrder[AXIS.X],
+                view,
                 arrayViews,
                 indexes,
-                screen.positions[AXIS.X].size,
+                view.positions[AXIS.X].size,
                 viewsRestored,
                 scrollSize,
+                false,
             )
             this.calculateViews(
                 AXIS.Y,
-                screen.childrenOrder[AXIS.Y],
-                screen,
+                view.childrenOrder[AXIS.Y],
+                view,
                 arrayViews,
                 indexes,
-                screen.positions[AXIS.Y].size,
+                view.positions[AXIS.Y].size,
                 viewsRestored,
                 scrollSize,
+                true,
             )
         } while (viewsRestored.length > 0)
+
+        // update state of screen
+        view.setState(UIViewState.VALUES_CALCULATED)
     }
 
     private static calculateViews(
@@ -55,10 +59,23 @@ export default class UICalculator {
         size: number,
         viewsRestored: UIView[],
         scrollSize: number,
+        lastAxis: boolean,
     ) {
-        for (var i = 0; i < views.length; i++) {
-            if (views[i].hasToBeCalculated()) {
-                this.calculateView(axis, views[i], parentView, arrayViews, indexes, size, viewsRestored, scrollSize)
+        for (const view of views) {
+            // check if it is already calculated
+            if (view.getState() < UIViewState.VALUES_CALCULATED) {
+                // clean axis
+                view.clean(axis)
+
+                // check if this view has
+                if (!view.isGone()) {
+                    this.calculateView(axis, view, parentView, arrayViews, indexes, size, viewsRestored, scrollSize)
+                }
+
+                // if it is the last axis we mark it as calculated
+                if (lastAxis) {
+                    view.setState(UIViewState.VALUES_CALCULATED)
+                }
             }
         }
     }
@@ -110,6 +127,7 @@ export default class UICalculator {
                     viewWidth,
                     viewsRestored,
                     scrollSize,
+                    axis == AXIS.Y,
                 )
 
                 //move left and right of all children using the paddingLeft
@@ -130,6 +148,7 @@ export default class UICalculator {
                     viewWidth,
                     viewsRestored,
                     scrollSize,
+                    axis == AXIS.Y,
                 )
 
                 //move left and right of all children using the paddingLeft

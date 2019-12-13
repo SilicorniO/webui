@@ -1,12 +1,27 @@
-import UIView from "../../model/UIView"
+import UIView, { UIViewState } from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIConfiguration from "../../UIConfiguration"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
-import { WebUIListener } from "../../WebUI"
 
 export default class UIPreparer {
+    public static prepareScreen(screen: UIView, configuration: UIConfiguration) {
+        // check this screen needs to be prepared
+        if (screen.getState() >= UIViewState.PREPARED) {
+            return
+        }
+
+        //update the size of the screen
+        var screenSizeChanged = UIPreparer.loadSizeScreen(screen)
+
+        //load sizes of views
+        UIPreparer.loadSizes(screen.getChildElements(), configuration, screenSizeChanged)
+
+        // update state of the screen
+        screen.setState(UIViewState.PREPARED)
+    }
+
     /**
      * Load the sizes of all views and translate paddings and margins to dimens
      * @param {Array<*>} elements Array of dom nodes to load size
@@ -17,13 +32,13 @@ export default class UIPreparer {
         for (var i = 0; i < elements.length; i++) {
             var ele = elements[i]
             var view = ele.ui
-            if (view && view.hasToBeCalculated()) {
+            if (view && !view.isGone()) {
                 // show view if it is not visible
                 if (ele.style.display == "none") {
                     ele.style.display = "inline-block"
                 }
 
-                if (view.hasToBeCalculated() && (forceSizeLoaded || !view.sizeLoaded)) {
+                if (!view.isGone() && (forceSizeLoaded || view.getState() < UIViewState.PREPARED)) {
                     if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
                         view.attrs[AXIS.X].sizeValue = DomSizeUtils.calculateWidthView(view, ele)
                     }
@@ -36,10 +51,14 @@ export default class UIPreparer {
                     this.applyDimensToView(view, coreConfig)
 
                     //mark the sizeLoaded flag of this view as true
-                    view.sizeLoaded = true
+                    view.setState(UIViewState.PREPARED)
                 }
 
-                this.loadSizes(view.getChildElements(), coreConfig, forceSizeLoaded || !view.sizeLoaded)
+                this.loadSizes(
+                    view.getChildElements(),
+                    coreConfig,
+                    forceSizeLoaded || view.getState() < UIViewState.PREPARED,
+                )
             }
         }
     }
@@ -104,51 +123,7 @@ export default class UIPreparer {
         screen.positions[AXIS.Y].endChanged = true
         screen.positions[AXIS.Y].startChanged = true
 
-        //mark size as loaded
-        screen.sizeLoaded = true
-
         //return the flag
         return sizeChanged
-    }
-
-    public static generateUIViews(
-        element: HTMLElement,
-        config: UIConfiguration,
-        webUIListener: WebUIListener,
-        parent?: UIView,
-        screen?: UIView,
-    ) {
-        // parent and screen to send
-        let parentChildren: UIView | undefined = undefined
-        let screenChildren: UIView | undefined = undefined
-
-        // check if it has UI attribute
-        if (element.hasAttribute(config.attribute)) {
-            // generate UIView to this element
-            parentChildren = new UIView(element, config, webUIListener, parent, screen)
-
-            // save screen
-            if (screen != null) {
-                screenChildren = screen
-            } else {
-                screenChildren = parentChildren
-            }
-        }
-
-        // generate views of all children
-        element.childNodes.forEach(child => {
-            if (child instanceof HTMLElement) {
-                UIPreparer.generateUIViews(child, config, webUIListener, parentChildren, screenChildren)
-            }
-        })
-
-        // if it is an screen, all its children have been prepared so it is ready
-        if (parentChildren != null && parentChildren.screen == null) {
-            //set the position as relative because the children will be absolute
-            element.style.position = "relative"
-
-            // call to draw this screen
-            webUIListener.onScreenRedraw(screenChildren)
-        }
     }
 }

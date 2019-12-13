@@ -1,12 +1,17 @@
-import UIView from "../../model/UIView"
+import UIView, { UIViewState } from "../../model/UIView"
 import UIDrawGenerator from "./UIDrawGenerator"
-import { UIAxis } from "../../model/UIAxis"
+import { UIAxis, AXIS } from "../../model/UIAxis"
 import UIConfiguration from "../../UIConfiguration"
 import { UI_VISIBILITY } from "../../model/UIVisibility"
 import UIDrawer from "./UIDrawer"
 
 export default class UIDrawController {
-    public static generateDrawsOfScreen(screen: UIView, configuration: UIConfiguration) {
+    public static generateDraws(screen: UIView, configuration: UIConfiguration) {
+        // check if screen has to generate again the draw
+        if (screen.getState() >= UIViewState.DRAW_DEFINED) {
+            return
+        }
+
         // get the maximum position of children
         const childrenMaxPosition: UIAxis<number> = {
             x: 0,
@@ -32,6 +37,9 @@ export default class UIDrawController {
 
         // set draw to screen
         screen.draw = screenDraw
+
+        // update state of screen
+        screen.setState(UIViewState.DRAW_DEFINED)
     }
 
     private static generateDrawOfView(
@@ -39,6 +47,18 @@ export default class UIDrawController {
         screenVisibility: UI_VISIBILITY,
         configuration: UIConfiguration,
     ): UIAxis<number> {
+        for (const child of view.getUIChildren()) {
+            this.generateDrawOfView(child, screenVisibility, configuration)
+        }
+
+        // check draw is already generated
+        if (view.getState() >= UIViewState.DRAW_DEFINED) {
+            return {
+                x: view.positions[AXIS.X].start + view.positions[AXIS.X].size,
+                y: view.positions[AXIS.Y].start + view.positions[AXIS.Y].size,
+            }
+        }
+
         const childResult = UIDrawGenerator.generateChildDraw(
             view.attrs,
             view.positions,
@@ -50,9 +70,8 @@ export default class UIDrawController {
         // set draw to child
         view.draw = childResult.draw
 
-        for (const child of view.getUIChildren()) {
-            this.generateDrawOfView(child, screenVisibility, configuration)
-        }
+        // update state of view
+        view.setState(UIViewState.DRAW_DEFINED)
 
         return childResult.maxPosition
     }

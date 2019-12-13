@@ -7,13 +7,13 @@ import UIConfigurationData from "./model/UIConfigurationData"
 import HtmlUtils from "./utils/html/HTMLUtils"
 import CounterUtils from "./utils/counter/CounterUtils"
 import UICalculator from "./core/calculate/UICalculator"
-import UIPrepareOrderUtils from "./core/prepare/UIPrepareOrderUtils"
 import UIDrawController from "./core/draw/UIDrawController"
+import UIDomPreparer from "./core/prepare/UIDomPreparer"
+import UIOrganizer from "./core/organize/UIOrganizer"
 
 export type WebUIRedraw = (screen: UIView) => void
 
 export interface WebUIListener {
-    onScreenReinit: (screen: UIView) => void
     onScreenRedraw: (screen: UIView) => void
 }
 
@@ -31,11 +31,6 @@ class WebUI implements WebUIListener {
     private redrawTimer: CallbackTimer = new CallbackTimer()
 
     private screensToDraw: { [key: string]: UIView } = {}
-
-    onScreenReinit(screen: UIView) {
-        // init screen
-        this.initDom(screen.element)
-    }
 
     onScreenRedraw(screen: UIView) {
         // disable events from screen
@@ -96,109 +91,78 @@ class WebUI implements WebUIListener {
         Log.uiShowLogs = this.configuration.showLogs
         Log.uiViewLogs = this.configuration.logsView
 
-        // launch from body, only first time
-        this.initDom(bodyElement)
+        // discover screens
+        UIDomPreparer.discoverScreens(bodyElement, this.configuration, this, screen => {
+            this.drawUIScreen(screen)
+        })
 
         Log.log("Time drawing screens: " + CounterUtils.endCounter("drawScreens"))
     }
 
-    private initDom(element: HTMLElement) {
-        // clear to avoid problems if it was called previously
-        WebUI.clearUI(element)
-
-        // generate views
-        UIPreparer.generateUIViews(element, this.configuration, this)
-    }
-
-    private static clearUI(element: Node) {
-        //delete the UI element and childrens
-        delete (element as any).ui
-
-        // delete the UI from children
-        element.childNodes.forEach(childNode => {
-            WebUI.clearUI(childNode)
-        })
-    }
-
     private drawUIScreen(screen: UIView) {
-        //timers variables
-        var timerLoadSizes = 0
-        var timerOrderViews = 0
-        var timerPrepare = 0
-        var timerCore = 0
-        var timerDraw = 0
-        var timerAll = 0
-
         Log.log(`Drawing screen '${screen.id}'`)
 
-        //start genral counter
-        CounterUtils.startCounter("all")
-
-        //---- PREPARE -----
-        CounterUtils.startCounter("prepare")
-        CounterUtils.startCounter("loadSizes")
+        //timers variables
+        var timerDom = 0
+        var timerPrepare = 0
+        var timerOrganize = 0
+        var timerCalculate = 0
+        var timerDraw = 0
+        var timerAll = 0
 
         //call to listener with start event
         this.configuration.sendStartEvent()
 
-        if (screen.hasToBeCalculated()) {
-            //update the size of the screen
-            var screenSizeChanged = UIPreparer.loadSizeScreen(screen)
+        //start genral counter
+        CounterUtils.startCounter("all")
 
-            //load sizes of views
-            UIPreparer.loadSizes(screen.getChildElements(), this.configuration, screenSizeChanged)
-            timerLoadSizes = CounterUtils.endCounter("loadSizes")
+        // ----- PREPARE DOM -----
+        CounterUtils.startCounter("dom")
+        UIDomPreparer.prepareDom(screen.element, this.configuration, this, screen, screen)
+        timerDom = CounterUtils.endCounter("dom")
 
-            //order views
-            CounterUtils.startCounter("orderViews")
-            UIPrepareOrderUtils.orderViews(screen)
-            timerOrderViews = CounterUtils.endCounter("orderViews")
+        // ----- PREPARE -----
+        CounterUtils.startCounter("prepare")
+        UIPreparer.prepareScreen(screen, this.configuration)
+        timerPrepare = CounterUtils.endCounter("prepare")
 
-            timerPrepare = CounterUtils.endCounter("prepare")
+        // ----- ORGANIZE -----
+        CounterUtils.startCounter("organize")
+        UIOrganizer.organize(screen)
+        timerOrganize = CounterUtils.endCounter("organize")
 
-            //---- CORE -----
-            CounterUtils.startCounter("core")
+        // ----- CALCULATE -----
+        CounterUtils.startCounter("calculate")
+        UICalculator.calculate(screen, this.scrollSize)
+        timerCalculate = CounterUtils.endCounter("calculate")
 
-            //assign position and sizes to screen
-            UICalculator.calculateScreen(screen, this.scrollSize)
-
-            timerCore = CounterUtils.endCounter("core")
-        }
-
-        //---- DRAW -----
+        // ---- DRAW -----
         CounterUtils.startCounter("draw")
-
-        // prepare to draw, generate draw objects
-        UIDrawController.generateDrawsOfScreen(screen, this.configuration)
-
-        // apply draw objects
+        UIDrawController.generateDraws(screen, this.configuration)
         UIDrawController.applyDrawsToScreen(screen, this.configuration)
-
-        // apply events
-        screen.evalEvents()
-
         timerDraw = CounterUtils.endCounter("draw")
 
-        //end counter
+        // show counter logs
         timerAll = CounterUtils.endCounter("all")
-
         Log.log(
             "[" +
                 screen.id +
                 "] All: " +
                 timerAll +
+                "ms - Prepare dom: " +
+                timerDom +
                 "ms - Prepare: " +
                 timerPrepare +
-                "ms - Core: " +
-                timerCore +
+                "ms - Organize: " +
+                timerOrganize +
+                "ms - Calculate: " +
+                timerCalculate +
                 "ms - Draw: " +
-                timerDraw +
-                "ms - LoadSizes: " +
-                timerLoadSizes +
-                "ms - OrderViews: " +
-                timerOrderViews +
-                "ms",
+                timerDraw,
         )
+
+        // apply events
+        screen.evalEvents()
 
         //call to listener with end event
         this.configuration.sendEndEvent()

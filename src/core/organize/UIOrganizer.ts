@@ -1,37 +1,38 @@
-import UIView from "../../model/UIView"
+import UIView, { UIViewState } from "../../model/UIView"
 import { AXIS } from "../../model/UIAxis"
 import { UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import Log from "../../utils/log/Log"
 
-export default class UIPrepareOrderUtils {
+export default class UIOrganizer {
     /**
      * Order the children of the parent view received
-     * @param {UIView} parent View to order the childrens
+     * @param {UIView} view View to order the childrens
      **/
-    public static orderViews(parent: UIView) {
-        if (!parent.childrenInOrder) {
-            //clean dependencies of all views
-            for (const child of parent.getUIChildren()) {
-                child.dependencies[AXIS.X] = []
-                child.dependencies[AXIS.Y] = []
-            }
-
-            //then order all the views with parent screen
-            parent.childrenOrder[AXIS.X] = this.orderViewsSameParent(parent, true)
-            parent.childrenOrder[AXIS.Y] = this.orderViewsSameParent(parent, false)
-
-            //mark as parent with order
-            parent.childrenInOrder = true
+    public static organize(view: UIView) {
+        // check if it is already organized
+        if (view.getState() >= UIViewState.ORGANIZED) {
+            return
         }
 
-        //for each one, add the view and then its ordered children
-        for (const child of parent.getUIChildren()) {
-            if (child.getChildElements().length > 0) {
-                this.orderViews(child)
-            }
+        // clean dependencies of all views
+        for (const child of view.getUIChildren()) {
+            child.dependencies[AXIS.X] = []
+            child.dependencies[AXIS.Y] = []
         }
+
+        // then order all the views with parent screen
+        view.childrenOrder[AXIS.X] = this.orderViewsSameParent(view, true)
+        view.childrenOrder[AXIS.Y] = this.orderViewsSameParent(view, false)
+
+        // for each one, add the view and then its ordered children
+        for (const child of view.getUIChildren()) {
+            this.organize(child)
+        }
+
+        // mark view as ordered
+        view.setState(UIViewState.ORGANIZED)
     }
 
     /**
