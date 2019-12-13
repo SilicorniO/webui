@@ -6,6 +6,8 @@ import UIConfigurationData, {
 } from "./model/UIConfigurationData"
 
 export default class UIConfiguration {
+    private static readonly TIME_REDRAW_DEFAULT = 20
+
     private static readonly ATTRIBUTE_DEFAULT = "ui"
     private static readonly ANIMATION_TIME_DEFAULT = 0.3
     private static readonly ANIMATION_OPACITY_DEFAULT = false
@@ -17,7 +19,7 @@ export default class UIConfiguration {
     public attributes: string[] = []
     private dimens: { [key: string]: number } = {}
     private selectedDimens: { [key: string]: number } = {}
-    public timeRedraw = 20
+    public timeRedraw = UIConfiguration.TIME_REDRAW_DEFAULT
 
     // show colors to know the size of the views
     public viewColors: boolean = false

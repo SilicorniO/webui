@@ -6,12 +6,11 @@
 <body style="margin:0">
     
     <div id="screen" ui="fw;fh">
-        <div id="container" ui="">
-            <div id="element1" ui="">element 1</div>
-            <div id="element2" ui="ab:l">element 2</div>
+        <div id="element" ui="">
+            <span id="elementContent">Text</span>
         </div>
         <div id="buttons" ui="ab:l">
-            <a id="changeElement" href="#" onClick="changeElementUI()" ui="">Change element UI</a>
+            <a id="changContent" href="#" onClick="changContent()" ui="">Change content</a>
         </div>
     </div>
     
@@ -23,10 +22,10 @@
         timeRedraw: 0
     });
     
-    var element2 = document.getElementById('element2');
+    var elementContent = document.getElementById('elementContent');
 
-    function changeElementUI(){
-        element2.setAttribute('ui', "ar:l");
+    function changContent(){
+        elementContent.innerHTML = "Text with more length to check resize";
     }
     
 

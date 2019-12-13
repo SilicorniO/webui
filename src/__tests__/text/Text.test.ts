@@ -2,7 +2,6 @@ const puppeteer = require("puppeteer")
 import PuppeteerUtils from "../PuppeteerUtils"
 
 const TIMEOUT = 5000
-const SIZE = 50
 
 describe("Text", () => {
     let browser: any

@@ -107,4 +107,17 @@ describe("Dom", () => {
         expect(element2.top).toBe(element1.top)
         expect(element2.left).toBe(element1.left + element1.width)
     })
+
+    test("Change element content", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-content")
+
+        // check position
+        let element = await PuppeteerUtils.evalUiElement(page, "element")
+        const elementWidth = element.width
+
+        // add one element
+        await page.click("#changContent")
+        element = await PuppeteerUtils.evalUiElement(page, "element")
+        expect(element.width).toBeGreaterThan(elementWidth)
+    })
 })

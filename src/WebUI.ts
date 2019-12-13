@@ -4,7 +4,6 @@ import RedrawTimer from "./utils/redrawtimer/RedrawTimer"
 import UIConfiguration from "./UIConfiguration"
 import Log from "./utils/log/Log"
 import UIView from "./model/UIView"
-import UIHTMLElement from "./model/UIHTMLElement"
 import UIConfigurationData from "./model/UIConfigurationData"
 import HtmlUtils from "./utils/html/HTMLUtils"
 import CounterUtils from "./utils/counter/CounterUtils"
@@ -39,14 +38,21 @@ class WebUI implements WebUIListener {
     }
 
     onScreenRedraw(screen: UIView) {
-        // draw this screen
-        this.drawUIScreen(screen)
+        // disable events from screen
+        screen.disableEvents()
+
+        // if no time to redraw we draw at the moment
+        if (this.configuration.timeRedraw === 0) {
+            // draw this screen
+            this.drawUIScreen(screen)
+            return
+        }
 
         // add to the list of screens to draw
-        // this.screensToDraw[screen.id] = screen
+        this.screensToDraw[screen.id] = screen
 
         // call to redraw
-        // this.redraw()
+        this.redraw()
     }
 
     //redraw function
@@ -122,6 +128,8 @@ class WebUI implements WebUIListener {
         var timerCore = 0
         var timerDraw = 0
         var timerAll = 0
+
+        Log.log(`Drawing screen '${screen.id}'`)
 
         //start genral counter
         CounterUtils.startCounter("all")

@@ -3,6 +3,7 @@ import { WebUIListener } from "../../WebUI"
 import UIConfiguration from "../../UIConfiguration"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import { UI_SIZE } from "../../model/UIAttr"
+import Log from "../../utils/log/Log"
 
 export default class UIViewEventsManager {
     // associated screen
@@ -34,17 +35,23 @@ export default class UIViewEventsManager {
         this.evalListenResizeEvents()
     }
 
+    public disableEvents() {
+        this.disableListenAttributes()
+        this.disableListenCharacterData()
+        this.disableListenAddRemoveNodes()
+        this.disableListenResizeEvents()
+    }
+
     public launchResizeEvent() {
-        this.resizeEvent()
+        this.view.sizeLoaded = false
+        this.webUIListener.onScreenRedraw(this.view.screen || this.view)
     }
 
     // ----- PRIVATE -----
 
     private evalListenAttributes() {
         // remove previous observer
-        if (this.observerAttributes != null) {
-            this.observerAttributes.disconnect()
-        }
+        this.disableListenAttributes()
 
         // Create an observer instance linked to the callback function
         const observerAttributes = new MutationObserver((mutationsList: MutationRecord[]) => {
@@ -57,6 +64,7 @@ export default class UIViewEventsManager {
                         attributeName == this.configuration.attribute ||
                         this.configuration.attributes.includes(attributeName)
                     ) {
+                        Log.log(`Event 'attributes' being processed for view ${this.view.id}`)
                         this.webUIListener.onScreenReinit(this.view.screen || this.view)
                     }
                 }
@@ -68,11 +76,16 @@ export default class UIViewEventsManager {
         observerAttributes.observe(this.view.element, { attributes: true, subtree: false })
     }
 
+    private disableListenAttributes() {
+        // remove previous observer
+        if (this.observerAttributes != null) {
+            this.observerAttributes.disconnect()
+        }
+    }
+
     private evalListenCharacterData() {
         // remove previous observer
-        if (this.observerCharacterData != null) {
-            this.observerCharacterData.disconnect()
-        }
+        this.disableListenCharacterData()
 
         // check has not children
         if (this.view.element.childNodes.length > 0) {
@@ -83,6 +96,7 @@ export default class UIViewEventsManager {
         const observerCharacterData = new MutationObserver((mutationsList: MutationRecord[]) => {
             for (var mutation of mutationsList) {
                 if (mutation.type == "characterData") {
+                    Log.log(`Event 'characterData' being processed for view ${this.view.id}`)
                     this.webUIListener.onScreenRedraw(this.view.screen || this.view)
                 }
             }
@@ -93,16 +107,27 @@ export default class UIViewEventsManager {
         observerCharacterData.observe(this.view.element, { characterData: true, subtree: true })
     }
 
+    private disableListenCharacterData() {
+        // remove previous observer
+        if (this.observerCharacterData != null) {
+            this.observerCharacterData.disconnect()
+        }
+    }
+
     private evalListenAddRemoveNodes() {
         // remove previous observer
-        if (this.observerAddRemoveNodes != null) {
-            this.observerAddRemoveNodes.disconnect()
+        this.disableListenAddRemoveNodes()
+
+        // check this view is screen
+        if (this.view.parent != null) {
+            return
         }
 
         // Create an observer instance linked to the callback function
         const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
             for (var mutation of mutationsList) {
                 if (mutation.type == "childList") {
+                    Log.log(`Event 'childList' being processed for view ${this.view.id}`)
                     this.webUIListener.onScreenReinit(this.view.screen || this.view)
                 }
             }
@@ -113,20 +138,21 @@ export default class UIViewEventsManager {
         observerAddRemoveNodes.observe(this.view.element, { childList: true, subtree: true })
     }
 
+    private disableListenAddRemoveNodes() {
+        // remove previous observer
+        if (this.observerAddRemoveNodes != null) {
+            this.observerAddRemoveNodes.disconnect()
+        }
+    }
+
     private resizeEvent() {
-        this.view.sizeLoaded = false
-        this.webUIListener.onScreenRedraw(this.view.screen || this.view)
+        Log.log(`Event 'resize' being processed for view ${this.view.id}`)
+        this.launchResizeEvent()
     }
 
     private evalListenResizeEvents() {
-        // listen events of parent or window
-        let parentElement: HTMLElement | Window = this.view.element.parentElement
-        if (parentElement == null) {
-            parentElement = window
-        }
-
-        // remove event by default
-        parentElement.removeEventListener("resize", this.resizeEvent.bind(this))
+        // disable resize events
+        const parentElement = this.disableListenResizeEvents()
 
         // check this view is screen
         if (this.view.parent != null) {
@@ -140,5 +166,18 @@ export default class UIViewEventsManager {
 
         // apply listener
         parentElement.addEventListener("resize", this.resizeEvent.bind(this))
+    }
+
+    private disableListenResizeEvents(): HTMLElement | Window {
+        // listen events of parent or window
+        let parentElement: HTMLElement | Window = this.view.element.parentElement
+        if (parentElement == null) {
+            parentElement = window
+        }
+
+        // remove event by default
+        parentElement.removeEventListener("resize", this.resizeEvent.bind(this))
+
+        return parentElement
     }
 }

@@ -60,7 +60,6 @@ export default class UIView {
 
     // ----- Flags for changes -----
     sizeLoaded: boolean = false
-    positionLoaded: boolean = false
 
     // animations
     animationDurations: number[] = []
@@ -115,6 +114,15 @@ export default class UIView {
         // eval events of all children
         for (const child of this.getUIChildren()) {
             child.evalEvents()
+        }
+    }
+
+    public disableEvents() {
+        this.eventsManager.disableEvents()
+
+        // eval events of all children
+        for (const child of this.getUIChildren()) {
+            child.disableEvents()
         }
     }
 
