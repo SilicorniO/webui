@@ -1,6 +1,6 @@
 import UIViewAttrs from "../../../model/UIViewAttrs"
 import { UI_SIZE } from "../../../model/UIAttr"
-import UIAttrReader from "../../../core/read/UIAttrReader"
+import UIAttrReader from "../../../core/dom/UIAttrReader"
 import { UI_VISIBILITY } from "../../../model/UIVisibility"
 
 describe("UiAttrReader", () => {
@@ -38,16 +38,22 @@ describe("UiAttrReader", () => {
     test("generateUiAttr - references", async () => {
         // generate attributes
         const viewAttrs = new UIViewAttrs()
+
         viewAttrs.x.startStart = "_l"
-        viewAttrs.x.startEnd = "_r"
-        viewAttrs.y.startStart = "p"
-        viewAttrs.y.startEnd = "l"
+        viewAttrs.x.startEnd = "_ar"
+        viewAttrs.x.endEnd = "_r"
+        viewAttrs.x.endStart = "_al"
+
+        viewAttrs.y.startStart = "_t"
+        viewAttrs.y.startEnd = "_ab"
+        viewAttrs.y.endEnd = "_b"
+        viewAttrs.y.endStart = "_at"
 
         // convert to text
         const uiAttr = UIAttrReader.generateUiAttr(viewAttrs)
 
         // check text
-        expect(uiAttr).toBe("l:_l;r:_r;t:p;b:l")
+        expect(uiAttr).toBe("l:_l;ar:_ar;r:_r;al:_al;t:_t;ab:_ab;b:_b;at:_at")
     })
 
     test("generateUiAttr - margin", async () => {

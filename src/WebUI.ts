@@ -8,7 +8,7 @@ import HtmlUtils from "./utils/html/HTMLUtils"
 import CounterUtils from "./utils/counter/CounterUtils"
 import UICalculator from "./core/calculate/UICalculator"
 import UIDrawController from "./core/draw/UIDrawController"
-import UIDomPreparer from "./core/prepare/UIDomPreparer"
+import UIDomPreparer from "./core/dom/UIDomPreparer"
 import UIOrganizer from "./core/organize/UIOrganizer"
 
 export type WebUIRedraw = (screen: UIView) => void
@@ -74,7 +74,12 @@ class WebUI implements WebUIListener {
      * @param {UIConfiguration} configuration
      */
     public start(configuration: UIConfigurationData) {
-        CounterUtils.startCounter("drawScreens")
+        //save configuration
+        this.configuration = new UIConfiguration(configuration)
+
+        //apply global values for logs
+        Log.uiShowLogs = this.configuration.showLogs
+        Log.uiViewLogs = this.configuration.logsView
 
         //get the body element
         var bodyElement = document.getElementsByTagName("BODY")[0] as HTMLElement
@@ -84,23 +89,20 @@ class WebUI implements WebUIListener {
             this.scrollSize = HtmlUtils.getScrollWidth()
         }
 
-        //save configuration
-        this.configuration = new UIConfiguration(configuration)
-
-        //apply global values for logs
-        Log.uiShowLogs = this.configuration.showLogs
-        Log.uiViewLogs = this.configuration.logsView
+        // start processing
+        Log.log("[WebUI] Start processing")
+        CounterUtils.startCounter("drawScreens")
 
         // discover screens
         UIDomPreparer.discoverScreens(bodyElement, this.configuration, this, screen => {
             this.drawUIScreen(screen)
         })
 
-        Log.log("Time drawing screens: " + CounterUtils.endCounter("drawScreens"))
+        Log.log(`[WebUI] End processing(${CounterUtils.endCounter("drawScreens")})`)
     }
 
     private drawUIScreen(screen: UIView) {
-        Log.log(`Drawing screen '${screen.id}'`)
+        Log.log(`[${screen.id}] Start processing`)
 
         //timers variables
         var timerDom = 0
@@ -145,20 +147,13 @@ class WebUI implements WebUIListener {
         // show counter logs
         timerAll = CounterUtils.endCounter("all")
         Log.log(
-            "[" +
-                screen.id +
-                "] All: " +
-                timerAll +
-                "ms - Prepare dom: " +
-                timerDom +
-                "ms - Prepare: " +
-                timerPrepare +
-                "ms - Organize: " +
-                timerOrganize +
-                "ms - Calculate: " +
-                timerCalculate +
-                "ms - Draw: " +
-                timerDraw,
+            `[${screen.id}] End processing:` +
+                ` All(${timerAll})` +
+                ` Dom(${timerDom})` +
+                ` Prepare(${timerPrepare})` +
+                ` Organize(${timerOrganize})` +
+                ` Calculate(${timerCalculate})` +
+                ` Draw(${timerDraw})`,
         )
 
         // apply events

@@ -2,6 +2,7 @@ import UIConfiguration from "../../UIConfiguration"
 import { WebUIListener } from "../../WebUI"
 import UIView, { UIViewState } from "../../model/UIView"
 import UIHTMLElement from "../../model/UIHTMLElement"
+import UIAttrReader from "./UIAttrReader"
 
 export default class UIDomPreparer {
     public static discoverScreens(
@@ -12,31 +13,34 @@ export default class UIDomPreparer {
         parentUi: boolean = false,
     ) {
         // flag to know if this element is a screen
-        let isScreen = false
+        let hasParentUi = false
 
         // check if it has UI attribute
-        if (element.hasAttribute(config.attribute) && !parentUi) {
-            // generate screen
-            const screen = new UIView(element, config, webUIListener)
+        if (element.hasAttribute(config.attribute)) {
+            // if parentUi we don't create yet the UIView because it is not a screen
+            if (!parentUi) {
+                // generate screen
+                const screen = new UIView(element, config, webUIListener)
 
-            // screen was discovered
-            listener(screen)
+                // screen was discovered
+                listener(screen)
+            }
 
             // mark element as screen
-            isScreen = true
+            hasParentUi = true
         }
 
         // no UI, search in children
         element.childNodes.forEach(child => {
             if (child instanceof HTMLElement) {
-                UIDomPreparer.discoverScreens(child, config, webUIListener, listener, isScreen)
+                UIDomPreparer.discoverScreens(child, config, webUIListener, listener, hasParentUi)
             }
         })
     }
 
     public static prepareDom(
         element: HTMLElement,
-        config: UIConfiguration,
+        configuration: UIConfiguration,
         webUIListener: WebUIListener,
         parent: UIView,
         screen: UIView,
@@ -45,12 +49,15 @@ export default class UIDomPreparer {
         const uiElement = UIHTMLElement.get(element)
         if (uiElement != null) {
             const view = uiElement.ui
-            // search if it is ecessary in the rest of the dom
+            // search if it is necessary in the rest of the dom
             if (view.getState() == UIViewState.NOT_STARTED) {
+                // read again the attributes
+                view.attrs = UIAttrReader.readAttrs(view.element, configuration)
+
                 // generate views of all children
                 element.childNodes.forEach(child => {
                     if (child instanceof HTMLElement) {
-                        UIDomPreparer.prepareDom(child, config, webUIListener, view, screen)
+                        UIDomPreparer.prepareDom(child, configuration, webUIListener, view, screen)
                     }
                 })
 
@@ -61,17 +68,20 @@ export default class UIDomPreparer {
         }
 
         // check element has attribute, else we stop here
-        if (!element.hasAttribute(config.attribute)) {
+        if (!element.hasAttribute(configuration.attribute)) {
             return
         }
 
         // generate the view
-        const view = new UIView(element, config, webUIListener, parent, screen)
+        const view = new UIView(element, configuration, webUIListener, parent, screen)
+
+        // read attributes
+        view.attrs = UIAttrReader.readAttrs(view.element, configuration)
 
         // generate views of all children
         element.childNodes.forEach(child => {
             if (child instanceof HTMLElement) {
-                UIDomPreparer.prepareDom(child, config, webUIListener, view, screen)
+                UIDomPreparer.prepareDom(child, configuration, webUIListener, view, screen)
             }
         })
 

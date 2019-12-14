@@ -233,13 +233,26 @@ export default class UIAttrReader {
             attrs.push(`${ATTR.LEFT}:${viewAttrs.x.startStart}`)
         }
         if (viewAttrs.x.startEnd.length > 0) {
-            attrs.push(`${ATTR.RIGHT}:${viewAttrs.x.startEnd}`)
+            attrs.push(`${ATTR.AT_RIGHT}:${viewAttrs.x.startEnd}`)
         }
+        if (viewAttrs.x.endEnd.length > 0) {
+            attrs.push(`${ATTR.RIGHT}:${viewAttrs.x.endEnd}`)
+        }
+        if (viewAttrs.x.endStart.length > 0) {
+            attrs.push(`${ATTR.AT_LEFT}:${viewAttrs.x.endStart}`)
+        }
+
         if (viewAttrs.y.startStart.length > 0) {
             attrs.push(`${ATTR.TOP}:${viewAttrs.y.startStart}`)
         }
         if (viewAttrs.y.startEnd.length > 0) {
-            attrs.push(`${ATTR.BOTTOM}:${viewAttrs.y.startEnd}`)
+            attrs.push(`${ATTR.AT_BOTTOM}:${viewAttrs.y.startEnd}`)
+        }
+        if (viewAttrs.y.endEnd.length > 0) {
+            attrs.push(`${ATTR.BOTTOM}:${viewAttrs.y.endEnd}`)
+        }
+        if (viewAttrs.y.endStart.length > 0) {
+            attrs.push(`${ATTR.AT_TOP}:${viewAttrs.y.endStart}`)
         }
 
         // margin

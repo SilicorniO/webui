@@ -11,30 +11,29 @@
     </div>
     
     <script>
-    WebUI.start({
-        viewColors: true,
-        showLogs: true,
-        timeRedraw: 0
-    });
-
-    setTimeout(function(){
-        console.log("After first timeout");
-
-        var element1 = document.getElementById('element1');
-        element1.ui.setAttr("w", 300, 0.1);
-
-        var element2 = document.getElementById('element2');
-        element2.ui.setAttr("w", 50, 0.1);
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            timeRedraw: 0
+        });
 
         setTimeout(function(){
-            console.log("After second timeout");
-            
-            element2.ui.setAttr("ml", 200, 0.1);
+            console.log("After first timeout");
+
+            var element1 = document.getElementById('element1');
+            element1.ui.setAttr("w", 300, 0.1);
+
+            var element2 = document.getElementById('element2');
+            element2.ui.setAttr("w", 50, 0.1);
+
+            setTimeout(function(){
+                console.log("After second timeout");
+                
+                element2.ui.setAttr("ml", 200, 0.1);
+
+            }, 50);
 
         }, 50);
-
-    }, 50);
-
     </script>
     
 </body>

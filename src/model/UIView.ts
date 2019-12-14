@@ -6,10 +6,10 @@ import UIPosition from "./UIPosition"
 import UIDraw from "./UIDraw"
 import { UI_VISIBILITY } from "./UIVisibility"
 import UIViewAttrs from "./UIViewAttrs"
-import UIAttrReader, { ATTR } from "../core/read/UIAttrReader"
+import UIAttrReader, { ATTR } from "../core/dom/UIAttrReader"
 import { WebUIListener } from "../WebUI"
 import UIViewEventsManager from "../core/events/UIViewEventsManager"
-import { UIAttributeValueArray } from "../core/read/UIAttributeValue"
+import { UIAttributeValueArray } from "../core/dom/UIAttributeValue"
 import UIViewStateManager from "../core/state/UIViewStateManager"
 
 export enum UIViewState {
@@ -99,9 +99,6 @@ export default class UIView {
         this.element = UIHTMLElement.convert(element, this)
         this.parent = parent
         this.screen = screen
-
-        // initialize
-        this.attrs = UIAttrReader.readAttrs(this.element, configuration)
 
         // initialize events manager
         this.eventsManager = new UIViewEventsManager(this, webUIListener, configuration)

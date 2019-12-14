@@ -3,7 +3,7 @@ import { WebUIListener } from "../../WebUI"
 import UIConfiguration from "../../UIConfiguration"
 import { UI_SIZE } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
-import UIAttrReader from "../read/UIAttrReader"
+import UIAttrReader from "../dom/UIAttrReader"
 
 export default class UIViewEventsManager {
     // associated screen
