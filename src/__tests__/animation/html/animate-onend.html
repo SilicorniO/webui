@@ -1,0 +1,32 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="element" ui="w:50;h:50"></div>
+    </div>
+    
+    <script>
+        var executed = false
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            timeRedraw: 0,
+            events: function(event) {
+                if (event.name == "end" && !executed) {
+                    executed = true
+                    // apply animation
+                    var element = document.getElementById("element")
+                    element.ui.setAttr("w", 200, 1.1, () => {
+                        element.ui.setAttr("h", 200, 2.3)
+                    })
+                }
+            }
+        });
+    </script>
+    
+</body>
+</html>

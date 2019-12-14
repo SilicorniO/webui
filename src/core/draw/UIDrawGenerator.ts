@@ -2,7 +2,7 @@ import { AXIS, UIAxis } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
 import { UI_VISIBILITY } from "../../model/UIVisibility"
 import UIPosition from "../../model/UIPosition"
-import UIDraw from "../../model/UIDraw"
+import UIDraw, { UIDrawAnimation } from "../../model/UIDraw"
 import UIViewAttrs from "../../model/UIViewAttrs"
 
 export interface DrawGeneratorChildResult {
@@ -58,7 +58,7 @@ export default class UIDrawGenerator {
     public static generateChildDraw(
         attrs: UIViewAttrs,
         positions: UIAxis<UIPosition>,
-        animationDurations: number[],
+        animations: UIDrawAnimation[],
         parentVisibility: UI_VISIBILITY,
         viewColors: boolean,
     ): DrawGeneratorChildResult {
@@ -69,7 +69,7 @@ export default class UIDrawGenerator {
         this.applyBackground(viewColors, draw)
         const maxPosition = this.applyPosition(positions, draw)
         this.applyVisibility(attrs, draw, parentVisibility)
-        this.applyAnimation(animationDurations, draw)
+        this.applyAnimation(animations, draw)
 
         // return the draw object
         return {
@@ -87,11 +87,16 @@ export default class UIDrawGenerator {
         draw.backgroundColor = this.generateRandomViewColor()
     }
 
-    private static applyAnimation(animationDurations: number[], draw: UIDraw) {
+    private static applyAnimation(animations: UIDrawAnimation[], draw: UIDraw) {
         //apply animation
-        if (animationDurations.length > 0) {
-            draw.transition = "all " + animationDurations[0] + "s ease 0s"
-            animationDurations.splice(0, 1)
+        if (animations.length > 0) {
+            // read first animation and pop from stack
+            const firstAnimation = animations[0]
+            animations.splice(0, 1)
+
+            // apply transition
+            draw.transition = "all " + firstAnimation.duration + "s ease 0s"
+            draw.onTransitionEnd = firstAnimation.onEnd
         }
     }
 

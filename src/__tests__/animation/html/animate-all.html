@@ -15,18 +15,17 @@
     
     <script>
     WebUI.start({
-        viewColors: true,
+        viewColors: false,
         showLogs: true,
-        timeRedraw: 2000,
+        timeRedraw: 0,
     });
 
-    var TIMEOUT = 100
+    var TIMEOUT = 1000
     var ANIMATION_TIME = 1.0
     var content = document.getElementById("content")
     var element = null
     var text = null
     var executions = [
-        // add element at center
         function() {
             // create square
             element = document.createElement("div");
@@ -49,6 +48,25 @@
             element = document.getElementById("element")
             element.ui.setAttr("c", false, ANIMATION_TIME)
             text.innerHTML = "TOP-LEFT"
+        },
+        // move element to top right
+        function() {
+            element = document.getElementById("element")
+            element.ui.setAttr("r", "p", ANIMATION_TIME)
+            text.innerHTML = "TOP-RIGHT"
+        },
+        // move element to bottom right
+        function() {
+            element = document.getElementById("element")
+            element.ui.setAttr("b", "p", ANIMATION_TIME)
+            text.innerHTML = "BOTTOM-RIGHT"
+        },
+        // move element to bottom left
+        function() {
+            element = document.getElementById("element")
+            element.ui.setAttr("r", "", ANIMATION_TIME)
+            element.ui.setAttr("b", "p", ANIMATION_TIME)
+            text.innerHTML = "BOTTOM-LEFT"
         }
     ]
 
@@ -65,13 +83,12 @@
 
         execution()
 
-        // execute
-        // setTimeout(function(){
-        //     nextExecution()
-        // }, TIMEOUT)
+        setTimeout(function(){
+            nextExecution()
+        }, TIMEOUT)
 
     }
-    // nextExecution()
+    nextExecution()
     </script>
     
 </body>

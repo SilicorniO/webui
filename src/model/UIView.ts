@@ -3,7 +3,7 @@ import UIConfiguration from "../UIConfiguration"
 import UIAttr, { UI_SIZE } from "./UIAttr"
 import { AXIS, AXIS_LIST, UIAxisArray, UIAxis } from "./UIAxis"
 import UIPosition from "./UIPosition"
-import UIDraw from "./UIDraw"
+import UIDraw, { UIDrawAnimation } from "./UIDraw"
 import { UI_VISIBILITY } from "./UIVisibility"
 import UIViewAttrs from "./UIViewAttrs"
 import UIAttrReader, { ATTR } from "../core/dom/UIAttrReader"
@@ -71,7 +71,7 @@ export default class UIView {
     private stateManager: UIViewStateManager
 
     // animations
-    animationDurations: number[] = []
+    animations: UIDrawAnimation[] = []
 
     /**
      * Create a view object reading the HTML of the element
@@ -157,25 +157,30 @@ export default class UIView {
 
     // ----- SET ATTRIBUTE -----
 
-    public setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number) {
+    public setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number, animationEnd?: () => void) {
         // apply attributes
         for (const attribute of attributes) {
             this.applyAttribute(attribute[0], attribute[1])
         }
 
         // apply animation
-        this.animateNextRefresh(animationDuration)
+        this.animateNextRefresh(animationDuration, animationEnd)
 
         // launch resize event
         this.eventsManager.onChangeAttribute()
     }
 
-    public setAttr(attribute: ATTR, value?: string | number | boolean, animationDuration?: number) {
+    public setAttr(
+        attribute: ATTR,
+        value?: string | number | boolean,
+        animationDuration?: number,
+        animationEnd?: () => void,
+    ) {
         // apply attribute
         this.applyAttribute(attribute, value)
 
         // apply animation
-        this.animateNextRefresh(animationDuration)
+        this.animateNextRefresh(animationDuration, animationEnd)
 
         // launch resize event
         this.eventsManager.onChangeAttribute()
@@ -207,28 +212,19 @@ export default class UIView {
 
     // Animations
 
-    private animateNextRefresh(animationDuration?: number) {
+    private animateNextRefresh(animationDuration?: number, animationEnd?: () => void) {
         // check animation duration is valid
         if (animationDuration == null) {
             return
         }
 
-        //animate all views from parent
-        if (this.parent) {
-            this.parent.animateDependencies(animationDuration)
-        } else {
-            this.animateDependencies(animationDuration)
-        }
-    }
+        // generate next animation
+        const animation = new UIDrawAnimation()
+        animation.duration = animationDuration
+        animation.onEnd = animationEnd || null
 
-    private animateDependencies(animationDuration: number) {
         //animate this
-        this.animationDurations.push(animationDuration)
-
-        //animate children
-        for (const child of this.getUIChildren()) {
-            child.animateDependencies(animationDuration)
-        }
+        this.animations.push(animation)
     }
 
     /**

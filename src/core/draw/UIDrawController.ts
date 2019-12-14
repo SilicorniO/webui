@@ -62,7 +62,7 @@ export default class UIDrawController {
         const childResult = UIDrawGenerator.generateChildDraw(
             view.attrs,
             view.positions,
-            view.animationDurations,
+            view.animations,
             screenVisibility,
             configuration.viewColors,
         )

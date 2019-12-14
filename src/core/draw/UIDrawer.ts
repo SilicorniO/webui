@@ -32,7 +32,9 @@ export default class UIDrawer {
 
     private static drawBackground(element: HTMLElement, draw: UIDraw) {
         // apply background
-        element.style.backgroundColor = draw.backgroundColor
+        if (draw.backgroundColor.length > 0) {
+            element.style.backgroundColor = draw.backgroundColor
+        }
     }
 
     private static drawChildCommon(element: HTMLElement, draw: UIDraw) {
@@ -45,18 +47,31 @@ export default class UIDrawer {
     }
 
     private static drawTransition(element: HTMLElement, draw: UIDraw) {
+        // flag to know if view is with transition
+        const transitionRunning = element.style.transition.length > 0
+
         // apply transition
-        element.style.transition = draw.transition
+        if (draw.transition.length > 0 || !transitionRunning) {
+            Log.log(`[${element.id}] Changing transition to: '${draw.transition}'`)
+            element.style.transition = draw.transition
+        }
 
         // remove transition if necessary
-        if (draw.transition.length > 0 && !draw.transitionForever) {
+        if (draw.transition.length > 0 && !transitionRunning) {
             //remove transition after the end of the animation
-            var endTranstion = (event: any) => {
-                Log.log("Removing transition after ending")
+            const endTransition = (event: any) => {
+                Log.log(`[${element.id}] End transition '${draw.transition}'`)
+
+                // remove transition
                 element.style.transition = ""
-                element.removeEventListener("transitionend", endTranstion)
+                element.removeEventListener("transitionend", endTransition)
+
+                // call to listener if we have one
+                if (draw.onTransitionEnd != null) {
+                    draw.onTransitionEnd()
+                }
             }
-            element.addEventListener("transitionend", endTranstion)
+            element.addEventListener("transitionend", endTransition.bind(this))
         }
     }
 
