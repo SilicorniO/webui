@@ -1,40 +1,58 @@
 export default class CallbackTimer {
-    private static readonly TIME_MILLIS_DEFAULT = 20
-    private time: number | null = null
+    private static readonly DELAY_DEFAULT = 20
 
-    /**
-     * Catch a lot of requests and call to callback once after timeout
-     * @param cb Callback to call when it is time to redraw
-     * @param timeMillis milliseconds to wait
-     **/
-    public timer(cb: () => void, timeMillis: number = CallbackTimer.TIME_MILLIS_DEFAULT) {
-        //check if it is running
-        var running = this.time != null
+    // time to execute
+    private timeNextExecution: number | null = null
 
-        //update the time
-        this.time = new Date().getTime() + timeMillis
+    // delay to apply between executions
+    private delay: number
 
-        //start the timer if not started
-        if (!running) {
-            // launch time
-            this.timerLauncher(timeMillis, cb)
-        }
+    // callback to call when it's time to execute
+    private cbExecution: () => void
+
+    // timeout being used
+    private timeoutRunning: boolean = false
+
+    constructor(cbExecution: () => void, delay: number = CallbackTimer.DELAY_DEFAULT) {
+        this.cbExecution = cbExecution
+        this.delay = delay
     }
 
-    private timerLauncher(timeInMillis: number, cb: () => void) {
-        setTimeout(() => {
-            //check time is after timer
-            var now = new Date().getTime()
-            if (now > this.time) {
-                //clean the timer
-                this.time = null
+    public execute() {
+        // check we have execution
+        if (this.timeNextExecution == null || this.delay == 0) {
+            this.callToExecute()
+            return
+        }
 
-                // callback
-                cb()
-            } else {
-                //run timer again with rest of milliseconds
-                this.timerLauncher(this.time - now, cb)
-            }
-        }, timeInMillis)
+        // check time is after execution
+        const timeNow = new Date().getTime()
+        if (timeNow > this.timeNextExecution) {
+            this.callToExecute()
+            return
+        }
+
+        // check we have not a timeout running
+        if (this.timeoutRunning) {
+            return
+        }
+
+        // can't be executed at this moment, we add a timeout
+        this.timeoutRunning = true
+        setTimeout(() => {
+            // cancel timeout
+            this.timeoutRunning = false
+
+            // execute
+            this.execute()
+        }, this.timeNextExecution - timeNow)
+    }
+
+    private callToExecute() {
+        // save time for next execution
+        this.timeNextExecution = new Date().getTime() + this.delay
+
+        // execute
+        this.cbExecution()
     }
 }

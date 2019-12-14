@@ -52,7 +52,6 @@ export default class UIDrawer {
 
         // apply transition
         if (draw.transition.length > 0 || !transitionRunning) {
-            Log.log(`[${element.id}] Changing transition to: '${draw.transition}'`)
             element.style.transition = draw.transition
         }
 
@@ -60,18 +59,18 @@ export default class UIDrawer {
         if (draw.transition.length > 0 && !transitionRunning) {
             //remove transition after the end of the animation
             const endTransition = (event: any) => {
-                Log.log(`[${element.id}] End transition '${draw.transition}'`)
-
                 // remove transition
                 element.style.transition = ""
                 element.removeEventListener("transitionend", endTransition)
 
                 // call to listener if we have one
                 if (draw.onTransitionEnd != null) {
-                    draw.onTransitionEnd()
+                    setTimeout(() => {
+                        draw.onTransitionEnd()
+                    }, 0)
                 }
             }
-            element.addEventListener("transitionend", endTransition.bind(this))
+            element.addEventListener("transitionend", endTransition)
         }
     }
 

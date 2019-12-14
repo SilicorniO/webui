@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer")
 import PuppeteerUtils from "../PuppeteerUtils"
+import TestUtils from "../TestUtils"
 
 const TIMEOUT = 5000
 const ANIMATION_TIME = 300
@@ -35,7 +36,7 @@ describe("Animation", () => {
         expect(element2.left).toBe(element1.left + element1.width + MARGIN)
         expect(element2.width).toBe(SQUARE_SIZE)
 
-        await PuppeteerUtils.delay(ANIMATION_TIME)
+        await TestUtils.delay(ANIMATION_TIME)
         element1 = await PuppeteerUtils.evalUiElement(page, "element1")
         element2 = await PuppeteerUtils.evalUiElement(page, "element2")
         expect(element1.left).toBe(0)
@@ -55,7 +56,7 @@ describe("Animation", () => {
         expect(element2.left).toBe(element1.left + element1.width + MARGIN)
         expect(element2.width).toBe(SQUARE_SIZE)
 
-        await PuppeteerUtils.delay(ANIMATION_TIME)
+        await TestUtils.delay(ANIMATION_TIME)
         element1 = await PuppeteerUtils.evalUiElement(page, "element1")
         element2 = await PuppeteerUtils.evalUiElement(page, "element2")
         expect(element1.opacity).toBe("0")

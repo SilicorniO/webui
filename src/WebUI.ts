@@ -28,46 +28,9 @@ class WebUI implements WebUIListener {
     private configuration: UIConfiguration = new UIConfiguration()
 
     //timer for repainting
-    private redrawTimer: CallbackTimer = new CallbackTimer()
+    private redrawTimer: CallbackTimer
 
     private screensToDraw: { [key: string]: UIView } = {}
-
-    onScreenRedraw(screen: UIView) {
-        // disable events from screen
-        screen.disableEvents()
-
-        // if no time to redraw we draw at the moment
-        if (this.configuration.timeRedraw === 0) {
-            // draw this screen
-            this.drawUIScreen(screen)
-            return
-        }
-
-        // add to the list of screens to draw
-        this.screensToDraw[screen.id] = screen
-
-        // call to redraw
-        this.redraw()
-    }
-
-    //redraw function
-    private redraw() {
-        this.redrawTimer.timer(() => {
-            // get a copy of the screens to draw
-            const screens: UIView[] = []
-            for (const id of Object.keys(this.screensToDraw)) {
-                screens.push(this.screensToDraw[id])
-            }
-            this.screensToDraw = {}
-
-            //draw
-            Log.log(" -- Redraw -- ")
-            for (const screen of screens) {
-                // draw this screen
-                this.drawUIScreen(screen)
-            }
-        }, this.configuration.timeRedraw)
-    }
 
     /**
      * Start running the webUI listening for dom changes and initial start
@@ -76,6 +39,9 @@ class WebUI implements WebUIListener {
     public start(configuration: UIConfigurationData) {
         //save configuration
         this.configuration = new UIConfiguration(configuration)
+
+        // initialize callbackTimer
+        this.redrawTimer = new CallbackTimer(this.redraw.bind(this), this.configuration.timeRedraw)
 
         //apply global values for logs
         Log.uiShowLogs = this.configuration.showLogs
@@ -161,6 +127,38 @@ class WebUI implements WebUIListener {
 
         //call to listener with end event
         this.configuration.sendEndEvent()
+    }
+
+    // ----- REDRAW -----
+
+    onScreenRedraw(screen: UIView) {
+        // disable events from screen
+        screen.disableEvents()
+
+        // add to the list of screens to draw
+        this.screensToDraw[screen.id] = screen
+
+        // call to redraw
+        this.redrawTimer.execute()
+    }
+
+    //redraw function
+    private redraw() {
+        // get a copy of the screens to draw
+        const screens: UIView[] = []
+        for (const id of Object.keys(this.screensToDraw)) {
+            screens.push(this.screensToDraw[id])
+        }
+        this.screensToDraw = {}
+
+        //draw
+        Log.log("[WebUI] Start redrawing")
+        CounterUtils.startCounter("redraw")
+        for (const screen of screens) {
+            // draw this screen
+            this.drawUIScreen(screen)
+        }
+        Log.log(`[WebUI] End redraw(${CounterUtils.endCounter("redraw")})`)
     }
 }
 
