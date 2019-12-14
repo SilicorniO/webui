@@ -13,7 +13,7 @@ export default class UIPreparer {
         }
 
         //update the size of the screen
-        var screenSizeChanged = UIPreparer.loadSizeScreen(screen)
+        const screenSizeChanged = UIPreparer.loadSizeScreen(screen)
 
         //load sizes of views
         UIPreparer.loadSizes(screen.getChildElements(), configuration, screenSizeChanged)
@@ -29,9 +29,9 @@ export default class UIPreparer {
      * @param {boolean} forceSizeLoaded
      **/
     public static loadSizes(elements: UIHTMLElement[], coreConfig: UIConfiguration, forceSizeLoaded: boolean = false) {
-        for (var i = 0; i < elements.length; i++) {
-            var ele = elements[i]
-            var view = ele.ui
+        for (let i = 0; i < elements.length; i++) {
+            const ele = elements[i]
+            const view = ele.ui
             if (view && !view.isGone()) {
                 // show view if it is not visible
                 if (ele.style.display == "none") {
@@ -79,10 +79,10 @@ export default class UIPreparer {
      **/
     public static loadSizeScreen(screen: UIView): boolean {
         //flag looking for changes
-        var sizeChanged = false
+        let sizeChanged = false
 
         //get the element
-        var ele = screen.element
+        const ele = screen.element
         ele.style.position = "absolute"
 
         //show view if it is not visible
@@ -98,7 +98,7 @@ export default class UIPreparer {
                 ele.style.width = screen.attrs[AXIS.X].sizeValue + "%"
             }
 
-            var offsetWidth = ele.offsetWidth
+            const offsetWidth = ele.offsetWidth
             if (offsetWidth != screen.positions[AXIS.X].size) {
                 screen.positions[AXIS.X].size = offsetWidth
                 sizeChanged = true

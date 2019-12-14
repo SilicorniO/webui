@@ -91,7 +91,7 @@ export default class UIDrawer {
         configurationAnimations: UIConfigurationDataAnimations,
     ) {
         //hide view if visibility is gone
-        var opacityOld = element.style.opacity
+        const opacityOld = element.style.opacity
         if (configurationAnimations.defaultOpacity && draw.opacity != opacityOld) {
             element.style.transition = "opacity " + configurationAnimations.defaultTime + "s ease 0s"
         }

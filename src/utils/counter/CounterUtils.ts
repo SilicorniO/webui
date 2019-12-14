@@ -6,12 +6,12 @@ export default class CounterUtils {
     private static counters: { [key: string]: number } = {}
 
     public static startCounter(name: string) {
-        var now = new Date().getTime()
+        const now = new Date().getTime()
         CounterUtils.counters[name] = now
     }
 
     public static endCounter(name: string) {
-        var now = new Date().getTime()
+        const now = new Date().getTime()
         return now - CounterUtils.counters[name]
     }
 

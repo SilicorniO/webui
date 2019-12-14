@@ -87,7 +87,7 @@ export default class UIAttr {
             this.size = value
             this.sizeValue = 0
         } else if (String(value).indexOf("%") != -1) {
-            var indexPercent = value.indexOf("%")
+            const indexPercent = value.indexOf("%")
             this.sizeValue = parseFloat(value.substring(0, indexPercent))
             if (indexPercent < value.length - 1) {
                 this.percentPos = parseInt(value.substring(indexPercent + 1, value.length), 10)

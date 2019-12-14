@@ -76,7 +76,7 @@ export default class UIAttrReader {
     ): UIView {
         //read main attributes
         let attributeValues = UIAttrReaderUtils.readAttributes(element.getAttribute(attributeMain))
-        for (var i = 0; i < attributes.length; i++) {
+        for (let i = 0; i < attributes.length; i++) {
             attributeValues = attributeValues.concat(
                 UIAttrReaderUtils.readAttributes(element.getAttribute(attributes[i])),
             )
@@ -113,99 +113,134 @@ export default class UIAttrReader {
         const sValue = "" + attributeValue.value
         const bValue = attributeValue.value !== false
 
-        if (attr === ATTR.WIDTH) {
-            viewAttrs.x.setSize(sValue)
-        } else if (attr === ATTR.FULL_WIDTH) {
-            viewAttrs.x.setSize("100%")
-        } else if (attr === ATTR.HEIGHT) {
-            viewAttrs.y.setSize(sValue)
-        } else if (attr === ATTR.FULL_HEIGHT) {
-            viewAttrs.y.setSize("100%")
-        } else if (attr === ATTR.LEFT) {
-            viewAttrs.x.setRef(UI_REF.START_START, sValue)
-        } else if (attr === ATTR.RIGHT) {
-            viewAttrs.x.setRef(UI_REF.END_END, sValue)
-        } else if (attr === ATTR.TOP) {
-            viewAttrs.y.setRef(UI_REF.START_START, sValue)
-        } else if (attr === ATTR.BOTTOM) {
-            viewAttrs.y.setRef(UI_REF.END_END, sValue)
-        } else if (attr === ATTR.AT_LEFT) {
-            viewAttrs.x.setRef(UI_REF.END_START, sValue)
-        } else if (attr === ATTR.AT_LEFT_EQUAL) {
-            viewAttrs.x.setRef(UI_REF.END_START, sValue)
-            viewAttrs.y.setRef(UI_REF.START_START, sValue)
-            viewAttrs.y.setRef(UI_REF.END_END, sValue)
-        } else if (attr === ATTR.AT_RIGHT) {
-            viewAttrs.x.setRef(UI_REF.START_END, sValue)
-        } else if (attr === ATTR.AT_RIGHT_EQUAL) {
-            viewAttrs.x.setRef(UI_REF.START_END, sValue)
-            viewAttrs.y.setRef(UI_REF.START_START, sValue)
-            viewAttrs.y.setRef(UI_REF.END_END, sValue)
-        } else if (attr === ATTR.AT_TOP) {
-            viewAttrs.y.setRef(UI_REF.END_START, sValue)
-        } else if (attr === ATTR.AT_TOP_EQUAL) {
-            viewAttrs.y.setRef(UI_REF.END_START, sValue)
-            viewAttrs.x.setRef(UI_REF.START_START, sValue)
-            viewAttrs.x.setRef(UI_REF.END_END, sValue)
-        } else if (attr === ATTR.AT_BOTTOM) {
-            viewAttrs.y.setRef(UI_REF.START_END, sValue)
-        } else if (attr === ATTR.AT_BOTTOM_EQUAL) {
-            viewAttrs.y.setRef(UI_REF.START_END, sValue)
-            viewAttrs.x.setRef(UI_REF.START_START, sValue)
-            viewAttrs.x.setRef(UI_REF.END_END, sValue)
-        } else if (attr === ATTR.MARGIN_LEFT) {
-            viewAttrs.x.marginStart = sValue
-        } else if (attr === ATTR.MARGIN_RIGHT) {
-            viewAttrs.x.marginEnd = sValue
-        } else if (attr === ATTR.MARGIN_TOP) {
-            viewAttrs.y.marginStart = sValue
-        } else if (attr === ATTR.MARGIN_BOTTOM) {
-            viewAttrs.y.marginEnd = sValue
-        } else if (attr === ATTR.MARGIN) {
-            var mValues = sValue.split(",")
-            if (mValues.length === 1) {
-                viewAttrs.x.setMargin(sValue)
-                viewAttrs.y.setMargin(sValue)
-            } else if (mValues.length === 4) {
-                viewAttrs.x.marginStart = mValues[0]
-                viewAttrs.y.marginStart = mValues[1]
-                viewAttrs.x.marginEnd = mValues[2]
-                viewAttrs.y.marginEnd = mValues[3]
-            }
-        } else if (attr === ATTR.PADDING_LEFT) {
-            viewAttrs.x.paddingStart = sValue
-        } else if (attr === ATTR.PADDING_RIGHT) {
-            viewAttrs.x.paddingEnd = sValue
-        } else if (attr === ATTR.PADDING_TOP) {
-            viewAttrs.y.paddingStart = sValue
-        } else if (attr === ATTR.PADDING_BOTTOM) {
-            viewAttrs.y.paddingEnd = sValue
-        } else if (attr === ATTR.PADDING) {
-            var pValues = sValue.split(",")
-            if (pValues.length === 1) {
-                viewAttrs.x.setPadding(sValue)
-                viewAttrs.y.setPadding(sValue)
-            } else if (pValues.length === 4) {
-                viewAttrs.x.paddingStart = mValues[0]
-                viewAttrs.y.paddingStart = mValues[1]
-                viewAttrs.x.paddingEnd = mValues[2]
-                viewAttrs.y.paddingEnd = mValues[3]
-            }
-        } else if (attr === ATTR.CENTER_VERTICAL) {
-            viewAttrs.y.center = bValue
-        } else if (attr === ATTR.CENTER_HORIZONTAL) {
-            viewAttrs.x.center = bValue
-        } else if (attr === ATTR.CENTER) {
-            viewAttrs.x.center = bValue
-            viewAttrs.y.center = bValue
-        } else if (attr === ATTR.SCROLL_VERTICAL) {
-            viewAttrs.y.scroll = bValue
-        } else if (attr === ATTR.SCROLL_HORIZONTAL) {
-            viewAttrs.x.scroll = bValue
-        } else if (attr === ATTR.VISIBILITY) {
-            viewAttrs.visibility = (sValue as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
-        } else if (attr != ATTR.NONE) {
-            Log.logW("Attribute unknown: " + attr + " in view " + viewId)
+        switch (attr) {
+            case ATTR.WIDTH:
+                viewAttrs.x.setSize(sValue)
+                break
+            case ATTR.FULL_WIDTH:
+                viewAttrs.x.setSize("100%")
+                break
+            case ATTR.HEIGHT:
+                viewAttrs.y.setSize(sValue)
+                break
+            case ATTR.FULL_HEIGHT:
+                viewAttrs.y.setSize("100%")
+                break
+            case ATTR.LEFT:
+                viewAttrs.x.setRef(UI_REF.START_START, sValue)
+                break
+            case ATTR.RIGHT:
+                viewAttrs.x.setRef(UI_REF.END_END, sValue)
+                break
+            case ATTR.TOP:
+                viewAttrs.y.setRef(UI_REF.START_START, sValue)
+                break
+            case ATTR.BOTTOM:
+                viewAttrs.y.setRef(UI_REF.END_END, sValue)
+                break
+            case ATTR.AT_LEFT:
+                viewAttrs.x.setRef(UI_REF.END_START, sValue)
+                break
+            case ATTR.AT_LEFT_EQUAL:
+                viewAttrs.x.setRef(UI_REF.END_START, sValue)
+                viewAttrs.y.setRef(UI_REF.START_START, sValue)
+                viewAttrs.y.setRef(UI_REF.END_END, sValue)
+                break
+            case ATTR.AT_RIGHT:
+                viewAttrs.x.setRef(UI_REF.START_END, sValue)
+                break
+            case ATTR.AT_RIGHT_EQUAL:
+                viewAttrs.x.setRef(UI_REF.START_END, sValue)
+                viewAttrs.y.setRef(UI_REF.START_START, sValue)
+                viewAttrs.y.setRef(UI_REF.END_END, sValue)
+                break
+            case ATTR.AT_TOP:
+                viewAttrs.y.setRef(UI_REF.END_START, sValue)
+                break
+            case ATTR.AT_TOP_EQUAL:
+                viewAttrs.y.setRef(UI_REF.END_START, sValue)
+                viewAttrs.x.setRef(UI_REF.START_START, sValue)
+                viewAttrs.x.setRef(UI_REF.END_END, sValue)
+                break
+            case ATTR.AT_BOTTOM:
+                viewAttrs.y.setRef(UI_REF.START_END, sValue)
+                break
+            case ATTR.AT_BOTTOM_EQUAL:
+                viewAttrs.y.setRef(UI_REF.START_END, sValue)
+                viewAttrs.x.setRef(UI_REF.START_START, sValue)
+                viewAttrs.x.setRef(UI_REF.END_END, sValue)
+                break
+            case ATTR.MARGIN_LEFT:
+                viewAttrs.x.marginStart = sValue
+                break
+            case ATTR.MARGIN_RIGHT:
+                viewAttrs.x.marginEnd = sValue
+                break
+            case ATTR.MARGIN_TOP:
+                viewAttrs.y.marginStart = sValue
+                break
+            case ATTR.MARGIN_BOTTOM:
+                viewAttrs.y.marginEnd = sValue
+                break
+            case ATTR.MARGIN:
+                const mValues = sValue.split(",")
+                if (mValues.length === 1) {
+                    viewAttrs.x.setMargin(sValue)
+                    viewAttrs.y.setMargin(sValue)
+                } else if (mValues.length === 4) {
+                    viewAttrs.x.marginStart = mValues[0]
+                    viewAttrs.y.marginStart = mValues[1]
+                    viewAttrs.x.marginEnd = mValues[2]
+                    viewAttrs.y.marginEnd = mValues[3]
+                }
+                break
+            case ATTR.PADDING_LEFT:
+                viewAttrs.x.paddingStart = sValue
+                break
+            case ATTR.PADDING_RIGHT:
+                viewAttrs.x.paddingEnd = sValue
+                break
+            case ATTR.PADDING_TOP:
+                viewAttrs.y.paddingStart = sValue
+                break
+            case ATTR.PADDING_BOTTOM:
+                viewAttrs.y.paddingEnd = sValue
+                break
+            case ATTR.PADDING:
+                const pValues = sValue.split(",")
+                if (pValues.length === 1) {
+                    viewAttrs.x.setPadding(sValue)
+                    viewAttrs.y.setPadding(sValue)
+                } else if (pValues.length === 4) {
+                    viewAttrs.x.paddingStart = mValues[0]
+                    viewAttrs.y.paddingStart = mValues[1]
+                    viewAttrs.x.paddingEnd = mValues[2]
+                    viewAttrs.y.paddingEnd = mValues[3]
+                }
+                break
+            case ATTR.CENTER_VERTICAL:
+                viewAttrs.y.center = bValue
+                break
+            case ATTR.CENTER_HORIZONTAL:
+                viewAttrs.x.center = bValue
+                break
+            case ATTR.CENTER:
+                viewAttrs.x.center = bValue
+                viewAttrs.y.center = bValue
+                break
+            case ATTR.SCROLL_VERTICAL:
+                viewAttrs.y.scroll = bValue
+                break
+            case ATTR.SCROLL_HORIZONTAL:
+                viewAttrs.x.scroll = bValue
+                break
+            case ATTR.VISIBILITY:
+                viewAttrs.visibility = (sValue as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
+                break
+            case ATTR.NONE:
+                break
+            default:
+                Log.logW("Attribute unknown: " + attr + " in view " + viewId)
         }
     }
 

@@ -15,12 +15,12 @@ export default class UIAttrReaderUtils {
         }
 
         //split the text
-        var aValues = text.replace(" ", "").split(";")
+        const aValues = text.replace(" ", "").split(";")
 
         //for each value read the value and key adding it to an array
-        var aAttributes: UIAttributeValue[] = []
-        for (var i = 0; i < aValues.length; i++) {
-            var aValue = aValues[i].split(":")
+        const aAttributes: UIAttributeValue[] = []
+        for (let i = 0; i < aValues.length; i++) {
+            const aValue = aValues[i].split(":")
             if (aValue.length == 2) {
                 aAttributes.push({
                     attr: aValue[0] as ATTR,

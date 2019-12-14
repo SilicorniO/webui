@@ -250,7 +250,7 @@ export default class UIView {
     }
 
     public getUIChildren(): UIView[] {
-        var children = UIHTMLElement.getAll(this.element.childNodes)
+        const children = UIHTMLElement.getAll(this.element.childNodes)
         const uiChildren: UIView[] = []
         for (const child of children) {
             const uiElement = UIHTMLElement.get(child)
@@ -270,8 +270,8 @@ export default class UIView {
         }
 
         const childNodes = this.parent.element.childNodes
-        for (var i = 0; i < childNodes.length; i++) {
-            var child = UIHTMLElement.get(childNodes[i])
+        for (let i = 0; i < childNodes.length; i++) {
+            const child = UIHTMLElement.get(childNodes[i])
             if (child != null) {
                 if (child.id == this.id) {
                     return previousView

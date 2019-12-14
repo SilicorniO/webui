@@ -50,9 +50,9 @@ export default class UIOrganizer {
         let views0dependencies = 0
         let lastChild: UIView | null = null
         for (const child of parent.getUIChildren()) {
-            var numDependencies = 0
+            let numDependencies = 0
 
-            var attrsAxis = hor ? child.getAttrs(AXIS.X) : child.getAttrs(AXIS.Y)
+            const attrsAxis = hor ? child.getAttrs(AXIS.X) : child.getAttrs(AXIS.Y)
             for (const key of UI_REF_LIST) {
                 let reference = attrsAxis.getRef(key)
 
@@ -94,7 +94,7 @@ export default class UIOrganizer {
         const childElements = parent.getChildElements()
 
         //array of references of views to search them faster
-        var indexes = DomSizeUtils.generateIndexes(UIHTMLElement.convertToUIView(childElements))
+        const indexes = DomSizeUtils.generateIndexes(UIHTMLElement.convertToUIView(childElements))
 
         //search dependencies until we have all children with them
         let allViewsSet: boolean = true
@@ -107,10 +107,10 @@ export default class UIOrganizer {
             //for each view check dependencies
             for (const child of parent.getUIChildren()) {
                 if (child.orderNum == -1) {
-                    var dependencies = hor ? child.dependencies[AXIS.X] : child.dependencies[AXIS.Y]
-                    var sumDependencies = 0
-                    for (var n = 0; n < dependencies.length; n++) {
-                        var orderNum = 0
+                    const dependencies = hor ? child.dependencies[AXIS.X] : child.dependencies[AXIS.Y]
+                    let sumDependencies = 0
+                    for (let n = 0; n < dependencies.length; n++) {
+                        let orderNum = 0
                         if (indexes[dependencies[n]] != null) {
                             orderNum = childElements[indexes[dependencies[n]]].ui.orderNum
                         }

@@ -139,9 +139,9 @@ export default class UIDrawGenerator {
     }
 
     private static generateRandomViewColor() {
-        var r = parseInt("" + Math.random() * 255, 10)
-        var g = parseInt("" + Math.random() * 255, 10)
-        var b = parseInt("" + Math.random() * 255, 10)
+        const r = parseInt("" + Math.random() * 255, 10)
+        const g = parseInt("" + Math.random() * 255, 10)
+        const b = parseInt("" + Math.random() * 255, 10)
         return "rgba(" + r + "," + g + "," + b + ",0.4)"
     }
 }

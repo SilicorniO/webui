@@ -128,7 +128,7 @@ export default class UIViewEventsManager {
 
         // Create an observer instance linked to the callback function
         const observerCharacterData = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (var mutation of mutationsList) {
+            for (const mutation of mutationsList) {
                 if (mutation.type == "characterData") {
                     Log.log(`Event 'characterData' being processed for view ${this.view.id}`)
                     this.webUIListener.onScreenRedraw(this.view.screen || this.view)
@@ -159,7 +159,7 @@ export default class UIViewEventsManager {
 
         // Create an observer instance linked to the callback function
         const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (var mutation of mutationsList) {
+            for (const mutation of mutationsList) {
                 if (mutation.type == "childList") {
                     Log.log(`Event 'childList' being processed for view ${this.view.id}`)
                     this.launchReinitEvent()
