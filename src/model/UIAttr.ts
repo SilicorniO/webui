@@ -24,6 +24,15 @@ export enum UI_SIZE {
     PERCENTAGE = "sp",
 }
 
+export interface UIAttrCleanOptions {
+    size?: boolean
+    position?: boolean
+    margin?: boolean
+    padding?: boolean
+    scroll?: boolean
+    center?: boolean
+}
+
 export default class UIAttr {
     startStart: UIViewId = ""
     startEnd: UIViewId = ""
@@ -100,19 +109,31 @@ export default class UIAttr {
         this.paddingEnd = padding
     }
 
-    public clean() {
-        this.startStart = ""
-        this.startEnd = ""
-        this.endEnd = ""
-        this.endStart = ""
-        this.size = UI_SIZE.SIZE_CONTENT
-        this.sizeValue = 0
-        this.percentPos = 0
-        this.scroll = false
-        this.center = false
-        this.marginStart = "0"
-        this.marginEnd = "0"
-        this.paddingStart = "0"
-        this.paddingEnd = "0"
+    public clean(options?: UIAttrCleanOptions) {
+        if (options == null || options.position != false) {
+            this.startStart = ""
+            this.startEnd = ""
+            this.endEnd = ""
+            this.endStart = ""
+        }
+        if (options == null || options.size != false) {
+            this.size = UI_SIZE.SIZE_CONTENT
+            this.sizeValue = 0
+            this.percentPos = 0
+        }
+        if (options == null || options.scroll != false) {
+            this.scroll = false
+        }
+        if (options == null || options.center != false) {
+            this.center = false
+        }
+        if (options == null || options.margin != false) {
+            this.marginStart = ""
+            this.marginEnd = ""
+        }
+        if (options == null || options.position != false) {
+            this.paddingStart = ""
+            this.paddingEnd = ""
+        }
     }
 }

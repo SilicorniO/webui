@@ -239,6 +239,13 @@ For example:
 The function you can use this two methods that can be called from a UI-View.
 -   **setAttr:** `setAttr(attribute: ATTR, value?: string | number | boolean)` The attribute is the parameter defined in #2.
 -   **setAttrs:** `setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number)` The UIAttributeValueArray is an array with: "attr" (0) and "value" (1) as the method "setAttr".
+-   **cleanAttrs:** `cleanAttrs(options: UIAttrCleanOptions)` This method can be used to clean attributes before setting. This clean is not executed until next refresh of the view. The UIAttrCleanOptions is an object with boolean attributes. By default they are set to true, if an attribute is false then those type os attributes will not be cleaned. The possible attributes:
+    -   size
+    -   position
+    -   margin
+    -   padding
+    -   scroll
+    -   center
 
 You can change directly the "ui" attribute of the element and changes will be applied automatically, but it requires to parse the parameters and it is worse for performance than do the change with javascript.
 

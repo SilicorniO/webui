@@ -1,6 +1,6 @@
 import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
-import UIAttr, { UI_SIZE } from "./UIAttr"
+import UIAttr, { UI_SIZE, UIAttrCleanOptions } from "./UIAttr"
 import { AXIS, AXIS_LIST, UIAxisArray, UIAxis } from "./UIAxis"
 import UIPosition from "./UIPosition"
 import UIDraw, { UIDrawAnimation } from "./UIDraw"
@@ -169,7 +169,6 @@ export default class UIView {
         // launch resize event
         this.eventsManager.onChangeAttribute()
     }
-
     public setAttr(
         attribute: ATTR,
         value?: string | number | boolean,
@@ -196,6 +195,11 @@ export default class UIView {
             },
             this.id,
         )
+    }
+
+    public cleanAttrs(options: UIAttrCleanOptions) {
+        // clean attributes
+        this.attrs.clean(options)
     }
 
     // ----- REFERENCES -----

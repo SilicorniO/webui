@@ -8,9 +8,6 @@
     <div id="screen" ui="fw;fh">
         <div id="content" ui="fw;fh">
         </div>
-        <div id="buttons" ui="">
-            <a href="#" onClick="nextExecution()">execute</a>
-        </div>
     </div>
     
     <script>
@@ -21,74 +18,177 @@
     });
 
     var TIMEOUT = 1000
-    var ANIMATION_TIME = 1.0
+    var ANIMATION_TIME = 1.1
+    var ANIMATION_TIME_2 = 2
+    var SIZE_BOX = 200
     var content = document.getElementById("content")
-    var element = null
-    var text = null
-    var executions = [
-        function() {
-            // create square
-            element = document.createElement("div");
-            element.id = "element";
-            element.style.backgroundColor = "#EFB7C0"
-            element.setAttribute("ui", "w:200;h:200;c");
+    var element
+    var text
 
-            // create and append text
-            text = document.createElement("span");
-            text.id = "text"
-            text.innerHTML = "CENTER"
-            text.setAttribute("ui", "c")
-            element.appendChild(text)
+    var execCreate = () => {
+        // create square
+        var element = document.createElement("div");
+        element.id = "element";
+        element.style.backgroundColor = "#EFB7C0"
+        element.setAttribute("ui", "w:" + SIZE_BOX + ";h:" + SIZE_BOX + ";c;v:i");
 
-            // append element
-            content.appendChild(element);
-        },
-        // move element to top left
-        function() {
-            element = document.getElementById("element")
-            element.ui.setAttr("c", false, ANIMATION_TIME)
-            text.innerHTML = "TOP-LEFT"
-        },
-        // move element to top right
-        function() {
-            element = document.getElementById("element")
-            element.ui.setAttr("r", "p", ANIMATION_TIME)
-            text.innerHTML = "TOP-RIGHT"
-        },
-        // move element to bottom right
-        function() {
-            element = document.getElementById("element")
-            element.ui.setAttr("b", "p", ANIMATION_TIME)
-            text.innerHTML = "BOTTOM-RIGHT"
-        },
-        // move element to bottom left
-        function() {
-            element = document.getElementById("element")
-            element.ui.setAttr("r", "", ANIMATION_TIME)
-            element.ui.setAttr("b", "p", ANIMATION_TIME)
-            text.innerHTML = "BOTTOM-LEFT"
-        }
-    ]
+        // create and append text
+        var text = document.createElement("span");
+        text.id = "text"
+        text.innerHTML = "CENTER"
+        text.setAttribute("ui", "c")
+        element.appendChild(text)
 
-    // execute all functions
-    function nextExecution() {
-        // check to stop
-        if (executions.length == 0) {
-            return
-        }
+        // append element
+        content.appendChild(element);
 
-        // get next execution
-        var execution = executions[0]
-        executions.splice(0, 1)
-
-        execution()
-
-        setTimeout(function(){
-            nextExecution()
-        }, TIMEOUT)
-
+        // execute top left
+        setTimeout(function() {
+            var element = document.getElementById("element")
+            element.ui.setAttr("v", "v", ANIMATION_TIME, () => {
+                execTopLeft()    
+            })
+        }, 1)
     }
-    nextExecution()
+    
+    var execTopLeft = () => {
+        element = document.getElementById("element")
+        text = document.getElementById("text")
+        text.innerHTML = "TOP-LEFT"
+        element.ui.setAttr("c", false, ANIMATION_TIME, () => {
+            execTopRight()
+        })
+    }
+
+    var execTopRight = () => {
+        text.innerHTML = "TOP-RIGHT"
+        element.ui.setAttr("r", "p", ANIMATION_TIME, () => {
+            execBottomRight()
+        })
+    }
+
+    var execBottomRight = () => {
+        text.innerHTML = "BOTTOM-RIGHT"
+        element.ui.setAttr("b", "p", ANIMATION_TIME, () => {
+            execBottomLeft()
+        })
+    }
+
+    var execBottomLeft = () => {
+        text.innerHTML = "BOTTOM-LEFT"
+        element.ui.setAttrs([
+                ["r", ""],
+                ["b", "p"]
+            ], ANIMATION_TIME, () => {
+            execCreateCenter()
+        })
+    }
+
+    var execCreateCenter = () => {
+        // create center
+        var center = document.createElement("span");
+        center.id = "center";
+        center.style.backgroundColor = "#CFD7B0"
+        center.setAttribute("ui", "w:" + SIZE_BOX + ";h:" + SIZE_BOX + ";c;v:i");
+
+        // create and append text
+        var textCenter = document.createElement("span");
+        textCenter.id = "textCenter"
+        textCenter.innerHTML = "CENTER"
+        textCenter.setAttribute("ui", "c")
+        center.appendChild(textCenter)
+
+        // append element
+        content.insertBefore(center, element);
+
+        setTimeout(function() {
+            var center = document.getElementById("center")
+            center.ui.setAttr("v", "v", ANIMATION_TIME, () => {
+                execAtLeft()    
+            })
+        }, 1)
+        
+    }
+
+    var execAtLeft = () => {
+        element = document.getElementById("element")
+        text = document.getElementById("text")
+        text.innerHTML = "AT-LEFT"
+        element.ui.cleanAttrs({ size: false })
+        element.ui.setAttrs([
+            ["al", "center"],
+            ["t", "center"]
+        ], ANIMATION_TIME, () => {
+            execAtTop()
+        })
+    }
+
+    var execAtTop = () => {
+        text.innerHTML = "AT-TOP"
+        element.ui.cleanAttrs({ size: false })
+        element.ui.setAttrs([
+            ["at", "center"],
+            ["l", "center"]
+        ], ANIMATION_TIME, () => {
+            execAtRight()
+        })
+    }
+
+    var execAtRight = () => {
+        text.innerHTML = "AT-RIGHT"
+        element.ui.cleanAttrs({ size: false })
+        element.ui.setAttrs([
+            ["ar", "center"],
+            ["t", "center"]
+        ], ANIMATION_TIME, () => {
+            execAtBottom()
+        })
+    }
+
+    var execAtBottom = () => {
+        text.innerHTML = "AT-BOTTOM"
+        element.ui.cleanAttrs({ size: false })
+        element.ui.setAttrs([
+            ["ab", "center"],
+            ["l", "center"]
+        ], ANIMATION_TIME, () => {
+            moveElementToCenter()
+        })
+    }
+
+    var moveElementToCenter = () => {
+        element.ui.cleanAttrs({ size: false })
+        element.ui.setAttrs([
+            ["c", ""],
+        ], ANIMATION_TIME, () => {
+            text.ui.setAttr("", "", ANIMATION_TIME)
+            text.innerHTML = "CENTER"
+            content.removeChild(center)
+            changeWidth()
+        })
+        center.ui.setAttr("v", "i", ANIMATION_TIME)
+    }
+
+    var changeWidth = () => {
+        element.ui.setAttrs([
+            ["w", SIZE_BOX * 1.5],
+        ], ANIMATION_TIME, () => {
+            text.ui.setAttr("", "", ANIMATION_TIME)
+            text.innerHTML = "CHANGE WIDTH"
+            changeHeight()
+        })
+    }
+
+    var changeHeight = () => {
+        element.ui.setAttrs([
+            ["h", SIZE_BOX * 1.5],
+        ], ANIMATION_TIME, () => {
+            text.ui.setAttr("", "", ANIMATION_TIME)
+            text.innerHTML = "CHANGE HEIGHT"    
+        })
+    }
+
+    execCreate()
     </script>
     
 </body>

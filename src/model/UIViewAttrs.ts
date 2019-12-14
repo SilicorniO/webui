@@ -1,4 +1,4 @@
-import UIAttr from "./UIAttr"
+import UIAttr, { UIAttrCleanOptions } from "./UIAttr"
 import { UI_VISIBILITY } from "./UIVisibility"
 import { AXIS } from "./UIAxis"
 
@@ -21,9 +21,9 @@ export default class UIViewAttrs {
         }
     }
 
-    public clean() {
-        this.x.clean()
-        this.y.clean()
+    public clean(options: UIAttrCleanOptions) {
+        this.x.clean(options)
+        this.y.clean(options)
         this.visibility = UI_VISIBILITY.VISIBLE
     }
 }
