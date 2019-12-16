@@ -1,7 +1,7 @@
 import UIHTMLElement from "./UIHTMLElement"
 import UIConfiguration from "../UIConfiguration"
-import UIAttr, { UI_SIZE, UIAttrCleanOptions } from "./UIAttr"
-import { AXIS, AXIS_LIST, UIAxisArray, UIAxis } from "./UIAxis"
+import UIAttr, { UIAttrCleanOptions } from "./UIAttr"
+import { AXIS, UIAxisArray, UIAxis } from "./UIAxis"
 import UIPosition from "./UIPosition"
 import UIDraw, { UIDrawAnimation } from "./UIDraw"
 import { UI_VISIBILITY } from "./UIVisibility"
@@ -12,13 +12,32 @@ import UIViewEventsManager from "../core/events/UIViewEventsManager"
 import { UIAttributeValueArray } from "../core/dom/UIAttributeValue"
 import UIViewStateManager from "../core/state/UIViewStateManager"
 
+export enum UIViewStateChange {
+    NONE,
+    ALL,
+    SIZE,
+    SIZE_POS,
+    START,
+    END,
+    CENTER,
+    MARGIN_START,
+    MARGIN_END,
+    PADDING_START,
+    PADDING_END,
+    SCROLL,
+    VISIBILITY,
+    CHILD_NODE_ADDED,
+    CHILD_NODE_REMOVED,
+    PARENT_RESIZED,
+}
+
 export enum UIViewState {
-    NOT_STARTED = 0,
-    DOM_PREPARED = 1,
-    PREPARED = 2,
-    ORGANIZED = 3,
-    VALUES_CALCULATED = 4,
-    DRAW_DEFINED = 5,
+    DOM = 0,
+    PREPARE = 1,
+    ORGANIZE = 2,
+    CALCULATE = 3,
+    DRAW = 4,
+    PAINT = 5,
 }
 
 export default class UIView {
@@ -101,8 +120,8 @@ export default class UIView {
         this.screen = screen
 
         // initialize events manager
-        this.eventsManager = new UIViewEventsManager(this, webUIListener, configuration)
-        this.stateManager = new UIViewStateManager(this)
+        this.eventsManager = new UIViewEventsManager(this, configuration)
+        this.stateManager = new UIViewStateManager(this, webUIListener)
 
         // initialize opacity to 0 to show it when it has the position
         element.style.opacity = "0"
@@ -121,8 +140,8 @@ export default class UIView {
         this.stateManager.setState(state)
     }
 
-    public changeState(state: UIViewState) {
-        this.stateManager.changeState(state)
+    public changeState(change: UIViewStateChange, axis?: AXIS): UIView | null {
+        return this.stateManager.changeState(change, axis)
     }
 
     public getState(): UIViewState {
@@ -151,8 +170,8 @@ export default class UIView {
 
     // ----- REFRESH -----
 
-    public forceRefresh(initialize: boolean = false) {
-        this.eventsManager.onRefresh(initialize)
+    public forceRefresh() {
+        this.stateManager.changeState(UIViewStateChange.ALL)
     }
 
     // ----- SET ATTRIBUTE -----
@@ -160,15 +179,13 @@ export default class UIView {
     public setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number, animationEnd?: () => void) {
         // apply attributes
         for (const attribute of attributes) {
-            this.applyAttribute(attribute[0], attribute[1])
+            this.setAttr(attribute[0], attribute[1])
         }
 
         // apply animation
         this.animateNextRefresh(animationDuration, animationEnd)
-
-        // launch resize event
-        this.eventsManager.onChangeAttribute()
     }
+
     public setAttr(
         attribute: ATTR,
         value?: string | number | boolean,
@@ -182,7 +199,7 @@ export default class UIView {
         this.animateNextRefresh(animationDuration, animationEnd)
 
         // launch resize event
-        this.eventsManager.onChangeAttribute()
+        this.eventsManager.onChangeAttribute(attribute)
     }
 
     private applyAttribute(attribute: ATTR, value?: string | number | boolean) {

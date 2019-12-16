@@ -66,7 +66,9 @@ export default class UIDrawer {
                 // call to listener if we have one
                 if (draw.onTransitionEnd != null) {
                     setTimeout(() => {
-                        draw.onTransitionEnd()
+                        if (draw.onTransitionEnd != null) {
+                            draw.onTransitionEnd()
+                        }
                     }, 0)
                 }
             }

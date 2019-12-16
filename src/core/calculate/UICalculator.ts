@@ -7,7 +7,7 @@ import UIPosition from "../../model/UIPosition"
 
 export default class UICalculator {
     public static calculate(view: UIView, scrollSize: number) {
-        if (view.getState() >= UIViewState.VALUES_CALCULATED) {
+        if (view.getState() >= UIViewState.DRAW) {
             return
         }
 
@@ -47,7 +47,7 @@ export default class UICalculator {
         } while (viewsRestored.length > 0)
 
         // update state of screen
-        view.setState(UIViewState.VALUES_CALCULATED)
+        view.setState(UIViewState.DRAW)
     }
 
     private static calculateViews(
@@ -63,7 +63,7 @@ export default class UICalculator {
     ) {
         for (const view of views) {
             // check if it is already calculated
-            if (view.getState() < UIViewState.VALUES_CALCULATED) {
+            if (view.getState() < UIViewState.DRAW) {
                 // clean axis
                 view.clean(axis)
 
@@ -74,7 +74,7 @@ export default class UICalculator {
 
                 // if it is the last axis we mark it as calculated
                 if (lastAxis) {
-                    view.setState(UIViewState.VALUES_CALCULATED)
+                    view.setState(UIViewState.DRAW)
                 }
             }
         }
@@ -239,10 +239,14 @@ export default class UICalculator {
                 if (!view.positions[axis].scrollApplied) {
                     //apply style to show vertical scroll
                     var element = document.getElementById(view.id)
-                    if (axis == AXIS.X) {
-                        element.style.overflowX = "auto"
+                    if (element != null) {
+                        if (axis == AXIS.X) {
+                            element.style.overflowX = "auto"
+                        } else {
+                            element.style.overflowY = "auto"
+                        }
                     } else {
-                        element.style.overflowY = "auto"
+                        Log.logE(`Error trying to find element with identifier ${view.id}`)
                     }
 
                     //recalculate all the children

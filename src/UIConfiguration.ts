@@ -59,7 +59,7 @@ export default class UIConfiguration {
         if (uiConf.showLogs == true) {
             this.showLogs = true
             if (uiConf.viewLogs) {
-                this.logsView = document.getElementById(uiConf.viewLogs)
+                this.logsView = document.getElementById(uiConf.viewLogs) || undefined
             }
         }
 
@@ -97,14 +97,16 @@ export default class UIConfiguration {
         }
 
         // save screen modes
-        this.screenModes = uiConf.screenModes
+        if (uiConf.screenModes != null) {
+            this.screenModes = uiConf.screenModes
+        }
 
         this.refreshScreenSize()
     }
 
     public refreshScreenSize() {
         //initialize array of attributes
-        var aAttributes = []
+        var aAttributes: string[] = []
         var dimens = this.dimens
 
         var widthScreen = window.innerWidth
@@ -133,8 +135,13 @@ export default class UIConfiguration {
                         screenMode.heightEnd == 0 ||
                         heightScreen < screenMode.heightEnd)
                 ) {
-                    aAttributes.push(screenMode["attribute"])
-                    Log.log("SHOWING ATTRIBUTE: " + screenMode["attribute"])
+                    // attribute
+                    const screenModeAttribute = screenMode["attribute"]
+                    if (screenModeAttribute != null) {
+                        aAttributes.push(screenModeAttribute)
+                        Log.log("SHOWING ATTRIBUTE: " + screenModeAttribute)
+                    }
+
                     //add dimens of this screen mode overriding existing
                     if (screenMode.dimens) {
                         var dimenKeys = Object.keys(screenMode["dimens"])

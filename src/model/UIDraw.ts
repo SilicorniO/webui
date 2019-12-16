@@ -1,6 +1,6 @@
 export class UIDrawAnimation {
     public duration: number = 0
-    public onEnd: () => void | null = null
+    public onEnd: (() => void) | null = null
 }
 
 export default class UIDraw {
@@ -15,5 +15,5 @@ export default class UIDraw {
     backgroundColor: string = ""
 
     // listener for the end of transition
-    onTransitionEnd: () => void | null = null
+    onTransitionEnd: (() => void) | null = null
 }

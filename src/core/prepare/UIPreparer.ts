@@ -6,20 +6,22 @@ import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
 
 export default class UIPreparer {
-    public static prepareScreen(screen: UIView, configuration: UIConfiguration) {
+    public static prepareScreen(view: UIView, configuration: UIConfiguration) {
         // check this screen needs to be prepared
-        if (screen.getState() >= UIViewState.PREPARED) {
+        if (view.getState() >= UIViewState.ORGANIZE) {
             return
         }
 
-        //update the size of the screen
-        const screenSizeChanged = UIPreparer.loadSizeScreen(screen)
+        // update the size of the screen
+        if (view.parent == null) {
+            UIPreparer.loadSizeScreen(view)
+        }
 
-        //load sizes of views
-        UIPreparer.loadSizes(screen.getChildElements(), configuration, screenSizeChanged)
+        // load sizes of views
+        UIPreparer.loadSizes(view.getChildElements(), configuration)
 
         // update state of the screen
-        screen.setState(UIViewState.PREPARED)
+        view.setState(UIViewState.ORGANIZE)
     }
 
     /**
@@ -28,21 +30,23 @@ export default class UIPreparer {
      * @param {UIConfiguration} coreConfig
      * @param {boolean} forceSizeLoaded
      **/
-    public static loadSizes(elements: UIHTMLElement[], coreConfig: UIConfiguration, forceSizeLoaded: boolean = false) {
+    public static loadSizes(elements: UIHTMLElement[], coreConfig: UIConfiguration) {
         for (let i = 0; i < elements.length; i++) {
             const ele = elements[i]
             const view = ele.ui
-            if (view && !view.isGone()) {
-                // show view if it is not visible
-                if (ele.style.display == "none") {
-                    ele.style.display = "inline-block"
-                }
+            if (view.getState() < UIViewState.ORGANIZE) {
+                if (!view.isGone()) {
+                    // show view if it is not visible
+                    if (ele.style.display == "none") {
+                        ele.style.display = "inline-block"
+                    }
 
-                if (!view.isGone() && (forceSizeLoaded || view.getState() < UIViewState.PREPARED)) {
+                    // get width of size content view
                     if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
                         view.attrs[AXIS.X].sizeValue = DomSizeUtils.calculateWidthView(view, ele)
                     }
 
+                    // get height of size content view
                     if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
                         view.attrs[AXIS.Y].sizeValue = DomSizeUtils.calculateHeightView(view, ele)
                     }
@@ -50,15 +54,12 @@ export default class UIPreparer {
                     //translate paddings and margins
                     this.applyDimensToView(view, coreConfig)
 
-                    //mark the sizeLoaded flag of this view as true
-                    view.setState(UIViewState.PREPARED)
+                    // load children
+                    this.loadSizes(view.getChildElements(), coreConfig)
                 }
 
-                this.loadSizes(
-                    view.getChildElements(),
-                    coreConfig,
-                    forceSizeLoaded || view.getState() < UIViewState.PREPARED,
-                )
+                //mark the sizeLoaded flag of this view as true
+                view.setState(UIViewState.ORGANIZE)
             }
         }
     }
@@ -78,19 +79,19 @@ export default class UIPreparer {
      * @return {boolean} flag to know if screen changed
      **/
     public static loadSizeScreen(screen: UIView): boolean {
-        //flag looking for changes
+        // flag looking for changes
         let sizeChanged = false
 
-        //get the element
+        // get the element
         const ele = screen.element
         ele.style.position = "absolute"
 
-        //show view if it is not visible
+        // show view if it is not visible
         if (ele.style.display == "none") {
             ele.style.display = "inline-block"
         }
 
-        //apply width and height if they are defined
+        // apply width and height if they are defined
         if (screen.attrs[AXIS.X].size != UI_SIZE.SIZE_CONTENT) {
             if (screen.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
                 ele.style.width = screen.attrs[AXIS.X].sizeValue + "px"

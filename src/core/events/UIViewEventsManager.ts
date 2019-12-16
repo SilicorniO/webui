@@ -1,16 +1,15 @@
-import UIView, { UIViewState } from "../../model/UIView"
+import UIView, { UIViewState, UIViewStateChange } from "../../model/UIView"
 import { WebUIListener } from "../../WebUI"
 import UIConfiguration from "../../UIConfiguration"
-import { UI_SIZE } from "../../model/UIAttr"
+import UIAttr, { UI_SIZE } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
-import UIAttrReader from "../dom/UIAttrReader"
+import UIAttrReader, { ATTR } from "../dom/UIAttrReader"
+import UIViewEventsUtils from "./UIViewEventsUtils"
+import { AXIS } from "../../model/UIAxis"
 
 export default class UIViewEventsManager {
     // associated screen
     private view: UIView
-
-    // associated listener for redraw events
-    private webUIListener: WebUIListener
 
     // associated configuration
     private configuration: UIConfiguration
@@ -23,9 +22,8 @@ export default class UIViewEventsManager {
     // flag to disable next ui attribute mutation
     private dismissNextUiAttributeMutation: boolean = false
 
-    constructor(view: UIView, webUIListener: WebUIListener, configuration: UIConfiguration) {
+    constructor(view: UIView, configuration: UIConfiguration) {
         this.view = view
-        this.webUIListener = webUIListener
         this.configuration = configuration
     }
 
@@ -45,11 +43,16 @@ export default class UIViewEventsManager {
         this.disableListenResizeEvents()
     }
 
-    public onChangeAttribute() {
+    public onChangeAttribute(attribute: ATTR) {
+        // update ui attribute
         this.dismissNextUiAttributeMutation = true
         this.view.element.setAttribute(this.configuration.attribute, UIAttrReader.generateUiAttr(this.view.attrs))
 
-        this.launchResizeEvent()
+        // launch change of state
+        const aStateChangeAndAxis = UIViewEventsUtils.convertAttrToStateChangeWithAxis(attribute)
+        for (const stateChangeAndAxis of aStateChangeAndAxis) {
+            this.view.changeState(stateChangeAndAxis.stateChange, stateChangeAndAxis.axis)
+        }
     }
 
     public onLoadElement() {
@@ -65,14 +68,12 @@ export default class UIViewEventsManager {
     }
 
     private launchResizeEvent() {
-        this.view.changeState(UIViewState.NOT_STARTED)
-        this.webUIListener.onScreenRedraw(this.view.screen || this.view)
+        this.view.changeState(UIViewStateChange.PARENT_RESIZED)
     }
 
     private launchReinitEvent() {
         // send re-init event
-        this.view.changeState(UIViewState.NOT_STARTED)
-        this.webUIListener.onScreenRedraw(this.view.screen || this.view)
+        this.view.changeState(UIViewStateChange.PARENT_RESIZED)
     }
 
     // ----- PRIVATE -----
@@ -86,20 +87,22 @@ export default class UIViewEventsManager {
             for (const mutation of mutationsList) {
                 if (mutation.type == "attributes") {
                     const attributeName = mutation.attributeName
-                    if (
-                        attributeName == "id" ||
-                        attributeName == "class" ||
-                        attributeName == this.configuration.attribute ||
-                        this.configuration.attributes.includes(attributeName)
-                    ) {
-                        // check if we have to dismiss it because it is our change
-                        if (attributeName == this.configuration.attribute && this.dismissNextUiAttributeMutation) {
-                            this.dismissNextUiAttributeMutation = false
-                            return
-                        }
+                    if (attributeName != null) {
+                        if (
+                            attributeName == "id" ||
+                            attributeName == "class" ||
+                            attributeName == this.configuration.attribute ||
+                            this.configuration.attributes.includes(attributeName)
+                        ) {
+                            // check if we have to dismiss it because it is our change
+                            if (attributeName == this.configuration.attribute && this.dismissNextUiAttributeMutation) {
+                                this.dismissNextUiAttributeMutation = false
+                                return
+                            }
 
-                        Log.log(`Event 'attributes' being processed for view ${this.view.id}`)
-                        this.launchReinitEvent()
+                            Log.log(`Event 'attributes' being processed for view ${this.view.id}`)
+                            this.launchReinitEvent()
+                        }
                     }
                 }
             }
@@ -131,7 +134,8 @@ export default class UIViewEventsManager {
             for (const mutation of mutationsList) {
                 if (mutation.type == "characterData") {
                     Log.log(`Event 'characterData' being processed for view ${this.view.id}`)
-                    this.webUIListener.onScreenRedraw(this.view.screen || this.view)
+                    this.view.changeState(UIViewStateChange.SIZE, AXIS.X)
+                    this.view.changeState(UIViewStateChange.SIZE, AXIS.Y)
                 }
             }
         })
@@ -187,6 +191,9 @@ export default class UIViewEventsManager {
     private evalListenResizeEvents() {
         // disable resize events
         const parentElement = this.disableListenResizeEvents()
+        if (parentElement == null) {
+            return
+        }
 
         // check this view is screen
         if (this.view.parent != null) {
@@ -202,11 +209,15 @@ export default class UIViewEventsManager {
         parentElement.addEventListener("resize", this.resizeEvent.bind(this))
     }
 
-    private disableListenResizeEvents(): HTMLElement | Window {
+    private disableListenResizeEvents(): HTMLElement | Window | null {
         // listen events of parent or window
-        let parentElement: HTMLElement | Window = this.view.element.parentElement
+        let parentElement: HTMLElement | Window | null = this.view.element.parentElement
         if (parentElement == null) {
-            parentElement = window
+            parentElement = window || null
+        }
+        if (parentElement == null) {
+            Log.logE("Window events can't be catched")
+            return null
         }
 
         // remove event by default

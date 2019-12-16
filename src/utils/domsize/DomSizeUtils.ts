@@ -10,7 +10,7 @@ export default class DomSizeUtils {
      * @param ele DOM element to calculate the width
      * @return width calculated
      **/
-    public static calculateWidthView(view: UIView, ele: HTMLElement, height?: number) {
+    public static calculateWidthView(view: UIView, ele: HTMLElement, height?: number): number {
         //prepare parent to give the son a lot of space for calculation
         // var parent = ele.parentElement;
         // var parentWidth = parent.offsetWidth;
@@ -29,7 +29,7 @@ export default class DomSizeUtils {
 
         //increment for text calculations error
         if (width > 0) {
-            width++
+            width += 1
         }
 
         //set values of parent back
@@ -45,7 +45,7 @@ export default class DomSizeUtils {
      * @param ele DOM element to calculate the height
      * @return height calculated
      **/
-    public static calculateHeightView(view: UIView, ele: HTMLElement, width?: number) {
+    public static calculateHeightView(view: UIView, ele: HTMLElement, width?: number): number {
         //prepare parent to give the son a lot of space for calculation
         // var parent = ele.parentElement;
         // var parentHeight = parent.offsetHeight;
@@ -64,7 +64,7 @@ export default class DomSizeUtils {
 
         //increment for text calculations error
         if (height > 0) {
-            height++
+            height += 1
         }
 
         //set values of parent back
@@ -79,9 +79,12 @@ export default class DomSizeUtils {
      * @param view View to change the height
      * @param ele DOM element to calculate the width
      **/
-    public static calculateWidthViewSlow(view: UIView, ele: HTMLElement) {
+    public static calculateWidthViewSlow(view: UIView, ele: HTMLElement): number {
         //prepare parent to give the son a lot of space for calculation
         var parent = ele.parentElement
+        if (parent == null) {
+            return 0
+        }
         var parentWidth = "" + parent.offsetWidth
         var parentScrollLeft = parent.scrollLeft
         parent.style.width = "10000"
@@ -94,7 +97,7 @@ export default class DomSizeUtils {
 
         //increment for text calculations error
         if (width > 0) {
-            width++
+            width += 1
         }
 
         //set values of parent back
@@ -109,9 +112,12 @@ export default class DomSizeUtils {
      * @param view View to change the height
      * @param ele DOM element to calculate the height
      **/
-    public static calculateHeightViewSlow(view: UIView, ele: HTMLElement) {
+    public static calculateHeightViewSlow(view: UIView, ele: HTMLElement): number {
         //prepare parent to give the son a lot of space for calculation
         var parent = ele.parentElement
+        if (parent == null) {
+            return 0
+        }
         var parentHeight = "" + parent.offsetHeight
         var parentScrollTop = parent.scrollTop
         parent.style.height = "10000"
@@ -124,7 +130,7 @@ export default class DomSizeUtils {
 
         //increment for text calculations error
         if (height > 0) {
-            height++
+            height += 1
         }
 
         //set values of parent back

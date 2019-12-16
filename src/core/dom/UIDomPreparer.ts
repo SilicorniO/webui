@@ -50,7 +50,7 @@ export default class UIDomPreparer {
         if (uiElement != null) {
             const view = uiElement.ui
             // search if it is necessary in the rest of the dom
-            if (view.getState() == UIViewState.NOT_STARTED) {
+            if (view.getState() == UIViewState.DOM) {
                 // read again the attributes
                 view.attrs = UIAttrReader.readAttrs(view.element, configuration)
 
@@ -62,7 +62,7 @@ export default class UIDomPreparer {
                 })
 
                 // update state of the view
-                view.setState(UIViewState.DOM_PREPARED)
+                view.setState(UIViewState.PREPARE)
             }
             return
         }
@@ -86,7 +86,7 @@ export default class UIDomPreparer {
         })
 
         // update state of the view
-        view.setState(UIViewState.DOM_PREPARED)
+        view.setState(UIViewState.PREPARE)
     }
 
     public static clearUIDom(element: Node) {

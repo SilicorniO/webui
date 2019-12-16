@@ -68,12 +68,7 @@ export default class UIAttrReader {
      * @param attributes with the name of the attributes to read as secondary
      * @return View generated
      **/
-    private static readUI(
-        viewAttrs: UIViewAttrs,
-        element: HTMLElement,
-        attributeMain: string,
-        attributes: string[],
-    ): UIView {
+    private static readUI(viewAttrs: UIViewAttrs, element: HTMLElement, attributeMain: string, attributes: string[]) {
         //read main attributes
         let attributeValues = UIAttrReaderUtils.readAttributes(element.getAttribute(attributeMain))
         for (let i = 0; i < attributes.length; i++) {
@@ -212,10 +207,10 @@ export default class UIAttrReader {
                     viewAttrs.x.setPadding(sValue)
                     viewAttrs.y.setPadding(sValue)
                 } else if (pValues.length === 4) {
-                    viewAttrs.x.paddingStart = mValues[0]
-                    viewAttrs.y.paddingStart = mValues[1]
-                    viewAttrs.x.paddingEnd = mValues[2]
-                    viewAttrs.y.paddingEnd = mValues[3]
+                    viewAttrs.x.paddingStart = pValues[0]
+                    viewAttrs.y.paddingStart = pValues[1]
+                    viewAttrs.x.paddingEnd = pValues[2]
+                    viewAttrs.y.paddingEnd = pValues[3]
                 }
                 break
             case ATTR.CENTER_VERTICAL:

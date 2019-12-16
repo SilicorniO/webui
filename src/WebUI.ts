@@ -14,7 +14,7 @@ import UIOrganizer from "./core/organize/UIOrganizer"
 export type WebUIRedraw = (screen: UIView) => void
 
 export interface WebUIListener {
-    onScreenRedraw: (screen: UIView) => void
+    onViewRedraw: (view: UIView) => void
 }
 
 /**
@@ -30,7 +30,7 @@ class WebUI implements WebUIListener {
     //timer for repainting
     private redrawTimer: CallbackTimer
 
-    private screensToDraw: { [key: string]: UIView } = {}
+    private viewsToDraw: { [key: string]: UIView } = {}
 
     /**
      * Start running the webUI listening for dom changes and initial start
@@ -61,14 +61,14 @@ class WebUI implements WebUIListener {
 
         // discover screens
         UIDomPreparer.discoverScreens(bodyElement, this.configuration, this, screen => {
-            this.drawUIScreen(screen)
+            this.drawUIView(screen)
         })
 
         Log.log(`[WebUI] End processing(${CounterUtils.endCounter("drawScreens")})`)
     }
 
-    private drawUIScreen(screen: UIView) {
-        Log.log(`[${screen.id}] Start processing`)
+    private drawUIView(view: UIView) {
+        Log.log(`[${view.id}] Start processing`)
 
         //timers variables
         var timerDom = 0
@@ -86,34 +86,34 @@ class WebUI implements WebUIListener {
 
         // ----- PREPARE DOM -----
         CounterUtils.startCounter("dom")
-        UIDomPreparer.prepareDom(screen.element, this.configuration, this, screen, screen)
+        UIDomPreparer.prepareDom(view.element, this.configuration, this, view, view)
         timerDom = CounterUtils.endCounter("dom")
 
         // ----- PREPARE -----
         CounterUtils.startCounter("prepare")
-        UIPreparer.prepareScreen(screen, this.configuration)
+        UIPreparer.prepareScreen(view, this.configuration)
         timerPrepare = CounterUtils.endCounter("prepare")
 
         // ----- ORGANIZE -----
         CounterUtils.startCounter("organize")
-        UIOrganizer.organize(screen)
+        UIOrganizer.organize(view)
         timerOrganize = CounterUtils.endCounter("organize")
 
         // ----- CALCULATE -----
         CounterUtils.startCounter("calculate")
-        UICalculator.calculate(screen, this.scrollSize)
+        UICalculator.calculate(view, this.scrollSize)
         timerCalculate = CounterUtils.endCounter("calculate")
 
         // ---- DRAW -----
         CounterUtils.startCounter("draw")
-        UIDrawController.generateDraws(screen, this.configuration)
-        UIDrawController.applyDrawsToScreen(screen, this.configuration)
+        UIDrawController.generateDraws(view, this.configuration)
+        UIDrawController.applyDrawsToScreen(view, this.configuration)
         timerDraw = CounterUtils.endCounter("draw")
 
         // show counter logs
         timerAll = CounterUtils.endCounter("all")
         Log.log(
-            `[${screen.id}] End processing:` +
+            `[${view.id}] End processing:` +
                 ` All(${timerAll})` +
                 ` Dom(${timerDom})` +
                 ` Prepare(${timerPrepare})` +
@@ -123,7 +123,7 @@ class WebUI implements WebUIListener {
         )
 
         // apply events
-        screen.evalEvents()
+        view.evalEvents()
 
         //call to listener with end event
         this.configuration.sendEndEvent()
@@ -131,12 +131,12 @@ class WebUI implements WebUIListener {
 
     // ----- REDRAW -----
 
-    onScreenRedraw(screen: UIView) {
+    onViewRedraw(view: UIView) {
         // disable events from screen
-        screen.disableEvents()
+        view.disableEvents()
 
         // add to the list of screens to draw
-        this.screensToDraw[screen.id] = screen
+        this.viewsToDraw[view.id] = view
 
         // call to redraw
         this.redrawTimer.execute()
@@ -145,18 +145,18 @@ class WebUI implements WebUIListener {
     //redraw function
     private redraw() {
         // get a copy of the screens to draw
-        const screens: UIView[] = []
-        for (const id of Object.keys(this.screensToDraw)) {
-            screens.push(this.screensToDraw[id])
+        const views: UIView[] = []
+        for (const id of Object.keys(this.viewsToDraw)) {
+            views.push(this.viewsToDraw[id])
         }
-        this.screensToDraw = {}
+        this.viewsToDraw = {}
 
         //draw
         Log.log("[WebUI] Start redrawing")
         CounterUtils.startCounter("redraw")
-        for (const screen of screens) {
+        for (const view of views) {
             // draw this screen
-            this.drawUIScreen(screen)
+            this.drawUIView(view)
         }
         Log.log(`[WebUI] End redraw(${CounterUtils.endCounter("redraw")})`)
     }

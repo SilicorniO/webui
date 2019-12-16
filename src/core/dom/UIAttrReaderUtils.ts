@@ -8,7 +8,7 @@ export default class UIAttrReaderUtils {
      * @param text String with the text to parse
      * @return array of objects with key and value
      **/
-    static readAttributes(text: string): UIAttributeValue[] {
+    static readAttributes(text: string | null): UIAttributeValue[] {
         //check text is not null
         if (text == null) {
             return []

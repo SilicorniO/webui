@@ -6,9 +6,9 @@ import { UI_VISIBILITY } from "../../model/UIVisibility"
 import UIDrawer from "./UIDrawer"
 
 export default class UIDrawController {
-    public static generateDraws(screen: UIView, configuration: UIConfiguration) {
+    public static generateDraws(view: UIView, configuration: UIConfiguration) {
         // check if screen has to generate again the draw
-        if (screen.getState() >= UIViewState.DRAW_DEFINED) {
+        if (view.getState() >= UIViewState.PAINT) {
             return
         }
 
@@ -18,28 +18,34 @@ export default class UIDrawController {
             y: 0,
         }
 
-        // generate draw for all children
-        for (const child of screen.getUIChildren()) {
-            const childPosition = this.generateDrawOfView(child, screen.attrs.visibility, configuration)
+        // check if it is a screen, screen has special draw
+        if (view.parent == null) {
+            // generate draw for all children
+            for (const child of view.getUIChildren()) {
+                const childPosition = this.generateDrawOfView(child, view.attrs.visibility, configuration)
 
-            // update children max positions
-            childrenMaxPosition.x = Math.max(childrenMaxPosition.x, childPosition.x)
-            childrenMaxPosition.y = Math.max(childrenMaxPosition.y, childPosition.y)
+                // update children max positions
+                childrenMaxPosition.x = Math.max(childrenMaxPosition.x, childPosition.x)
+                childrenMaxPosition.y = Math.max(childrenMaxPosition.y, childPosition.y)
+            }
+
+            // generate draw for screen
+            const screenDraw = UIDrawGenerator.generateScreenDraw(
+                view.attrs,
+                view.positions,
+                childrenMaxPosition,
+                configuration.viewColors,
+            )
+
+            // set draw to screen
+            view.draw = screenDraw
+        } else {
+            // generate draw as a child
+            this.generateDrawOfView(view, view.attrs.visibility, configuration)
         }
 
-        // generate draw for screen
-        const screenDraw = UIDrawGenerator.generateScreenDraw(
-            screen.attrs,
-            screen.positions,
-            childrenMaxPosition,
-            configuration.viewColors,
-        )
-
-        // set draw to screen
-        screen.draw = screenDraw
-
         // update state of screen
-        screen.setState(UIViewState.DRAW_DEFINED)
+        view.setState(UIViewState.PAINT)
     }
 
     private static generateDrawOfView(
@@ -52,7 +58,7 @@ export default class UIDrawController {
         }
 
         // check draw is already generated
-        if (view.getState() >= UIViewState.DRAW_DEFINED) {
+        if (view.getState() >= UIViewState.PAINT) {
             return {
                 x: view.positions[AXIS.X].start + view.positions[AXIS.X].size,
                 y: view.positions[AXIS.Y].start + view.positions[AXIS.Y].size,
@@ -71,7 +77,7 @@ export default class UIDrawController {
         view.draw = childResult.draw
 
         // update state of view
-        view.setState(UIViewState.DRAW_DEFINED)
+        view.setState(UIViewState.PAINT)
 
         return childResult.maxPosition
     }

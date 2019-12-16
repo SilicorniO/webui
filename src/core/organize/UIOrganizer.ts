@@ -12,7 +12,7 @@ export default class UIOrganizer {
      **/
     public static organize(view: UIView) {
         // check if it is already organized
-        if (view.getState() >= UIViewState.ORGANIZED) {
+        if (view.getState() >= UIViewState.CALCULATE) {
             return
         }
 
@@ -32,7 +32,7 @@ export default class UIOrganizer {
         }
 
         // mark view as ordered
-        view.setState(UIViewState.ORGANIZED)
+        view.setState(UIViewState.CALCULATE)
     }
 
     /**
