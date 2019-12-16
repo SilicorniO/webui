@@ -1,14 +1,15 @@
-import UIView, { UIViewState } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import UIDrawGenerator from "./UIDrawGenerator"
 import { UIAxis, AXIS } from "../../model/UIAxis"
 import UIConfiguration from "../../UIConfiguration"
 import { UI_VISIBILITY } from "../../model/UIVisibility"
 import UIDrawer from "./UIDrawer"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UIDrawController {
     public static generateDraws(view: UIView, configuration: UIConfiguration) {
         // check if screen has to generate again the draw
-        if (view.getState() >= UIViewState.PAINT) {
+        if (view.getState() >= UIViewState.DRAW) {
             return
         }
 
@@ -45,7 +46,7 @@ export default class UIDrawController {
         }
 
         // update state of screen
-        view.setState(UIViewState.PAINT)
+        view.setState(UIViewState.DRAW)
     }
 
     private static generateDrawOfView(
@@ -58,7 +59,7 @@ export default class UIDrawController {
         }
 
         // check draw is already generated
-        if (view.getState() >= UIViewState.PAINT) {
+        if (view.getState() >= UIViewState.DRAW) {
             return {
                 x: view.positions[AXIS.X].start + view.positions[AXIS.X].size,
                 y: view.positions[AXIS.Y].start + view.positions[AXIS.Y].size,
@@ -77,7 +78,7 @@ export default class UIDrawController {
         view.draw = childResult.draw
 
         // update state of view
-        view.setState(UIViewState.PAINT)
+        view.setState(UIViewState.DRAW)
 
         return childResult.maxPosition
     }

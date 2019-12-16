@@ -1,13 +1,14 @@
-import UIView, { UIViewState } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
-import { AXIS, AXIS_LIST } from "../../model/UIAxis"
+import { AXIS } from "../../model/UIAxis"
 import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
 import UIPosition from "../../model/UIPosition"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UICalculator {
     public static calculate(view: UIView, scrollSize: number) {
-        if (view.getState() >= UIViewState.DRAW) {
+        if (view.getState() >= UIViewState.CALCULATE) {
             return
         }
 
@@ -21,6 +22,16 @@ export default class UICalculator {
             //clean array
             viewsRestored = new Array()
 
+            // calculate width and height of the parent
+            let width = view.positions[AXIS.X].size
+            if (view.attrs.x.size == UI_SIZE.SIZE_CONTENT) {
+                width = 0
+            }
+            let height = view.positions[AXIS.Y].size
+            if (view.attrs.y.size == UI_SIZE.SIZE_CONTENT) {
+                height = 0
+            }
+
             //calculate views
             this.calculateViews(
                 AXIS.X,
@@ -28,7 +39,7 @@ export default class UICalculator {
                 view,
                 arrayViews,
                 indexes,
-                view.positions[AXIS.X].size,
+                width,
                 viewsRestored,
                 scrollSize,
                 false,
@@ -39,7 +50,7 @@ export default class UICalculator {
                 view,
                 arrayViews,
                 indexes,
-                view.positions[AXIS.Y].size,
+                height,
                 viewsRestored,
                 scrollSize,
                 true,
@@ -47,7 +58,7 @@ export default class UICalculator {
         } while (viewsRestored.length > 0)
 
         // update state of screen
-        view.setState(UIViewState.DRAW)
+        view.setState(UIViewState.CALCULATE)
     }
 
     private static calculateViews(
@@ -63,7 +74,7 @@ export default class UICalculator {
     ) {
         for (const view of views) {
             // check if it is already calculated
-            if (view.getState() < UIViewState.DRAW) {
+            if (view.getState() < UIViewState.CALCULATE) {
                 // clean axis
                 view.clean(axis)
 
@@ -74,7 +85,7 @@ export default class UICalculator {
 
                 // if it is the last axis we mark it as calculated
                 if (lastAxis) {
-                    view.setState(UIViewState.DRAW)
+                    view.setState(UIViewState.CALCULATE)
                 }
             }
         }

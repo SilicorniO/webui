@@ -1,11 +1,13 @@
-import UIView, { UIViewState, UIViewStateChange } from "../../model/UIView"
-import { AXIS } from "../../model/UIAxis"
+import UIView, { UIViewStateChange } from "../../model/UIView"
+import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
 import { WebUIListener } from "../../WebUI"
+import UIViewStateUtils from "./UIViewStateUtils"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UIViewStateManager {
     // state of the view
-    private state: UIViewState = UIViewState.DOM
+    private state: UIViewState = UIViewState.NONE
 
     // associated screen
     private view: UIView
@@ -29,23 +31,32 @@ export default class UIViewStateManager {
             switch (change) {
                 case UIViewStateChange.SIZE:
                     oldestView = this.changeStateSize(axis)
+                    break
                 case UIViewStateChange.SIZE_POS:
                     oldestView = this.changeStateSizePos(axis)
+                    break
                 case UIViewStateChange.START:
                     oldestView = this.changeStateStart(axis)
+                    break
                 case UIViewStateChange.END:
                     oldestView = this.changeStateEnd(axis)
+                    break
                 case UIViewStateChange.CENTER:
                     oldestView = this.changeStateCenter(axis)
+                    break
                 case UIViewStateChange.MARGIN_START:
                     oldestView = this.changeStateMarginStart(axis)
+                    break
                 case UIViewStateChange.MARGIN_END:
                     oldestView = this.changeStateMarginEnd(axis)
+                    break
                 case UIViewStateChange.PADDING_START:
                 case UIViewStateChange.PADDING_END:
                     oldestView = this.changeStatePadding(axis)
+                    break
                 case UIViewStateChange.SCROLL:
                     oldestView = this.changeStateScroll(axis)
+                    break
                 default:
                     break
             }
@@ -54,12 +65,22 @@ export default class UIViewStateManager {
             switch (change) {
                 case UIViewStateChange.VISIBILITY:
                     oldestView = this.changeStateVisibility()
+                    break
+                case UIViewStateChange.VISIBILITY_GONE:
+                    oldestView = this.changeStateVisibilityGone()
+                    break
                 case UIViewStateChange.CHILD_NODE_ADDED:
                     oldestView = this.changeStateChildNodeAdded()
+                    break
                 case UIViewStateChange.CHILD_NODE_REMOVED:
                     oldestView = this.changeStateChildNodeRemoved()
+                    break
                 case UIViewStateChange.PARENT_RESIZED:
                     oldestView = this.changeStateParentResized()
+                    break
+                case UIViewStateChange.ATTRIBUTE_MODIFIED:
+                    oldestView = this.changeStateAttributeModified()
+                    break
                 default:
                     break
             }
@@ -76,17 +97,6 @@ export default class UIViewStateManager {
         }
 
         return oldestView
-
-        // // check state is not smaller, then we don't need to do the change
-        // if (this.state <= state) {
-        //     return
-        // }
-        // // change state of the view
-        // this.state = state
-        // // check how this change the state affect to parent
-        // this.evalParentState(state)
-        // // check how this change the state affect to children
-        // this.evalChildrenState(state)
     }
 
     public setState(state: UIViewState) {
@@ -99,153 +109,106 @@ export default class UIViewStateManager {
 
     // ----- PRIVATE ------
 
-    private setLowerState(state: UIViewState) {
-        // check this is lower state
-        if (state >= this.state) {
-            return
-        }
-
-        // set state
-        this.state = state
+    private setViewLowerState(state: UIViewState): UIView | null {
+        return UIViewStateUtils.setLowerState(this.view, state)
     }
 
-    private setParentLowerState(state: UIViewState) {
-        // check this view has parent
+    private setParentOrViewLowerState(state: UIViewState): UIView | null {
         const viewParent = this.view.parent
-        if (viewParent == null) {
-            return
+        if (viewParent != null) {
+            UIViewStateUtils.setLowerState(viewParent, state)
+            UIViewStateUtils.setLowerState(this.view, state)
+            const mainView = UIViewStateUtils.setLowerStateToParents(viewParent, state)
+            UIViewStateUtils.setLowerStateToChildren(mainView, UIViewState.ORGANIZE)
+            return mainView
+        } else {
+            UIViewStateUtils.setLowerState(this.view, state)
+            const mainView = UIViewStateUtils.setLowerStateToParents(this.view, state)
+            UIViewStateUtils.setLowerStateToChildren(mainView, UIViewState.ORGANIZE)
+            return this.view
         }
-
-        // check this is lower state
-        if (state >= viewParent.getState()) {
-            return
-        }
-
-        // set state
-        viewParent.setState(state)
     }
-
-    // private evalParentState(state: UIViewState) {
-    //     // if no parent we stop
-    //     if (this.view.parent == null) {
-    //         return
-    //     }
-
-    //     // if parent has less state we stop
-    //     if (this.view.parent.getState() <= state) {
-    //         return
-    //     }
-
-    //     // continue changing state to parent
-    //     this.view.parent.changeState(state)
-    // }
-
-    // private evalChildrenState(state: UIViewState) {
-    //     // if no children we stop
-    //     const children = this.view.getUIChildren()
-    //     if (children.length === 0) {
-    //         return
-    //     }
-
-    //     // change state of children if necessary
-    //     for (const child of children) {
-    //         // TODO eval how each child is affected by the change of state of the view
-    //         child.changeState(state)
-    //     }
-    // }
 
     // ------ CHANGE STATE -----
 
     private changeStateAll(): UIView | null {
-        // change state to organize and parent to calculate
-        this.setLowerState(UIViewState.DOM)
-
-        // if parent is size content, the size might change
-        let view: UIView | null = this.view
-        const parentView = this.view.parent
-        if (parentView != null) {
-            view = parentView.changeState(UIViewStateChange.ALL)
-        }
-
-        // return parent as first view to check
-        return view
+        return this.setParentOrViewLowerState(UIViewState.NONE)
     }
 
     private changeStateSize(axis: AXIS): UIView | null {
-        // change state to organize and parent to calculate
-        this.setLowerState(UIViewState.CALCULATE)
-        this.setParentLowerState(UIViewState.CALCULATE)
-
-        // if parent is size content, the size might change
-        const parentView = this.view.parent
-        if (parentView != null && parentView.attrs[axis].size == UI_SIZE.SIZE_CONTENT) {
-            parentView.changeState(UIViewStateChange.SIZE, axis)
-        }
-
-        // return parent as first view to check
-        return parentView || this.view
+        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
     private changeStateSizePos(axis: AXIS): UIView | null {
-        this.changeState(UIViewStateChange.START, axis)
-
-        return this.view
+        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
     private changeStateStart(axis: AXIS): UIView | null {
-        // change state to calculate and parent to organize
-        this.setLowerState(UIViewState.CALCULATE)
-        this.setParentLowerState(UIViewState.ORGANIZE)
-
-        const parentView = this.view.parent
-        return parentView || this.view
+        return this.setParentOrViewLowerState(UIViewState.PREPARE)
     }
 
     private changeStateEnd(axis: AXIS): UIView | null {
-        // change state to calculate and parent to organize
-        this.setLowerState(UIViewState.CALCULATE)
-        this.setParentLowerState(UIViewState.ORGANIZE)
-
-        const parentView = this.view.parent
-        return parentView || this.view
+        return this.setParentOrViewLowerState(UIViewState.PREPARE)
     }
 
     private changeStateCenter(axis: AXIS): UIView | null {
-        // change state of parent to calculate
-        this.setParentLowerState(UIViewState.CALCULATE)
-
-        return this.view
+        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
     private changeStateMarginStart(axis: AXIS): UIView | null {
-        return this.changeState(UIViewStateChange.START, axis)
+        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
     private changeStateMarginEnd(axis: AXIS): UIView | null {
-        return this.changeState(UIViewStateChange.END, axis)
+        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
     private changeStatePadding(axis: AXIS): UIView | null {
-        return this.changeState(UIViewStateChange.SIZE, axis)
+        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
     private changeStateScroll(axis: AXIS): UIView | null {
-        return this.changeState(UIViewStateChange.SIZE, axis)
+        return this.setParentOrViewLowerState(UIViewState.PREPARE)
     }
 
     private changeStateVisibility(): UIView | null {
-        return this.view
+        // visibility of view has changed between invisible and visible
+        return this.setViewLowerState(UIViewState.DRAW)
+    }
+
+    private changeStateVisibilityGone(): UIView | null {
+        // visibility of view has changed between gone and visible or invisible
+        return this.setParentOrViewLowerState(UIViewState.DOM)
     }
 
     private changeStateChildNodeAdded(): UIView | null {
-        return this.view
+        // change state of this view to DOM
+        return this.setParentOrViewLowerState(UIViewState.NONE)
     }
 
     private changeStateChildNodeRemoved(): UIView | null {
-        return this.view
+        // change state of this view to DOM
+        return this.setParentOrViewLowerState(UIViewState.NONE)
     }
 
     private changeStateParentResized(): UIView | null {
-        return this.view
+        // this view should be an screen, change state if size is percentage
+        let percentageSize = false
+        for (const axis of AXIS_LIST) {
+            percentageSize = percentageSize || this.view.attrs[axis].size == UI_SIZE.PERCENTAGE
+        }
+
+        // if no percentage size, the size of the view didn't change
+        if (!percentageSize) {
+            return null
+        }
+
+        // calculate again with new space
+        return this.setViewLowerState(UIViewState.CALCULATE)
+    }
+
+    private changeStateAttributeModified(): UIView | null {
+        // change state of this view to DOM
+        return this.setParentOrViewLowerState(UIViewState.NONE)
     }
 }

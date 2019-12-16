@@ -1,4 +1,4 @@
-import { UIViewStateChange, UIViewState } from "../../model/UIView"
+import { UIViewStateChange } from "../../model/UIView"
 import { ATTR } from "../dom/UIAttrReader"
 import { AXIS } from "../../model/UIAxis"
 

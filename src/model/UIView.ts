@@ -11,6 +11,7 @@ import { WebUIListener } from "../WebUI"
 import UIViewEventsManager from "../core/events/UIViewEventsManager"
 import { UIAttributeValueArray } from "../core/dom/UIAttributeValue"
 import UIViewStateManager from "../core/state/UIViewStateManager"
+import { UIViewState } from "./UIViewState"
 
 export enum UIViewStateChange {
     NONE,
@@ -26,18 +27,11 @@ export enum UIViewStateChange {
     PADDING_END,
     SCROLL,
     VISIBILITY,
+    VISIBILITY_GONE,
     CHILD_NODE_ADDED,
     CHILD_NODE_REMOVED,
     PARENT_RESIZED,
-}
-
-export enum UIViewState {
-    DOM = 0,
-    PREPARE = 1,
-    ORGANIZE = 2,
-    CALCULATE = 3,
-    DRAW = 4,
-    PAINT = 5,
+    ATTRIBUTE_MODIFIED,
 }
 
 export default class UIView {

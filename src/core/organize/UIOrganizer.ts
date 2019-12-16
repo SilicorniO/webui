@@ -1,9 +1,10 @@
-import UIView, { UIViewState } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import { AXIS } from "../../model/UIAxis"
 import { UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import Log from "../../utils/log/Log"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UIOrganizer {
     /**
@@ -12,7 +13,7 @@ export default class UIOrganizer {
      **/
     public static organize(view: UIView) {
         // check if it is already organized
-        if (view.getState() >= UIViewState.CALCULATE) {
+        if (view.getState() >= UIViewState.ORGANIZE) {
             return
         }
 
@@ -32,7 +33,7 @@ export default class UIOrganizer {
         }
 
         // mark view as ordered
-        view.setState(UIViewState.CALCULATE)
+        view.setState(UIViewState.ORGANIZE)
     }
 
     /**

@@ -1,14 +1,15 @@
-import UIView, { UIViewState } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIConfiguration from "../../UIConfiguration"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UIPreparer {
     public static prepareScreen(view: UIView, configuration: UIConfiguration) {
         // check this screen needs to be prepared
-        if (view.getState() >= UIViewState.ORGANIZE) {
+        if (view.getState() >= UIViewState.PREPARE) {
             return
         }
 
@@ -21,7 +22,7 @@ export default class UIPreparer {
         UIPreparer.loadSizes(view.getChildElements(), configuration)
 
         // update state of the screen
-        view.setState(UIViewState.ORGANIZE)
+        view.setState(UIViewState.PREPARE)
     }
 
     /**
@@ -34,7 +35,7 @@ export default class UIPreparer {
         for (let i = 0; i < elements.length; i++) {
             const ele = elements[i]
             const view = ele.ui
-            if (view.getState() < UIViewState.ORGANIZE) {
+            if (view.getState() < UIViewState.PREPARE) {
                 if (!view.isGone()) {
                     // show view if it is not visible
                     if (ele.style.display == "none") {
@@ -59,7 +60,7 @@ export default class UIPreparer {
                 }
 
                 //mark the sizeLoaded flag of this view as true
-                view.setState(UIViewState.ORGANIZE)
+                view.setState(UIViewState.PREPARE)
             }
         }
     }

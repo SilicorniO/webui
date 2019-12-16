@@ -1,8 +1,9 @@
 import UIConfiguration from "../../UIConfiguration"
 import { WebUIListener } from "../../WebUI"
-import UIView, { UIViewState } from "../../model/UIView"
+import UIView from "../../model/UIView"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import UIAttrReader from "./UIAttrReader"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UIDomPreparer {
     public static discoverScreens(
@@ -50,7 +51,7 @@ export default class UIDomPreparer {
         if (uiElement != null) {
             const view = uiElement.ui
             // search if it is necessary in the rest of the dom
-            if (view.getState() == UIViewState.DOM) {
+            if (view.getState() < UIViewState.DOM) {
                 // read again the attributes
                 view.attrs = UIAttrReader.readAttrs(view.element, configuration)
 
@@ -62,7 +63,7 @@ export default class UIDomPreparer {
                 })
 
                 // update state of the view
-                view.setState(UIViewState.PREPARE)
+                view.setState(UIViewState.DOM)
             }
             return
         }
@@ -86,7 +87,7 @@ export default class UIDomPreparer {
         })
 
         // update state of the view
-        view.setState(UIViewState.PREPARE)
+        view.setState(UIViewState.DOM)
     }
 
     public static clearUIDom(element: Node) {

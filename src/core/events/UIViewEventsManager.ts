@@ -1,11 +1,10 @@
-import UIView, { UIViewState, UIViewStateChange } from "../../model/UIView"
-import { WebUIListener } from "../../WebUI"
+import UIView, { UIViewStateChange } from "../../model/UIView"
 import UIConfiguration from "../../UIConfiguration"
-import UIAttr, { UI_SIZE } from "../../model/UIAttr"
+import { UI_SIZE } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
 import UIAttrReader, { ATTR } from "../dom/UIAttrReader"
 import UIViewEventsUtils from "./UIViewEventsUtils"
-import { AXIS } from "../../model/UIAxis"
+import { AXIS, AXIS_LIST } from "../../model/UIAxis"
 
 export default class UIViewEventsManager {
     // associated screen
@@ -56,24 +55,9 @@ export default class UIViewEventsManager {
     }
 
     public onLoadElement() {
-        this.launchResizeEvent()
-    }
-
-    public onRefresh(initialize: boolean = false) {
-        if (initialize) {
-            this.launchReinitEvent()
-        } else {
-            this.launchResizeEvent()
+        for (const axis of AXIS_LIST) {
+            this.view.changeState(UIViewStateChange.SIZE, axis)
         }
-    }
-
-    private launchResizeEvent() {
-        this.view.changeState(UIViewStateChange.PARENT_RESIZED)
-    }
-
-    private launchReinitEvent() {
-        // send re-init event
-        this.view.changeState(UIViewStateChange.PARENT_RESIZED)
     }
 
     // ----- PRIVATE -----
@@ -101,7 +85,7 @@ export default class UIViewEventsManager {
                             }
 
                             Log.log(`Event 'attributes' being processed for view ${this.view.id}`)
-                            this.launchReinitEvent()
+                            this.view.changeState(UIViewStateChange.ATTRIBUTE_MODIFIED)
                         }
                     }
                 }
@@ -142,6 +126,7 @@ export default class UIViewEventsManager {
 
         // start observing the target node for configured mutations
         this.observerCharacterData = observerCharacterData
+        // listen for tree events if it is the last UI view in the tree
         observerCharacterData.observe(this.view.element, { characterData: true })
     }
 
@@ -156,24 +141,19 @@ export default class UIViewEventsManager {
         // remove previous observer
         this.disableListenAddRemoveNodes()
 
-        // check this view is screen
-        if (this.view.parent != null) {
-            return
-        }
-
         // Create an observer instance linked to the callback function
         const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
             for (const mutation of mutationsList) {
                 if (mutation.type == "childList") {
                     Log.log(`Event 'childList' being processed for view ${this.view.id}`)
-                    this.launchReinitEvent()
+                    this.view.changeState(UIViewStateChange.CHILD_NODE_ADDED)
                 }
             }
         })
 
         // start observing the target node for configured mutations
         this.observerAddRemoveNodes = observerAddRemoveNodes
-        observerAddRemoveNodes.observe(this.view.element, { childList: true, subtree: true })
+        observerAddRemoveNodes.observe(this.view.element, { childList: true, subtree: !this.view.hasUIChildren() })
     }
 
     private disableListenAddRemoveNodes() {
@@ -185,7 +165,7 @@ export default class UIViewEventsManager {
 
     private resizeEvent() {
         Log.log(`Event 'resize' being processed for view ${this.view.id}`)
-        this.launchResizeEvent()
+        this.view.changeState(UIViewStateChange.PARENT_RESIZED)
     }
 
     private evalListenResizeEvents() {
