@@ -32,6 +32,7 @@ export enum UIViewStateChange {
     CHILD_NODE_REMOVED,
     PARENT_RESIZED,
     ATTRIBUTE_MODIFIED,
+    ELEMENT_LOADED,
 }
 
 export default class UIView {

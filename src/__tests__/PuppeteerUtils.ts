@@ -9,6 +9,7 @@ export interface UiDataElement {
     overflowY: string
     opacity: string
     transition: string
+    rect: DOMRect
 }
 
 export interface DataElement {
@@ -36,14 +37,15 @@ export default class PuppeteerUtils {
             return {
                 sTop: element.style.top,
                 sLeft: element.style.left,
-                top: parseFloat(element.style.top),
-                left: parseFloat(element.style.left),
-                width: element.offsetWidth,
-                height: element.offsetHeight,
+                top: element.getBoundingClientRect().top,
+                left: element.getBoundingClientRect().left,
+                width: Math.ceil(element.getBoundingClientRect().width),
+                height: Math.ceil(element.getBoundingClientRect().height),
                 overflowX: element.style.overflowX,
                 overflowY: element.style.overflowY,
                 opacity: element.style.opacity,
                 transition: element.style.transition,
+                rect: element.getBoundingClientRect(),
             }
         }, elementId)
     }
@@ -59,8 +61,8 @@ export default class PuppeteerUtils {
 
             // evaluate right position
             return {
-                width: element.offsetWidth,
-                height: element.offsetHeight,
+                width: Math.ceil(element.getBoundingClientRect().width),
+                height: Math.ceil(element.getBoundingClientRect().height),
             }
         }, elementId)
     }

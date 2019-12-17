@@ -44,7 +44,7 @@ describe("CallbackTimer", () => {
         callbackTimer.execute()
         callbackTimer.execute()
 
-        await TestUtils.delay(DELAY)
+        await TestUtils.delay(DELAY * 2)
 
         // check text
         expect(result).toBe(2)
@@ -62,7 +62,7 @@ describe("CallbackTimer", () => {
         callbackTimer.execute()
         callbackTimer.execute()
 
-        await TestUtils.delay(DELAY)
+        await TestUtils.delay(DELAY * 2)
 
         // check text
         expect(result).toBe(2)
@@ -77,7 +77,7 @@ describe("CallbackTimer", () => {
             result += 1
         }, DELAY)
         callbackTimer.execute()
-        await TestUtils.delay(DELAY)
+        await TestUtils.delay(DELAY * 2)
         callbackTimer.execute()
 
         // check text

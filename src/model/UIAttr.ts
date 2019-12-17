@@ -94,7 +94,7 @@ export default class UIAttr {
             }
             this.size = UI_SIZE.PERCENTAGE
         } else {
-            this.sizeValue = parseInt(value, 10)
+            this.sizeValue = parseFloat(value)
             this.size = UI_SIZE.SCREEN
         }
     }

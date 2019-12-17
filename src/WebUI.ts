@@ -83,7 +83,7 @@ class WebUI implements WebUIListener {
     }
 
     private drawUIView(view: UIView) {
-        Log.log(`[${view.id}] Start processing`)
+        Log.log(`[${view.id}] Start processing screen`)
 
         //timers variables
         var timerDom = 0

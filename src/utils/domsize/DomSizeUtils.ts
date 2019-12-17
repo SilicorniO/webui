@@ -1,4 +1,5 @@
 import UIView from "../../model/UIView"
+import Log from "../log/Log"
 
 /**
  * @constructor
@@ -11,32 +12,18 @@ export default class DomSizeUtils {
      * @return width calculated
      **/
     public static calculateWidthView(ele: HTMLElement, height?: number): number {
-        //prepare parent to give the son a lot of space for calculation
-        // var parent = ele.parentElement;
-        // var parentWidth = parent.offsetWidth;
-        // var parentScrollLeft = parent.scrollLeft;
-        // parent.style.width = 10000;
-
         //get the height width much space
         ele.style.position = "fixed"
+
         // ele.style.display = 'inline-block';
         if (height) {
             ele.style.height = height + "px"
         }
         ele.style.width = "auto"
         // ele.style.height = 'auto';
-        var width = ele.offsetWidth
+        const rect = ele.getBoundingClientRect()
 
-        //increment for text calculations error
-        if (width > 0) {
-            width += 1
-        }
-
-        //set values of parent back
-        // parent.style.width = parentWidth;
-        // parent.scrollLeft = parentScrollLeft;
-
-        return width
+        return Math.ceil(rect.width)
     }
 
     /**
@@ -46,98 +33,16 @@ export default class DomSizeUtils {
      * @return height calculated
      **/
     public static calculateHeightView(ele: HTMLElement, width?: number): number {
-        //prepare parent to give the son a lot of space for calculation
-        // var parent = ele.parentElement;
-        // var parentHeight = parent.offsetHeight;
-        // var parentScrollTop = parent.scrollTop;
-        // parent.style.height = 10000;
-
         //get the width height much space
         ele.style.position = "fixed"
-        // ele.style.display = 'inline-block';
-        // ele.style.width = 'auto';
+
         if (width) {
             ele.style.width = width + "px"
         }
         ele.style.height = "auto"
-        var height = ele.offsetHeight
+        const rect = ele.getBoundingClientRect()
 
-        //increment for text calculations error
-        if (height > 0) {
-            height += 1
-        }
-
-        //set values of parent back
-        // parent.style.height = parentHeight;
-        // parent.scrollTop = parentScrollTop;
-
-        return height
-    }
-
-    /**
-     * Update the width of the view received
-     * @param view View to change the height
-     * @param ele DOM element to calculate the width
-     **/
-    public static calculateWidthViewSlow(view: UIView, ele: HTMLElement): number {
-        //prepare parent to give the son a lot of space for calculation
-        var parent = ele.parentElement
-        if (parent == null) {
-            return 0
-        }
-        var parentWidth = "" + parent.offsetWidth
-        var parentScrollLeft = parent.scrollLeft
-        parent.style.width = "10000"
-
-        //get the height width much space
-        ele.style.display = "inline-block"
-        ele.style.width = "auto"
-        ele.style.height = "auto"
-        var width = ele.offsetWidth
-
-        //increment for text calculations error
-        if (width > 0) {
-            width += 1
-        }
-
-        //set values of parent back
-        parent.style.width = parentWidth
-        parent.scrollLeft = parentScrollLeft
-
-        return width
-    }
-
-    /**
-     * Update the height of the view received
-     * @param view View to change the height
-     * @param ele DOM element to calculate the height
-     **/
-    public static calculateHeightViewSlow(view: UIView, ele: HTMLElement): number {
-        //prepare parent to give the son a lot of space for calculation
-        var parent = ele.parentElement
-        if (parent == null) {
-            return 0
-        }
-        var parentHeight = "" + parent.offsetHeight
-        var parentScrollTop = parent.scrollTop
-        parent.style.height = "10000"
-
-        //get the width height much space
-        ele.style.display = "inline-block"
-        ele.style.width = "auto"
-        ele.style.height = "auto"
-        var height = ele.offsetHeight
-
-        //increment for text calculations error
-        if (height > 0) {
-            height += 1
-        }
-
-        //set values of parent back
-        parent.style.height = parentHeight
-        parent.scrollTop = parentScrollTop
-
-        return height
+        return Math.ceil(rect.height)
     }
 
     // generate list of indexes

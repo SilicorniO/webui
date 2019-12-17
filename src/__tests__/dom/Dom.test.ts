@@ -87,10 +87,9 @@ describe("Dom", () => {
 
         // add one element
         await page.click("#removeElement")
-        await TestUtils.delay(REDRAW_TIME)
         const container = await PuppeteerUtils.evalUiElement(page, "container")
         const element2 = await PuppeteerUtils.evalElement(page, "element2")
-        expect(container.width).toBe(element2.width + 1)
+        expect(container.width).toBe(element2.width)
     })
 
     test("Remove element UI", async () => {

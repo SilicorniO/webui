@@ -24,14 +24,20 @@ export default class WebUIEventsManager {
                     // check it is an HTMLElement
                     const parentElement = mutation.target
                     if (parentElement instanceof HTMLElement) {
+                        // list of processed nodes
+                        const processedNodes: Node[] = []
+
                         // added nodes
                         mutation.addedNodes.forEach(addedNode => {
                             this.evalAddedNode(addedNode, parentElement)
+                            processedNodes.push(addedNode)
                         })
 
                         // removed nodes
                         mutation.removedNodes.forEach(removedNode => {
-                            this.evalRemovedNode(parentElement)
+                            if (!processedNodes.includes(removedNode)) {
+                                this.evalRemovedNode(parentElement)
+                            }
                         })
                     }
                 }

@@ -60,9 +60,7 @@ export default class UIViewEventsManager {
     }
 
     public onLoadElement() {
-        for (const axis of AXIS_LIST) {
-            this.view.changeState(UIViewStateChange.SIZE, axis)
-        }
+        this.view.changeState(UIViewStateChange.ELEMENT_LOADED)
     }
 
     // ----- PRIVATE -----

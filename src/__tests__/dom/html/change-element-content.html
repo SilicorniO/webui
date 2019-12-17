@@ -15,20 +15,18 @@
     </div>
     
     <script>
-    WebUI.start({
-        viewColors: true,
-        showLogs: true,
-        viewLogs: 'logs',
-        timeRedraw: 0
-    });
-    
-    var elementContent = document.getElementById('elementContent');
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            viewLogs: 'logs',
+            timeRedraw: 0
+        });
+        
+        var elementContent = document.getElementById('elementContent');
 
-    function changeContent(){
-        elementContent.innerHTML = "Text with more length to check resize";
-    }
-    
-
+        function changeContent(){
+            elementContent.innerHTML = "Text with more length to check resize";
+        }
     </script>
     
 </body>

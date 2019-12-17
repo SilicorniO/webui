@@ -82,6 +82,9 @@ export default class UIViewStateManager {
                 case UIViewStateChange.ATTRIBUTE_MODIFIED:
                     oldestView = this.changeStateAttributeModified()
                     break
+                case UIViewStateChange.ELEMENT_LOADED:
+                    oldestView = this.changeStateElementLoaded()
+                    break
                 default:
                     break
             }
@@ -137,7 +140,12 @@ export default class UIViewStateManager {
     }
 
     private changeStateSize(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        // if it is an screen we have to resize the screen
+        if (this.view.parent == null) {
+            return this.setViewLowerState(UIViewState.DOM)
+        } else {
+            return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        }
     }
 
     private changeStateSizePos(axis: AXIS): UIView | null {
@@ -211,5 +219,10 @@ export default class UIViewStateManager {
     private changeStateAttributeModified(): UIView | null {
         // change state of this view to DOM
         return this.setParentOrViewLowerState(UIViewState.NONE)
+    }
+
+    private changeStateElementLoaded(): UIView | null {
+        // change state of this view to DOM
+        return this.setParentOrViewLowerState(UIViewState.DOM)
     }
 }

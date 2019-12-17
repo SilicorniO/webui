@@ -27,8 +27,8 @@ describe("Padding", () => {
         const content = await PuppeteerUtils.evalUiElement(page, "content")
         const element = await PuppeteerUtils.evalUiElement(page, "element")
 
-        expect(element.width).toBe(PADDING + content.width + PADDING)
-        expect(element.height).toBe(PADDING + content.height + PADDING)
+        expect(element.width).toBe(50 + content.width + 50)
+        expect(element.height).toBe(50 + content.height + 50)
     })
 
     test("Padding all fullsize", async () => {

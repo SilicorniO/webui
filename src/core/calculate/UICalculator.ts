@@ -1,6 +1,6 @@
 import UIView from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
-import { AXIS } from "../../model/UIAxis"
+import { AXIS, UIAxis, AXIS_LIST } from "../../model/UIAxis"
 import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
 import UIPosition from "../../model/UIPosition"
@@ -13,6 +13,17 @@ export default class UICalculator {
             return
         }
 
+        // if view is a screen we calculate it as screen
+        if (view.parent == null) {
+            this.calculateAsScreen(view, configuration, scrollSize)
+            return
+        }
+
+        // if it is a view we calculate its parent as a screen
+        this.calculateAsScreen(view.parent, configuration, scrollSize)
+    }
+
+    private static calculateAsScreen(view: UIView, configuration: UIConfiguration, scrollSize: number) {
         //generate list of views and indexes for quick access
         var arrayViews = DomSizeUtils.generateArrayViews(view)
         var indexes = DomSizeUtils.generateIndexes(arrayViews)
@@ -23,41 +34,26 @@ export default class UICalculator {
             //clean array
             viewsRestored = new Array()
 
-            // calculate width and height of the parent
-            let width = view.positions[AXIS.X].size
-            if (view.attrs.x.size == UI_SIZE.SIZE_CONTENT) {
-                width = 0
-            }
-            let height = view.positions[AXIS.Y].size
-            if (view.attrs.y.size == UI_SIZE.SIZE_CONTENT) {
-                height = 0
-            }
+            for (const axis of AXIS_LIST) {
+                let size = view.positions[axis].size
+                if (view.attrs[axis].size == UI_SIZE.SIZE_CONTENT) {
+                    size = 0
+                }
 
-            //calculate views
-            this.calculateViews(
-                AXIS.X,
-                view.childrenOrder[AXIS.X],
-                view,
-                arrayViews,
-                indexes,
-                width,
-                viewsRestored,
-                configuration,
-                scrollSize,
-                false,
-            )
-            this.calculateViews(
-                AXIS.Y,
-                view.childrenOrder[AXIS.Y],
-                view,
-                arrayViews,
-                indexes,
-                height,
-                viewsRestored,
-                configuration,
-                scrollSize,
-                true,
-            )
+                //calculate views
+                this.calculateViews(
+                    axis,
+                    view.childrenOrder[axis],
+                    view,
+                    arrayViews,
+                    indexes,
+                    size,
+                    viewsRestored,
+                    configuration,
+                    scrollSize,
+                    false,
+                )
+            }
         } while (viewsRestored.length > 0)
 
         // update state of screen
