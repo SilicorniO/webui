@@ -5,9 +5,10 @@ import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID } from "../../model/UI
 import Log from "../../utils/log/Log"
 import UIPosition from "../../model/UIPosition"
 import { UIViewState } from "../../model/UIViewState"
+import UIConfiguration from "../../UIConfiguration"
 
 export default class UICalculator {
-    public static calculate(view: UIView, scrollSize: number) {
+    public static calculate(view: UIView, configuration: UIConfiguration, scrollSize: number) {
         if (view.getState() >= UIViewState.CALCULATE) {
             return
         }
@@ -41,6 +42,7 @@ export default class UICalculator {
                 indexes,
                 width,
                 viewsRestored,
+                configuration,
                 scrollSize,
                 false,
             )
@@ -52,6 +54,7 @@ export default class UICalculator {
                 indexes,
                 height,
                 viewsRestored,
+                configuration,
                 scrollSize,
                 true,
             )
@@ -69,6 +72,7 @@ export default class UICalculator {
         indexes: { [key: string]: number },
         size: number,
         viewsRestored: UIView[],
+        configuration: UIConfiguration,
         scrollSize: number,
         lastAxis: boolean,
     ) {
@@ -80,7 +84,17 @@ export default class UICalculator {
 
                 // check if this view has
                 if (!view.isGone()) {
-                    this.calculateView(axis, view, parentView, arrayViews, indexes, size, viewsRestored, scrollSize)
+                    this.calculateView(
+                        axis,
+                        view,
+                        parentView,
+                        arrayViews,
+                        indexes,
+                        size,
+                        viewsRestored,
+                        configuration,
+                        scrollSize,
+                    )
                 }
 
                 // if it is the last axis we mark it as calculated
@@ -99,6 +113,7 @@ export default class UICalculator {
         indexes: { [key: string]: number },
         size: number,
         viewsRestored: UIView[],
+        configuration: UIConfiguration,
         scrollSize: number,
     ) {
         //eval references to try to calculate the width
@@ -107,6 +122,10 @@ export default class UICalculator {
         const attr = view.attrs.getAxis(axis)
         const position = view.positions[axis]
         const parentPosition = parentView.positions[axis]
+
+        // translate margins and paddings
+        this.translateMargins(attr, configuration, position)
+        this.translatePaddings(attr, configuration, position)
 
         //calculate width
         this.evalFixedSize(attr, position)
@@ -137,6 +156,7 @@ export default class UICalculator {
                     indexes,
                     viewWidth,
                     viewsRestored,
+                    configuration,
                     scrollSize,
                     axis == AXIS.Y,
                 )
@@ -158,6 +178,7 @@ export default class UICalculator {
                     indexes,
                     viewWidth,
                     viewsRestored,
+                    configuration,
                     scrollSize,
                     axis == AXIS.Y,
                 )
@@ -166,7 +187,7 @@ export default class UICalculator {
                 this.applyPaddingChildren(axis, view)
 
                 //set the width of the children
-                this.applySizeChildren(axis, view, arrayViews, indexes, viewsRestored, scrollSize)
+                this.applySizeChildren(axis, view, arrayViews, indexes, viewsRestored, configuration, scrollSize)
             } else {
                 //else if there are not children we calculate the content size
                 this.applySizeContent(axis, view)
@@ -188,6 +209,16 @@ export default class UICalculator {
             // save the view as one to recalculate
             viewsRestored.push(view)
         }
+    }
+
+    private static translateMargins(attr: UIAttr, configuration: UIConfiguration, position: UIPosition) {
+        position.marginStart = configuration.getDimen(attr.marginStart)
+        position.marginEnd = configuration.getDimen(attr.marginEnd)
+    }
+
+    private static translatePaddings(attr: UIAttr, configuration: UIConfiguration, position: UIPosition) {
+        position.paddingStart = configuration.getDimen(attr.paddingStart)
+        position.paddingEnd = configuration.getDimen(attr.paddingEnd)
     }
 
     private static assignSize(position: UIPosition, size: number) {
@@ -303,6 +334,7 @@ export default class UICalculator {
         arrayViews: UIView[],
         indexes: { [key: string]: number },
         viewsRestored: UIView[],
+        configuration: UIConfiguration,
         scrollSize: number,
     ) {
         var min = 0
@@ -357,7 +389,17 @@ export default class UICalculator {
                 child.positions[axis].size <= 0
             ) {
                 child.clean(axis)
-                this.calculateView(axis, child, view, arrayViews, indexes, sizeChildren, viewsRestored, scrollSize)
+                this.calculateView(
+                    axis,
+                    child,
+                    view,
+                    arrayViews,
+                    indexes,
+                    sizeChildren,
+                    viewsRestored,
+                    configuration,
+                    scrollSize,
+                )
             }
         }
     }

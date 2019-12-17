@@ -5,6 +5,7 @@ import Log from "../../utils/log/Log"
 import UIAttrReader, { ATTR } from "../dom/UIAttrReader"
 import UIViewEventsUtils from "./UIViewEventsUtils"
 import { AXIS, AXIS_LIST } from "../../model/UIAxis"
+import UIViewAttrs from "../../model/UIViewAttrs"
 
 export default class UIViewEventsManager {
     // associated screen
@@ -42,13 +43,17 @@ export default class UIViewEventsManager {
         this.disableListenResizeEvents()
     }
 
-    public onChangeAttribute(attribute: ATTR) {
+    public onChangeAttribute(attribute: ATTR, previousAttributes: UIViewAttrs, value?: string | number | boolean) {
         // update ui attribute
         this.dismissNextUiAttributeMutation = true
         this.view.element.setAttribute(this.configuration.attribute, UIAttrReader.generateUiAttr(this.view.attrs))
 
         // launch change of state
-        const aStateChangeAndAxis = UIViewEventsUtils.convertAttrToStateChangeWithAxis(attribute)
+        const aStateChangeAndAxis = UIViewEventsUtils.convertAttrToStateChangeWithAxis(
+            attribute,
+            previousAttributes,
+            value,
+        )
         for (const stateChangeAndAxis of aStateChangeAndAxis) {
             this.view.changeState(stateChangeAndAxis.stateChange, stateChangeAndAxis.axis)
         }

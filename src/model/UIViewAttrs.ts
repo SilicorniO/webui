@@ -26,4 +26,17 @@ export default class UIViewAttrs {
         this.y.clean(options)
         this.visibility = UI_VISIBILITY.VISIBLE
     }
+
+    public clone(): UIViewAttrs {
+        const attrs = new UIViewAttrs()
+
+        // axis
+        attrs.x = this.x.clone()
+        attrs.x = this.y.clone()
+
+        // visibility
+        attrs.visibility = this.visibility
+
+        return attrs
+    }
 }

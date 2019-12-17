@@ -32,9 +32,9 @@ describe("Animation", () => {
         let element1 = await PuppeteerUtils.evalUiElement(page, "element1")
         let element2 = await PuppeteerUtils.evalUiElement(page, "element2")
         expect(element1.left).toBe(0)
-        expect(element1.width).toBe(SQUARE_SIZE)
-        expect(element2.left).toBe(element1.left + element1.width + MARGIN)
-        expect(element2.width).toBe(SQUARE_SIZE)
+        expect(element1.width).toBe(200)
+        expect(element2.left).toBe(element1.left + element1.width + 100)
+        expect(element2.width).toBe(200)
 
         await TestUtils.delay(ANIMATION_TIME)
         element1 = await PuppeteerUtils.evalUiElement(page, "element1")

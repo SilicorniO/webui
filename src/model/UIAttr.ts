@@ -136,4 +136,24 @@ export default class UIAttr {
             this.paddingEnd = ""
         }
     }
+
+    public clone(): UIAttr {
+        const attr = new UIAttr()
+
+        attr.startStart = this.startStart
+        attr.startEnd = this.startEnd
+        attr.endEnd = this.endEnd
+        attr.endStart = this.endStart
+        attr.size = this.size
+        attr.sizeValue = this.sizeValue
+        attr.percentPos = this.percentPos
+        attr.scroll = this.scroll
+        attr.center = this.center
+        attr.marginStart = this.marginStart
+        attr.marginEnd = this.marginEnd
+        attr.paddingStart = this.paddingStart
+        attr.paddingEnd = this.paddingEnd
+
+        return attr
+    }
 }

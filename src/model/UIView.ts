@@ -186,6 +186,9 @@ export default class UIView {
         animationDuration?: number,
         animationEnd?: () => void,
     ) {
+        // get a copy of the attributes
+        let previousAttributes = this.attrs.clone()
+
         // apply attribute
         this.applyAttribute(attribute, value)
 
@@ -193,7 +196,7 @@ export default class UIView {
         this.animateNextRefresh(animationDuration, animationEnd)
 
         // launch resize event
-        this.eventsManager.onChangeAttribute(attribute)
+        this.eventsManager.onChangeAttribute(attribute, previousAttributes, value)
     }
 
     private applyAttribute(attribute: ATTR, value?: string | number | boolean) {

@@ -173,7 +173,7 @@ export default class UIViewStateManager {
 
     private changeStateVisibility(): UIView | null {
         // visibility of view has changed between invisible and visible
-        return this.setViewLowerState(UIViewState.DRAW)
+        return this.setViewLowerState(UIViewState.CALCULATE)
     }
 
     private changeStateVisibilityGone(): UIView | null {

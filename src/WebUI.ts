@@ -101,7 +101,7 @@ class WebUI implements WebUIListener {
 
         // ----- CALCULATE -----
         CounterUtils.startCounter("calculate")
-        UICalculator.calculate(view, this.scrollSize)
+        UICalculator.calculate(view, this.configuration, this.scrollSize)
         timerCalculate = CounterUtils.endCounter("calculate")
 
         // ---- DRAW -----
