@@ -44,14 +44,22 @@ export default class UIDrawGenerator {
         } else if (attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
             draw.width = attrs[AXIS.X].sizeValue + "%"
         } else {
-            draw.width = childrenSize.x + "px"
+            if (childrenSize.x > 0) {
+                draw.width = childrenSize.x + "px"
+            } else {
+                draw.width = positions[AXIS.X].size + "px"
+            }
         }
         if (attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
             draw.height = positions[AXIS.Y].size + "px"
         } else if (attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
             draw.height = attrs[AXIS.Y].sizeValue + "%"
         } else {
-            draw.height = childrenSize.y + "px"
+            if (childrenSize.y > 0) {
+                draw.height = childrenSize.y + "px"
+            } else {
+                draw.height = positions[AXIS.Y].size + "px"
+            }
         }
     }
 

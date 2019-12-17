@@ -10,7 +10,7 @@ export default class DomSizeUtils {
      * @param ele DOM element to calculate the width
      * @return width calculated
      **/
-    public static calculateWidthView(view: UIView, ele: HTMLElement, height?: number): number {
+    public static calculateWidthView(ele: HTMLElement, height?: number): number {
         //prepare parent to give the son a lot of space for calculation
         // var parent = ele.parentElement;
         // var parentWidth = parent.offsetWidth;
@@ -45,7 +45,7 @@ export default class DomSizeUtils {
      * @param ele DOM element to calculate the height
      * @return height calculated
      **/
-    public static calculateHeightView(view: UIView, ele: HTMLElement, width?: number): number {
+    public static calculateHeightView(ele: HTMLElement, width?: number): number {
         //prepare parent to give the son a lot of space for calculation
         // var parent = ele.parentElement;
         // var parentHeight = parent.offsetHeight;

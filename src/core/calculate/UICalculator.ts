@@ -313,7 +313,7 @@ export default class UICalculator {
         } else if (view.positions[axis].startChanged) {
             // TODO previous axis should be already asigned to calculate now the size correctly
             if (axis == AXIS.Y && view.positions[AXIS.X].startChanged && view.positions[AXIS.X].endChanged) {
-                const height = DomSizeUtils.calculateHeightView(view, view.element, view.positions[AXIS.X].size)
+                const height = DomSizeUtils.calculateHeightView(view.element, view.positions[AXIS.X].size)
                 view.attrs[axis].sizeValue = height
                 view.positions[axis].end = view.positions[axis].start + view.attrs[axis].sizeValue
                 view.positions[axis].endChanged = true

@@ -29,4 +29,20 @@ export default class HtmlUtils {
 
         return w1 - w2
     }
+
+    public static getPreviousElementWithAttribute(attribute: string, element: HTMLElement): HTMLElement | null {
+        // check element has attribute
+        if (element.hasAttribute(attribute)) {
+            return element
+        }
+
+        // check it has parent
+        const parentElement = element.parentElement
+        if (parentElement == null) {
+            return null
+        }
+
+        // continue searching
+        return HtmlUtils.getPreviousElementWithAttribute(attribute, parentElement)
+    }
 }

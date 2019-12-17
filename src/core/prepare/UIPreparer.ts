@@ -3,8 +3,9 @@ import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIConfiguration from "../../UIConfiguration"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import { AXIS } from "../../model/UIAxis"
-import { UI_SIZE } from "../../model/UIAttr"
+import UIAttr, { UI_SIZE } from "../../model/UIAttr"
 import { UIViewState } from "../../model/UIViewState"
+import UIPosition from "../../model/UIPosition"
 
 export default class UIPreparer {
     public static prepareScreen(view: UIView, configuration: UIConfiguration) {
@@ -44,12 +45,12 @@ export default class UIPreparer {
 
                     // get width of size content view
                     if (view.attrs[AXIS.X].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.attrs[AXIS.X].sizeValue = DomSizeUtils.calculateWidthView(view, ele)
+                        view.attrs[AXIS.X].sizeValue = DomSizeUtils.calculateWidthView(ele)
                     }
 
                     // get height of size content view
                     if (view.attrs[AXIS.Y].size == UI_SIZE.SIZE_CONTENT && !view.hasUIChildren()) {
-                        view.attrs[AXIS.Y].sizeValue = DomSizeUtils.calculateHeightView(view, ele)
+                        view.attrs[AXIS.Y].sizeValue = DomSizeUtils.calculateHeightView(ele)
                     }
 
                     // load children
@@ -62,15 +63,7 @@ export default class UIPreparer {
         }
     }
 
-    /**
-     * Load the size of the screenView
-     * @param {UIView} screen View with screen value (body)
-     * @return {boolean} flag to know if screen changed
-     **/
-    public static loadSizeScreen(screen: UIView): boolean {
-        // flag looking for changes
-        let sizeChanged = false
-
+    public static loadSizeScreen(screen: UIView) {
         // get the element
         const ele = screen.element
         ele.style.position = "absolute"
@@ -80,40 +73,69 @@ export default class UIPreparer {
             ele.style.display = "inline-block"
         }
 
+        // flag to know if screen has children
+        const screenHasUIChildren = screen.hasUIChildren()
+
         // apply width and height if they are defined
-        if (screen.attrs[AXIS.X].size != UI_SIZE.SIZE_CONTENT) {
-            if (screen.attrs[AXIS.X].size == UI_SIZE.SCREEN) {
-                ele.style.width = screen.attrs[AXIS.X].sizeValue + "px"
-            } else if (screen.attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
-                ele.style.width = screen.attrs[AXIS.X].sizeValue + "%"
-            }
+        this.calculateScreenPosition(ele, AXIS.X, screen.attrs[AXIS.X], screen.positions[AXIS.X], screenHasUIChildren)
+        this.calculateScreenPosition(ele, AXIS.Y, screen.attrs[AXIS.Y], screen.positions[AXIS.Y], screenHasUIChildren)
 
-            const offsetWidth = ele.offsetWidth
-            if (offsetWidth != screen.positions[AXIS.X].size) {
-                screen.positions[AXIS.X].size = offsetWidth
-                sizeChanged = true
-            }
-        }
-        if (screen.attrs[AXIS.Y].size != UI_SIZE.SIZE_CONTENT) {
-            if (screen.attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
-                ele.style.height = screen.attrs[AXIS.Y].sizeValue + "px"
-            } else if (screen.attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
-                ele.style.height = screen.attrs[AXIS.Y].sizeValue + "%"
-            }
-
-            screen.positions[AXIS.Y].size = ele.offsetHeight
-        }
+        // change position to relative because all screen are relative
         ele.style.position = "relative"
+    }
 
-        screen.positions[AXIS.X].end = screen.positions[AXIS.X].size
-        screen.positions[AXIS.Y].end = screen.positions[AXIS.Y].size
+    /**
+     * Calculate screen position for an axis
+     * @param element
+     * @param axis
+     * @param attr
+     * @param position
+     * @param hasUIChildren
+     * @return sizeChanged as boolean
+     */
+    private static calculateScreenPosition(
+        element: HTMLElement,
+        axis: AXIS,
+        attr: UIAttr,
+        position: UIPosition,
+        hasUIChildren: boolean,
+    ) {
+        // if it is size content we calculate the size with the children
+        if (attr.size == UI_SIZE.SIZE_CONTENT) {
+            if (!hasUIChildren) {
+                if (axis == AXIS.X) {
+                    position.size = DomSizeUtils.calculateWidthView(element)
+                } else if (axis == AXIS.Y) {
+                    position.size = DomSizeUtils.calculateHeightView(element)
+                }
+            }
+        } else {
+            let style = ""
+            if (attr.size == UI_SIZE.SCREEN) {
+                style = attr.sizeValue + "px"
+            } else if (attr.size == UI_SIZE.PERCENTAGE) {
+                style = attr.sizeValue + "%"
+            }
 
-        screen.positions[AXIS.X].endChanged = true
-        screen.positions[AXIS.X].startChanged = true
-        screen.positions[AXIS.Y].endChanged = true
-        screen.positions[AXIS.Y].startChanged = true
+            let offset = 0
+            if (axis == AXIS.X) {
+                element.style.width = style
+                offset = element.offsetWidth
+            } else if (axis == AXIS.Y) {
+                element.style.height = style
+                offset = element.offsetHeight
+            }
 
-        //return the flag
-        return sizeChanged
+            if (offset != position.size) {
+                position.size = offset
+            }
+        }
+
+        // set end with the size
+        position.end = position.size
+
+        // mark as changed
+        position.endChanged = true
+        position.startChanged = true
     }
 }

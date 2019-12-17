@@ -10,10 +10,12 @@ import UICalculator from "./core/calculate/UICalculator"
 import UIDrawController from "./core/draw/UIDrawController"
 import UIDomPreparer from "./core/dom/UIDomPreparer"
 import UIOrganizer from "./core/organize/UIOrganizer"
+import WebUIEventsManager from "./core/events/WebUIEventsManager"
 
 export type WebUIRedraw = (screen: UIView) => void
 
 export interface WebUIListener {
+    onElementDiscover: (element: HTMLElement) => void
     onViewRedraw: (view: UIView) => void
 }
 
@@ -30,6 +32,10 @@ class WebUI implements WebUIListener {
     //timer for repainting
     private redrawTimer: CallbackTimer
 
+    // events manager for dom
+    private eventsManager: WebUIEventsManager = new WebUIEventsManager(this)
+
+    private elementsToDiscover: HTMLElement[] = []
     private viewsToDraw: { [key: string]: UIView } = {}
 
     /**
@@ -55,12 +61,21 @@ class WebUI implements WebUIListener {
             this.scrollSize = HtmlUtils.getScrollWidth()
         }
 
+        // listen the body to discover screens later
+        this.eventsManager.init(bodyElement, this.configuration)
+
+        // discover screens from body
+        this.discoverAndDraw(bodyElement)
+    }
+
+    private discoverAndDraw(element: HTMLElement) {
         // start processing
         Log.log("[WebUI] Start processing")
         CounterUtils.startCounter("drawScreens")
 
         // discover screens
-        UIDomPreparer.discoverScreens(bodyElement, this.configuration, this, screen => {
+        UIDomPreparer.discoverScreens(element, this.configuration, this, screen => {
+            // draw the screen
             this.drawUIView(screen)
         })
 
@@ -131,6 +146,19 @@ class WebUI implements WebUIListener {
 
     // ----- REDRAW -----
 
+    onElementDiscover(element: HTMLElement) {
+        // add the element to the list of elements to search
+        if (this.elementsToDiscover.includes(element)) {
+            return
+        }
+
+        // append the element
+        this.elementsToDiscover.push(element)
+
+        // call to redraw
+        this.redrawTimer.execute()
+    }
+
     onViewRedraw(view: UIView) {
         // add to the list of screens to draw
         this.viewsToDraw[view.id] = view
@@ -141,6 +169,10 @@ class WebUI implements WebUIListener {
 
     //redraw function
     private redraw() {
+        // get a copy of the elements to discover
+        const elements = this.elementsToDiscover.slice(0)
+        this.elementsToDiscover = []
+
         // get a copy of the screens to draw
         const views: UIView[] = []
         for (const id of Object.keys(this.viewsToDraw)) {
@@ -151,6 +183,13 @@ class WebUI implements WebUIListener {
         //draw
         Log.log("[WebUI] Start redrawing")
         CounterUtils.startCounter("redraw")
+
+        // discoverting
+        for (const element of elements) {
+            this.discoverAndDraw(element)
+        }
+
+        // drawing
         for (const view of views) {
             // draw this screen
             this.drawUIView(view)

@@ -1,0 +1,36 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0" id="body">
+
+    <div id="screenTest" style="width: 100%; height: 70%">
+    </div>
+    <a id="addElement" href="#" onClick="addElement()">Add element</a>
+    
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs',
+        timeRedraw: 0
+    });
+    
+    var body = document.getElementsByTagName("BODY")[0]
+    var screenTest = document.getElementById("screenTest")
+
+    var id = 0
+    function addElement(){
+        id += 1
+        var screen = document.createElement('div');
+        screen.id = "screen"
+        screen.innerHTML = "Screen"
+        screen.setAttribute("ui", "fw;fh");
+        screenTest.appendChild(screen);
+    }
+
+    </script>
+    
+</body>
+</html>

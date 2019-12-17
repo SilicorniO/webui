@@ -136,6 +136,21 @@ describe("Dom", () => {
         expect(element.width).toBeGreaterThan(elementWidth)
     })
 
+    test("Change element content sub", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-content-sub")
+
+        // check position
+        let screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const screenWidth = screen.width
+        const screenHeight = screen.height
+
+        // add one element
+        await page.click("#changeContent")
+        screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        expect(screen.width).toBeGreaterThan(screenWidth)
+        expect(screen.height).toBe(screenHeight)
+    })
+
     test("Change element ui content", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "change-element-ui-content")
 
@@ -152,5 +167,20 @@ describe("Dom", () => {
         expect(element.top).toBe(0)
         expect(text.width).toBeGreaterThan(textWidth)
         expect(text.height).toBe(textHeight)
+    })
+
+    test("Change element subscreen", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-subscreen")
+
+        // check position
+        let element = await PuppeteerUtils.evalUiElement(page, "element")
+        const elementWidth = element.width
+        const elementHeight = element.height
+
+        // add one element
+        await page.click("#changeContent")
+        element = await PuppeteerUtils.evalUiElement(page, "element")
+        expect(element.width).toBeGreaterThan(elementWidth)
+        expect(element.height).toBe(elementHeight)
     })
 })

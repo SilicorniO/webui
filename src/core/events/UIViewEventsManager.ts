@@ -33,15 +33,13 @@ export default class UIViewEventsManager {
 
     public evalEvents() {
         this.evalListenAttributes()
-        this.evalListenCharacterData()
-        this.evalListenAddRemoveNodes()
+        // this.evalListenCharacterData()
         this.evalListenResizeEvents()
     }
 
     public disableEvents() {
         this.disableListenAttributes()
-        this.disableListenCharacterData()
-        this.disableListenAddRemoveNodes()
+        // this.disableListenCharacterData()
         this.disableListenResizeEvents()
     }
 
@@ -114,80 +112,41 @@ export default class UIViewEventsManager {
         }
     }
 
-    private evalListenCharacterData() {
-        // check if we have a listen already created
-        if (this.observerCharacterData != null) {
-            return
-        }
+    // private evalListenCharacterData() {
+    //     // check if we have a listen already created
+    //     if (this.observerCharacterData != null) {
+    //         return
+    //     }
 
-        // check has not children
-        if (this.view.element.childNodes.length > 0) {
-            return
-        }
+    //     // check has not children
+    //     if (this.view.element.childNodes.length > 0) {
+    //         return
+    //     }
 
-        // Create an observer instance linked to the callback function
-        const observerCharacterData = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (const mutation of mutationsList) {
-                if (mutation.type == "characterData") {
-                    Log.log(`Event 'characterData' being processed for view ${this.view.id}`)
-                    this.view.changeState(UIViewStateChange.SIZE, AXIS.X)
-                    this.view.changeState(UIViewStateChange.SIZE, AXIS.Y)
-                }
-            }
-        })
+    //     // Create an observer instance linked to the callback function
+    //     const observerCharacterData = new MutationObserver((mutationsList: MutationRecord[]) => {
+    //         for (const mutation of mutationsList) {
+    //             if (mutation.type == "characterData") {
+    //                 Log.log(`Event 'characterData' being processed for view ${this.view.id}`)
+    //                 this.view.changeState(UIViewStateChange.SIZE, AXIS.X)
+    //                 this.view.changeState(UIViewStateChange.SIZE, AXIS.Y)
+    //             }
+    //         }
+    //     })
 
-        // start observing the target node for configured mutations
-        this.observerCharacterData = observerCharacterData
-        // listen for tree events if it is the last UI view in the tree
-        observerCharacterData.observe(this.view.element, { characterData: true })
-    }
+    //     // start observing the target node for configured mutations
+    //     this.observerCharacterData = observerCharacterData
+    //     // listen for tree events if it is the last UI view in the tree
+    //     observerCharacterData.observe(this.view.element, { characterData: true })
+    // }
 
-    private disableListenCharacterData() {
-        // remove previous observer
-        if (this.observerCharacterData != null) {
-            this.observerCharacterData.disconnect()
-            this.observerCharacterData = null
-        }
-    }
-
-    private evalListenAddRemoveNodes() {
-        // check if nodestree has changed, we disable the actual observer
-        const observerAddRemoveNodesTree = !this.view.hasUIChildren()
-        if (this.observerAddRemoveNodesTree != observerAddRemoveNodesTree) {
-            this.disableListenAddRemoveNodes()
-        }
-
-        // check if we have a listen already created
-        if (this.observerAddRemoveNodes != null) {
-            return
-        }
-
-        // remove previous observer
-        this.disableListenAddRemoveNodes()
-
-        // Create an observer instance linked to the callback function
-        const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
-            for (const mutation of mutationsList) {
-                if (mutation.type == "childList") {
-                    Log.log(`Event 'childList' being processed for view ${this.view.id}`)
-                    this.view.changeState(UIViewStateChange.CHILD_NODE_ADDED)
-                }
-            }
-        })
-
-        // start observing the target node for configured mutations
-        this.observerAddRemoveNodesTree = observerAddRemoveNodesTree
-        this.observerAddRemoveNodes = observerAddRemoveNodes
-        observerAddRemoveNodes.observe(this.view.element, { childList: true, subtree: observerAddRemoveNodesTree })
-    }
-
-    private disableListenAddRemoveNodes() {
-        // remove previous observer
-        if (this.observerAddRemoveNodes != null) {
-            this.observerAddRemoveNodes.disconnect()
-            this.observerAddRemoveNodes = null
-        }
-    }
+    // private disableListenCharacterData() {
+    //     // remove previous observer
+    //     if (this.observerCharacterData != null) {
+    //         this.observerCharacterData.disconnect()
+    //         this.observerCharacterData = null
+    //     }
+    // }
 
     private resizeEvent() {
         Log.log(`Event 'resize' being processed for view ${this.view.id}`)
@@ -195,51 +154,34 @@ export default class UIViewEventsManager {
     }
 
     private evalListenResizeEvents() {
-        // disable resize events
-        let parentElement: HTMLElement | Window | null = this.view.element.parentElement
-        if (parentElement == null) {
-            parentElement = window || null
-        }
-        if (parentElement == null) {
-            Log.logE("Window events can't be catched")
-            return
-        }
-
         // check we have already a resizeEvent
         if (this.observerResizeEvent) {
             return
         }
 
-        // check this view is screen
-        if (this.view.parent != null) {
+        // check this view has not children
+        if (this.view.hasUIChildren()) {
             return
         }
 
-        // check the size of the view dependes of parent size
-        if (this.view.attrs.x.size != UI_SIZE.PERCENTAGE && this.view.attrs.y.size != UI_SIZE.PERCENTAGE) {
+        // check the size of the view depends of content
+        if (this.view.attrs.x.size != UI_SIZE.SIZE_CONTENT && this.view.attrs.y.size != UI_SIZE.SIZE_CONTENT) {
             return
         }
 
         // apply listener
         this.observerResizeEvent = true
-        parentElement.addEventListener("resize", this.resizeEvent.bind(this))
+        this.view.element.addEventListener("resize", this.resizeEvent.bind(this))
     }
 
-    private disableListenResizeEvents(): HTMLElement | Window | null {
-        // listen events of parent or window
-        let parentElement: HTMLElement | Window | null = this.view.element.parentElement
-        if (parentElement == null) {
-            parentElement = window || null
-        }
-        if (parentElement == null) {
-            Log.logE("Window events can't be catched")
-            return null
+    private disableListenResizeEvents() {
+        // check we have a resizeEvent active
+        if (!this.observerResizeEvent) {
+            return
         }
 
         // remove event by default
-        parentElement.removeEventListener("resize", this.resizeEvent.bind(this))
+        this.view.element.removeEventListener("resize", this.resizeEvent.bind(this))
         this.observerResizeEvent = false
-
-        return parentElement
     }
 }
