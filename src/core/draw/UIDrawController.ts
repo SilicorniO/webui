@@ -83,14 +83,18 @@ export default class UIDrawController {
         return childResult.maxPosition
     }
 
-    public static applyDrawsToScreen(screen: UIView, configuration: UIConfiguration) {
+    public static applyDraws(view: UIView, configuration: UIConfiguration) {
         // apply draw to all children
-        for (const child of screen.getUIChildren()) {
+        for (const child of view.getUIChildren()) {
             this.applyDrawToView(child, configuration)
         }
 
-        // apply draw to screen
-        UIDrawer.drawScreen(screen.element, screen.draw, configuration.animations)
+        // apply draw to view
+        if (view.parent == null) {
+            UIDrawer.drawScreen(view.element, view.draw, configuration.animations)
+        } else {
+            this.applyDrawToView(view, configuration)
+        }
     }
 
     private static applyDrawToView(view: UIView, configuration: UIConfiguration) {

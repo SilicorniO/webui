@@ -38,4 +38,17 @@ describe("Attribute", () => {
         expect(element.width).toBe(screen.width)
         expect(element.height).toBe(200)
     })
+
+    test("Set attribute after inner", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "set-attribute-after-inner")
+        let element = await PuppeteerUtils.evalUiElement(page, "element")
+        const elementWidth = element.width
+
+        // click
+        await page.click("#changeElement")
+        element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.width).toBeGreaterThan(elementWidth)
+        expect(element.top).toBe(50)
+    })
 })

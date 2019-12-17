@@ -18,6 +18,8 @@ export default class UIViewEventsManager {
     private observerAttributes: MutationObserver | null = null
     private observerCharacterData: MutationObserver | null = null
     private observerAddRemoveNodes: MutationObserver | null = null
+    private observerAddRemoveNodesTree: boolean = false
+    private observerResizeEvent: boolean = false
 
     // flag to disable next ui attribute mutation
     private dismissNextUiAttributeMutation: boolean = false
@@ -68,8 +70,10 @@ export default class UIViewEventsManager {
     // ----- PRIVATE -----
 
     private evalListenAttributes() {
-        // remove previous observer
-        this.disableListenAttributes()
+        // check if we have a listen already created
+        if (this.observerAttributes != null) {
+            return
+        }
 
         // Create an observer instance linked to the callback function
         const observerAttributes = new MutationObserver((mutationsList: MutationRecord[]) => {
@@ -106,12 +110,15 @@ export default class UIViewEventsManager {
         // remove previous observer
         if (this.observerAttributes != null) {
             this.observerAttributes.disconnect()
+            this.observerAttributes = null
         }
     }
 
     private evalListenCharacterData() {
-        // remove previous observer
-        this.disableListenCharacterData()
+        // check if we have a listen already created
+        if (this.observerCharacterData != null) {
+            return
+        }
 
         // check has not children
         if (this.view.element.childNodes.length > 0) {
@@ -139,10 +146,22 @@ export default class UIViewEventsManager {
         // remove previous observer
         if (this.observerCharacterData != null) {
             this.observerCharacterData.disconnect()
+            this.observerCharacterData = null
         }
     }
 
     private evalListenAddRemoveNodes() {
+        // check if nodestree has changed, we disable the actual observer
+        const observerAddRemoveNodesTree = !this.view.hasUIChildren()
+        if (this.observerAddRemoveNodesTree != observerAddRemoveNodesTree) {
+            this.disableListenAddRemoveNodes()
+        }
+
+        // check if we have a listen already created
+        if (this.observerAddRemoveNodes != null) {
+            return
+        }
+
         // remove previous observer
         this.disableListenAddRemoveNodes()
 
@@ -157,14 +176,16 @@ export default class UIViewEventsManager {
         })
 
         // start observing the target node for configured mutations
+        this.observerAddRemoveNodesTree = observerAddRemoveNodesTree
         this.observerAddRemoveNodes = observerAddRemoveNodes
-        observerAddRemoveNodes.observe(this.view.element, { childList: true, subtree: !this.view.hasUIChildren() })
+        observerAddRemoveNodes.observe(this.view.element, { childList: true, subtree: observerAddRemoveNodesTree })
     }
 
     private disableListenAddRemoveNodes() {
         // remove previous observer
         if (this.observerAddRemoveNodes != null) {
             this.observerAddRemoveNodes.disconnect()
+            this.observerAddRemoveNodes = null
         }
     }
 
@@ -175,8 +196,17 @@ export default class UIViewEventsManager {
 
     private evalListenResizeEvents() {
         // disable resize events
-        const parentElement = this.disableListenResizeEvents()
+        let parentElement: HTMLElement | Window | null = this.view.element.parentElement
         if (parentElement == null) {
+            parentElement = window || null
+        }
+        if (parentElement == null) {
+            Log.logE("Window events can't be catched")
+            return
+        }
+
+        // check we have already a resizeEvent
+        if (this.observerResizeEvent) {
             return
         }
 
@@ -191,6 +221,7 @@ export default class UIViewEventsManager {
         }
 
         // apply listener
+        this.observerResizeEvent = true
         parentElement.addEventListener("resize", this.resizeEvent.bind(this))
     }
 
@@ -207,6 +238,7 @@ export default class UIViewEventsManager {
 
         // remove event by default
         parentElement.removeEventListener("resize", this.resizeEvent.bind(this))
+        this.observerResizeEvent = false
 
         return parentElement
     }

@@ -172,12 +172,15 @@ export default class UIView {
 
     public setAttrs(attributes: UIAttributeValueArray[], animationDuration?: number, animationEnd?: () => void) {
         // apply attributes
-        for (const attribute of attributes) {
-            this.setAttr(attribute[0], attribute[1])
+        for (let i = 0; i < attributes.length; i += 1) {
+            const attribute = attributes[i]
+            if (i == 0) {
+                // apply animation to last one
+                this.setAttr(attribute[0], attribute[1], animationDuration, animationEnd)
+            } else {
+                this.setAttr(attribute[0], attribute[1])
+            }
         }
-
-        // apply animation
-        this.animateNextRefresh(animationDuration, animationEnd)
     }
 
     public setAttr(

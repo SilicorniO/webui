@@ -107,7 +107,7 @@ class WebUI implements WebUIListener {
         // ---- DRAW -----
         CounterUtils.startCounter("draw")
         UIDrawController.generateDraws(view, this.configuration)
-        UIDrawController.applyDrawsToScreen(view, this.configuration)
+        UIDrawController.applyDraws(view, this.configuration)
         timerDraw = CounterUtils.endCounter("draw")
 
         // show counter logs
@@ -132,9 +132,6 @@ class WebUI implements WebUIListener {
     // ----- REDRAW -----
 
     onViewRedraw(view: UIView) {
-        // disable events from screen
-        view.disableEvents()
-
         // add to the list of screens to draw
         this.viewsToDraw[view.id] = view
 

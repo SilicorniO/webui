@@ -4,6 +4,7 @@ import { UI_SIZE } from "../../model/UIAttr"
 import { WebUIListener } from "../../WebUI"
 import UIViewStateUtils from "./UIViewStateUtils"
 import { UIViewState } from "../../model/UIViewState"
+import Log from "../../utils/log/Log"
 
 export default class UIViewStateManager {
     // state of the view
