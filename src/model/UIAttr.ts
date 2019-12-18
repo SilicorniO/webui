@@ -1,5 +1,3 @@
-import { AXIS } from "./UIAxis"
-
 export enum UI_VIEW_ID {
     NONE = "",
     SCREEN = "s",
@@ -14,9 +12,16 @@ export enum UI_REF {
     START_END,
     END_END,
     END_START,
+    CENTER,
 }
 
-export const UI_REF_LIST: UI_REF[] = [UI_REF.START_START, UI_REF.START_END, UI_REF.END_END, UI_REF.END_START]
+export const UI_REF_LIST: UI_REF[] = [
+    UI_REF.START_START,
+    UI_REF.START_END,
+    UI_REF.END_END,
+    UI_REF.END_START,
+    UI_REF.CENTER,
+]
 
 export enum UI_SIZE {
     SIZE_CONTENT = "sc",
@@ -42,7 +47,7 @@ export default class UIAttr {
     sizeValue: number = 0
     percentPos: number = 0
     scroll: boolean = false
-    center: boolean = false
+    center: UIViewId = ""
     marginStart: string = ""
     marginEnd: string = ""
     paddingStart: string = ""
@@ -58,6 +63,8 @@ export default class UIAttr {
                 return this.endEnd
             case UI_REF.END_START:
                 return this.endStart
+            case UI_REF.CENTER:
+                return this.center
             default:
                 return ""
         }
@@ -76,6 +83,9 @@ export default class UIAttr {
                 return
             case UI_REF.END_START:
                 this.endStart = id
+                return
+            case UI_REF.CENTER:
+                this.center = id
                 return
             default:
                 return
@@ -125,7 +135,7 @@ export default class UIAttr {
             this.scroll = false
         }
         if (options == null || options.center != false) {
-            this.center = false
+            this.center = ""
         }
         if (options == null || options.margin != false) {
             this.marginStart = ""

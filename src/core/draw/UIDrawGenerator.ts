@@ -112,8 +112,8 @@ export default class UIDrawGenerator {
         //set location
         const left = positions[AXIS.X].start
         const top = positions[AXIS.Y].start
-        const width = positions[AXIS.X].size > 0 ? positions[AXIS.X].size : 0
-        const height = positions[AXIS.Y].size > 0 ? positions[AXIS.Y].size : 0
+        const width = Math.max(0, positions[AXIS.X].end - positions[AXIS.X].start)
+        const height = Math.max(0, positions[AXIS.Y].end - positions[AXIS.Y].start)
         draw.left = left + "px"
         draw.top = top + "px"
         draw.width = width + "px"

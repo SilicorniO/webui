@@ -105,8 +105,16 @@ export default class UIAttrReader {
      */
     public static readUIAttribute(viewAttrs: UIViewAttrs, attributeValue: UIAttributeValue, viewId: string) {
         const attr = attributeValue.attr
-        const sValue = "" + attributeValue.value
-        const bValue = attributeValue.value !== false
+        const value = attributeValue.value
+        let sValue = ""
+        let bValue: boolean | null = null
+        if (value != null) {
+            if (value == true || value == false) {
+                bValue = value
+            } else {
+                sValue = "" + value
+            }
+        }
 
         switch (attr) {
             case ATTR.WIDTH:
@@ -214,20 +222,40 @@ export default class UIAttrReader {
                 }
                 break
             case ATTR.CENTER_VERTICAL:
-                viewAttrs.y.center = bValue
+                if (sValue.length > 0) {
+                    viewAttrs.y.center = sValue
+                } else if (bValue == false) {
+                    viewAttrs.y.center = ""
+                } else {
+                    viewAttrs.y.center = UI_VIEW_ID.PARENT
+                }
                 break
             case ATTR.CENTER_HORIZONTAL:
-                viewAttrs.x.center = bValue
+                if (sValue.length > 0) {
+                    viewAttrs.x.center = sValue
+                } else if (bValue == false) {
+                    viewAttrs.x.center = ""
+                } else {
+                    viewAttrs.x.center = UI_VIEW_ID.PARENT
+                }
                 break
             case ATTR.CENTER:
-                viewAttrs.x.center = bValue
-                viewAttrs.y.center = bValue
+                if (sValue.length > 0) {
+                    viewAttrs.x.center = sValue
+                    viewAttrs.y.center = sValue
+                } else if (bValue == false) {
+                    viewAttrs.x.center = ""
+                    viewAttrs.y.center = ""
+                } else {
+                    viewAttrs.x.center = UI_VIEW_ID.PARENT
+                    viewAttrs.y.center = UI_VIEW_ID.PARENT
+                }
                 break
             case ATTR.SCROLL_VERTICAL:
-                viewAttrs.y.scroll = bValue
+                viewAttrs.y.scroll = bValue || false
                 break
             case ATTR.SCROLL_HORIZONTAL:
-                viewAttrs.x.scroll = bValue
+                viewAttrs.x.scroll = bValue || false
                 break
             case ATTR.VISIBILITY:
                 viewAttrs.visibility = (sValue as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
@@ -314,11 +342,11 @@ export default class UIAttrReader {
         }
 
         // center
-        if (viewAttrs.x.center) {
-            attrs.push(`${ATTR.CENTER_HORIZONTAL}`)
+        if (viewAttrs.x.center.length > 0) {
+            attrs.push(`${ATTR.CENTER_HORIZONTAL}:${viewAttrs.x.center}`)
         }
-        if (viewAttrs.y.center) {
-            attrs.push(`${ATTR.CENTER_VERTICAL}`)
+        if (viewAttrs.y.center.length > 0) {
+            attrs.push(`${ATTR.CENTER_VERTICAL}:${viewAttrs.y.center}`)
         }
 
         // scroll

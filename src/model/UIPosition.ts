@@ -1,9 +1,14 @@
 export default class UIPosition {
     size: number = 0
+
     start: number = 0
     end: number = 0
+    center: number = 0
+
     startChanged: boolean = false
     endChanged: boolean = false
+    centerChanged: boolean = false
+
     scrollApplied: boolean = false
     marginStart: number = 0
     marginEnd: number = 0
@@ -13,6 +18,9 @@ export default class UIPosition {
     public clean() {
         this.startChanged = false
         this.endChanged = false
+        this.centerChanged = false
+
+        this.scrollApplied = false
 
         this.start = 0
         this.end = 0

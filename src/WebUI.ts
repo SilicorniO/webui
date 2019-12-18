@@ -11,6 +11,7 @@ import UIDrawController from "./core/draw/UIDrawController"
 import UIDomPreparer from "./core/dom/UIDomPreparer"
 import UIOrganizer from "./core/organize/UIOrganizer"
 import WebUIEventsManager from "./core/events/WebUIEventsManager"
+import UICalculator2 from "./core/calculate/UICalculator2"
 
 export type WebUIRedraw = (screen: UIView) => void
 
@@ -116,7 +117,8 @@ class WebUI implements WebUIListener {
 
         // ----- CALCULATE -----
         CounterUtils.startCounter("calculate")
-        UICalculator.calculate(view, this.configuration, this.scrollSize)
+        // UICalculator.calculate(view, this.configuration, this.scrollSize)
+        UICalculator2.calculate(view, this.configuration, this.scrollSize)
         timerCalculate = CounterUtils.endCounter("calculate")
 
         // ---- DRAW -----

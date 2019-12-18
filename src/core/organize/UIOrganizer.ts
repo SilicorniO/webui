@@ -1,6 +1,6 @@
 import UIView from "../../model/UIView"
 import { AXIS } from "../../model/UIAxis"
-import { UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
+import UIAttr, { UI_REF_LIST, UI_VIEW_ID, UI_REF } from "../../model/UIAttr"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import UIHTMLElement from "../../model/UIHTMLElement"
 import Log from "../../utils/log/Log"
@@ -26,6 +26,9 @@ export default class UIOrganizer {
         // then order all the views with parent screen
         view.childrenOrder[AXIS.X] = this.orderViewsSameParent(view, true)
         view.childrenOrder[AXIS.Y] = this.orderViewsSameParent(view, false)
+
+        // create a new map of children
+        this.updateDependenciesMap(view)
 
         // for each one, add the view and then its ordered children
         for (const child of view.getUIChildren()) {
@@ -145,5 +148,18 @@ export default class UIOrganizer {
         })
 
         return views
+    }
+
+    private static updateDependenciesMap(parent: UIView) {
+        // clean actual map
+        parent.dependenciesMap = {}
+
+        // add parent
+        parent.dependenciesMap[parent.id] = parent
+
+        // add all children to the map
+        for (const child of parent.getUIChildren()) {
+            parent.dependenciesMap[child.id] = child
+        }
     }
 }

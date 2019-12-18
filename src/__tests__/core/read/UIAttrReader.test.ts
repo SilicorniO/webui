@@ -1,5 +1,5 @@
 import UIViewAttrs from "../../../model/UIViewAttrs"
-import { UI_SIZE } from "../../../model/UIAttr"
+import { UI_SIZE, UI_VIEW_ID } from "../../../model/UIAttr"
 import UIAttrReader from "../../../core/dom/UIAttrReader"
 import { UI_VISIBILITY } from "../../../model/UIVisibility"
 
@@ -89,14 +89,14 @@ describe("UiAttrReader", () => {
     test("generateUiAttr - center", async () => {
         // generate attributes
         const viewAttrs = new UIViewAttrs()
-        viewAttrs.x.center = true
-        viewAttrs.y.center = true
+        viewAttrs.x.center = UI_VIEW_ID.PARENT
+        viewAttrs.y.center = UI_VIEW_ID.PARENT
 
         // convert to text
         const uiAttr = UIAttrReader.generateUiAttr(viewAttrs)
 
         // check text
-        expect(uiAttr).toBe("ch;cv")
+        expect(uiAttr).toBe("ch:p;cv:p")
     })
 
     test("generateUiAttr - scroll", async () => {

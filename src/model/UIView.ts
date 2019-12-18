@@ -69,6 +69,7 @@ export default class UIView {
         [AXIS.X]: [],
         [AXIS.Y]: [],
     }
+    dependenciesMap: { [key: string]: UIView } = {}
 
     public attrs: UIViewAttrs = new UIViewAttrs()
 
