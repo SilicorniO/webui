@@ -87,15 +87,15 @@ export default class UIAttrReader {
             this.readUIAttribute(viewAttrs, attributeValue, element.id)
         }
 
-        const referencesXEmpty = UIAttrReaderUtils.isReferenceEmpty(viewAttrs.x)
-        if (referencesXEmpty && !viewAttrs.x.center) {
-            viewAttrs.x.setRef(UI_REF.START_START, UI_VIEW_ID.PARENT)
-        }
+        // const referencesXEmpty = UIAttrReaderUtils.isReferenceEmpty(viewAttrs.x)
+        // if (referencesXEmpty && !viewAttrs.x.center) {
+        //     viewAttrs.x.setRef(UI_REF.START_START, UI_VIEW_ID.PARENT)
+        // }
 
-        const referencesYEmpty = UIAttrReaderUtils.isReferenceEmpty(viewAttrs.y)
-        if (referencesYEmpty && !viewAttrs.y.center) {
-            viewAttrs.y.setRef(UI_REF.START_START, UI_VIEW_ID.PARENT)
-        }
+        // const referencesYEmpty = UIAttrReaderUtils.isReferenceEmpty(viewAttrs.y)
+        // if (referencesYEmpty && !viewAttrs.y.center) {
+        //     viewAttrs.y.setRef(UI_REF.START_START, UI_VIEW_ID.PARENT)
+        // }
     }
 
     /**

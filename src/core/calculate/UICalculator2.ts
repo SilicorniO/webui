@@ -36,11 +36,8 @@ export default class UICalculator2 {
         const attr = view.attrs[axis]
         const position = view.positions[axis]
 
-        // calculate content rect
-        const contentRect = UICalculatorContentRect.calculateContentRect(axis, view, scrollSize, parentSize)
-
         // calculate children
-        UICalculatorView.calculate(axis, view, contentRect)
+        UICalculatorView.calculate(axis, view, parentSize, scrollSize)
 
         // if it is the last axis we mark it as calculated
         if (axis == AXIS_LIST[AXIS_LIST.length - 1]) {

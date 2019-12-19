@@ -2,19 +2,30 @@ import { AXIS, AxisRect } from "../../model/UIAxis"
 import UIView from "../../model/UIView"
 import { UI_SIZE } from "../../model/UIAttr"
 import UICalculatorDependencies from "./UICalculatorDependencies"
-import UICalculatorViewSize from "./UICalculatorViewSize"
-import UIPosition from "../../model/UIPosition"
+import UICalculatorContentRect from "./UICalculatorContentRect"
+import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 
 export default class UICalculatorView {
-    public static calculate(axis: AXIS, view: UIView, contentRect: AxisRect) {
+    public static calculate(axis: AXIS, view: UIView, size: number, scrollSize: number) {
+        // calculate content rect
+        const contentRect = UICalculatorContentRect.calculateContentRect(axis, view, scrollSize, size)
+
         // calculate children
-        this.calculateChildren(axis, view, contentRect)
+        this.calculateChildren(axis, view, contentRect, scrollSize)
     }
 
-    private static calculateChildren(axis: AXIS, parent: UIView, contentRect: AxisRect): number {
+    private static calculateChildren(axis: AXIS, parent: UIView, contentRect: AxisRect, scrollSize: number) {
+        // calculate content size
+        const contentSize = contentRect.end - contentRect.start
+
         // for each child
-        let maxEnd = 0
         for (const child of parent.getUIChildren()) {
+            // if has children we calculate children
+            if (child.hasUIChildren()) {
+                const childSize = this.getChildSize(axis, child, contentSize)
+                this.calculate(axis, child, childSize, scrollSize)
+            }
+
             // clean position because we are going to calculate everything
             child.positions[axis].clean()
 
@@ -25,14 +36,26 @@ export default class UICalculatorView {
             this.evalViewSize(axis, child, contentRect)
 
             // eval positions
-            this.evalViewPositions(child.positions[axis])
-
-            // save max end
-            maxEnd = Math.max(maxEnd, child.positions[axis].end)
+            this.evalViewPositions(axis, child)
         }
+    }
 
-        // return the biggest end of all children
-        return maxEnd
+    private static getChildSize(axis: AXIS, view: UIView, parentSize: number): number {
+        const attr = view.attrs[axis]
+
+        // check size is content
+        if (attr.size == UI_SIZE.SIZE_CONTENT) {
+            // calculate content size of view
+            if (view.hasUIChildren()) {
+                return parentSize
+            } else {
+                return attr.sizeValue
+            }
+        } else if (attr.size == UI_SIZE.PERCENTAGE) {
+            return (parentSize * attr.sizeValue) / 100
+        } else {
+            return attr.sizeValue
+        }
     }
 
     private static evalViewSize(axis: AXIS, view: UIView, contentRect: AxisRect) {
@@ -48,16 +71,49 @@ export default class UICalculatorView {
 
         // check size is content
         if (attr.size == UI_SIZE.SIZE_CONTENT) {
-            // calculate content size of view
-            position.size = UICalculatorViewSize.calculate(axis, view, 0, parentSize)
+            this.evalViewSizeContent(axis, view, contentRect)
         } else if (attr.size == UI_SIZE.PERCENTAGE) {
-            position.size = (parentSize * attr.sizeValue) / 100
+            // size of the parent can be changed with margins
+            const parentSizeLessMargins = parentSize - position.marginStart - position.marginEnd
+
+            // apply porcentage size
+            position.size = (parentSizeLessMargins * attr.sizeValue) / 100
+
+            // if we have a position we apply it now
+            position.start = position.size * attr.percentPos + position.marginStart
+            position.startChanged = true
         } else {
             position.size = attr.sizeValue
         }
     }
 
-    private static evalViewPositions(position: UIPosition) {
+    private static evalViewSizeContent(axis: AXIS, view: UIView, contentRect: AxisRect) {
+        const position = view.positions[axis]
+        const attr = view.attrs[axis]
+
+        // calculate max end checking all children
+        if (view.hasUIChildren()) {
+            let maxEnd = 0
+            for (const child of view.getUIChildren()) {
+                maxEnd = Math.max(maxEnd, child.positions[axis].end)
+            }
+            position.size = maxEnd - contentRect.start
+        } else {
+            // if we are not in first axis (x), the content could change, so we recalculate
+            if (axis == AXIS.Y) {
+                position.size = DomSizeUtils.calculateHeightView(view.element, view.positions[AXIS.X].size)
+            } else {
+                position.size = attr.sizeValue
+            }
+        }
+
+        // add padding end because this view is bigger than content size
+        position.size += position.paddingEnd
+    }
+
+    private static evalViewPositions(axis: AXIS, view: UIView) {
+        const position = view.positions[axis]
+
         // if we have center defined we calculate start and end
         if (position.centerChanged) {
             position.start = position.center - position.size / 2

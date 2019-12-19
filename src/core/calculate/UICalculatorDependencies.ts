@@ -33,8 +33,7 @@ export default class UICalculatorDependencies {
 
         //set left parent if there is not dependencies
         if (numDependencies == 0 && !view.attrs[axis].center) {
-            view.positions[axis].start = contentRect.start
-            view.positions[axis].startChanged = true
+            this.evalDependenceStartStart(axis, view, parentView, contentRect, parentView)
         }
     }
 
@@ -89,6 +88,7 @@ export default class UICalculatorDependencies {
         } else {
             view.positions[axis].start = viewDependency.positions[axis].start
         }
+        view.positions[axis].start += view.positions[axis].marginStart
         view.positions[axis].startChanged = true
     }
 
@@ -99,11 +99,12 @@ export default class UICalculatorDependencies {
         contentRect: AxisRect,
         viewDependency: UIView,
     ) {
-        if (viewDependency.positions[axis].endChanged) {
-            view.positions[axis].start = viewDependency.positions[axis].end
+        if (parentView == viewDependency) {
+            view.positions[axis].start = contentRect.end
         } else {
-            view.positions[axis].start = viewDependency.positions[axis].start + viewDependency.positions[axis].size
+            view.positions[axis].start = viewDependency.positions[axis].end
         }
+        view.positions[axis].start += view.positions[axis].marginStart
         view.positions[axis].startChanged = true
     }
 
@@ -117,12 +118,9 @@ export default class UICalculatorDependencies {
         if (parentView == viewDependency) {
             view.positions[axis].end = contentRect.end
         } else {
-            if (viewDependency.positions[axis].endChanged) {
-                view.positions[axis].end = viewDependency.positions[axis].end
-            } else {
-                view.positions[axis].end = viewDependency.positions[axis].start + viewDependency.positions[axis].size
-            }
+            view.positions[axis].end = viewDependency.positions[axis].end
         }
+        view.positions[axis].end -= view.positions[axis].marginEnd
         view.positions[axis].endChanged = true
     }
 
@@ -133,7 +131,12 @@ export default class UICalculatorDependencies {
         contentRect: AxisRect,
         viewDependency: UIView,
     ) {
-        view.positions[axis].end = viewDependency.positions[axis].start
+        if (parentView == viewDependency) {
+            view.positions[axis].end = contentRect.start
+        } else {
+            view.positions[axis].end = viewDependency.positions[axis].start
+        }
+        view.positions[axis].end -= view.positions[axis].marginEnd
         view.positions[axis].endChanged = true
     }
 
