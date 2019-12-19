@@ -136,7 +136,9 @@ export default class UIViewStateManager {
     // ------ CHANGE STATE -----
 
     private changeStateAll(): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.NONE)
+        const view = this.setParentOrViewLowerState(UIViewState.NONE)
+        UIViewStateUtils.setLowerStateToChildren(view || this.view, UIViewState.NONE)
+        return view
     }
 
     private changeStateSize(axis: AXIS): UIView | null {

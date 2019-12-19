@@ -50,6 +50,14 @@ describe("List", () => {
         expect(item3.width).toBeLessThan(screen.width)
     })
 
+    test("List vertical bottom", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "list-vertical-bottom")
+        const item1 = await PuppeteerUtils.evalUiElement(page, "item1")
+        const item2 = await PuppeteerUtils.evalUiElement(page, "item2")
+
+        expect(item1.height).toBe(item2.height)
+    })
+
     test("List horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "list-horizontal")
         const item1 = await PuppeteerUtils.evalUiElement(page, "item1")

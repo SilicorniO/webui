@@ -112,7 +112,7 @@ export default class UIAttrReader {
         let sValue = ""
         let bValue: boolean | null = null
         if (value != null) {
-            if (value == true || value == false) {
+            if (value === true || value === false) {
                 bValue = value
             } else {
                 sValue = "" + value
