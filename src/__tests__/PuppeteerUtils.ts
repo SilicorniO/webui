@@ -37,8 +37,8 @@ export default class PuppeteerUtils {
             return {
                 sTop: element.style.top,
                 sLeft: element.style.left,
-                top: element.getBoundingClientRect().top,
-                left: element.getBoundingClientRect().left,
+                top: parseFloat(element.style.top),
+                left: parseFloat(element.style.left),
                 width: Math.ceil(element.getBoundingClientRect().width),
                 height: Math.ceil(element.getBoundingClientRect().height),
                 overflowX: element.style.overflowX,

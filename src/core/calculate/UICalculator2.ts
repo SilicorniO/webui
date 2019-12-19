@@ -4,7 +4,6 @@ import UIAttr from "../../model/UIAttr"
 import UIPosition from "../../model/UIPosition"
 import { UIViewState } from "../../model/UIViewState"
 import UIConfiguration from "../../UIConfiguration"
-import UICalculatorContentRect from "./UICalculatorContentRect"
 import UICalculatorView from "./UICalculatorView"
 
 export default class UICalculator2 {
@@ -17,13 +16,8 @@ export default class UICalculator2 {
         this.translateMarginsAndPaddings(view, configuration)
 
         for (const axis of AXIS_LIST) {
-            if (view.parent != null) {
-                // if it is a view we calculate its parent as a screen
-                this.calculateView(axis, view.parent, scrollSize, view.parent.positions[axis].size)
-            } else {
-                // if view is a screen we calculate it as screen
-                this.calculateView(axis, view, scrollSize, view.positions[axis].size)
-            }
+            // if view is a screen we calculate it as screen
+            this.calculateView(axis, view, scrollSize, view.positions[axis].size)
         }
     }
 

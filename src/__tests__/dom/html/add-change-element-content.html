@@ -1,0 +1,73 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="fw;fh">
+        <div id="content" ui="fw;fh">
+        </div>
+        <div id="buttons" ui="p:10">
+            <a id="addContent" href="#" onClick="addContent()" ui="">Add content</a>
+            <a id="changeContent" href="#" onClick="changeContent()" ui="ab:l;mt:10">Change content</a>
+        </div>
+    </div>
+    
+    <script>
+        WebUI.start({
+            viewColors: true,
+            showLogs: true,
+            viewLogs: 'logs',
+            timeRedraw: 0
+        });
+
+        var content = document.getElementById("content")
+
+        function createFirst() {
+
+            // create square
+            var element = document.createElement("div");
+            element.id = "element";
+            element.style.backgroundColor = "#EFB7C0"
+            element.setAttribute("ui", "w:200;h:200;c");
+
+            // create and append text
+            var text = document.createElement("span");
+            text.id = "text"
+            text.innerHTML = "FIRST"
+            text.setAttribute("ui", "c")
+            element.appendChild(text)
+
+            // append element
+            content.appendChild(element);
+        }
+
+        function addContent() {
+            // create center
+            var center = document.createElement("span");
+            center.id = "center";
+            center.style.backgroundColor = "#CFD7B0"
+            center.setAttribute("ui", "w:200;h:200;c;v:v");
+
+            // create and append text
+            var textCenter = document.createElement("span");
+            textCenter.id = "textCenter"
+            textCenter.innerHTML = "ADDED"
+            textCenter.setAttribute("ui", "c")
+            center.appendChild(textCenter)
+
+            // append element
+            content.insertBefore(center, element);
+        }
+
+        function changeContent(){
+            text = document.getElementById("text")
+            text.innerHTML = "AT-LEFT"
+        }
+
+        createFirst()
+    </script>
+    
+</body>
+</html>

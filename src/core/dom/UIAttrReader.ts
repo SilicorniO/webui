@@ -246,12 +246,12 @@ export default class UIAttrReader {
                 if (sValue.length > 0) {
                     viewAttrs.x.center = sValue
                     viewAttrs.y.center = sValue
-                } else if (bValue == false) {
-                    viewAttrs.x.center = ""
-                    viewAttrs.y.center = ""
-                } else {
+                } else if (value == null || bValue === true) {
                     viewAttrs.x.center = UI_VIEW_ID.PARENT
                     viewAttrs.y.center = UI_VIEW_ID.PARENT
+                } else {
+                    viewAttrs.x.center = ""
+                    viewAttrs.y.center = ""
                 }
                 break
             case ATTR.OVERFLOW:

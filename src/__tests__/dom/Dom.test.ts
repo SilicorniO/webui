@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer")
 import PuppeteerUtils from "../PuppeteerUtils"
 import TestUtils from "../TestUtils"
 
-const TIMEOUT = 5000
+const TIMEOUT = 10000
 const REDRAW_TIME = 30
 const MARGIN_MEDIUM = 20
 
@@ -80,6 +80,28 @@ describe("Dom", () => {
         expect(element.height).toBe(200)
         expect(text.top).toBe(0)
         expect(text.left).toBe(0)
+    })
+
+    test("Add change element content", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "add-change-element-content")
+
+        // click events
+        await page.click("#addContent")
+        await page.click("#changeContent")
+
+        // get elements
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+        const text = await PuppeteerUtils.evalUiElement(page, "text")
+        const center = await PuppeteerUtils.evalUiElement(page, "center")
+        const textCenter = await PuppeteerUtils.evalUiElement(page, "textCenter")
+
+        expect(element.left).toBe((content.width - element.width) / 2)
+        expect(text.left).toBe((element.width - text.width) / 2)
+        expect(text.top).toBe((element.height - text.height) / 2)
+        expect(center.left).toBe((content.width - center.width) / 2)
+        expect(textCenter.left).toBe((center.width - textCenter.width) / 2)
+        expect(textCenter.top).toBe((center.height - textCenter.height) / 2)
     })
 
     test("Remove element", async () => {
