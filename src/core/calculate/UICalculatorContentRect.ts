@@ -9,9 +9,6 @@ export default class UICalculatorContentRect {
         const attr = view.attrs[axis]
         const position = view.positions[axis]
 
-        // clean position befofe calculate content rect
-        position.clean()
-
         // calculate the size of the view
         position.size = UICalculatorViewSize.calculate(axis, view, scrollSize, parentSize)
 

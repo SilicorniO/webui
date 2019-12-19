@@ -7,12 +7,6 @@ import UIPosition from "../../model/UIPosition"
 
 export default class UICalculatorView {
     public static calculate(axis: AXIS, view: UIView, contentRect: AxisRect) {
-        const attr = view.attrs[axis]
-        const position = view.positions[axis]
-
-        // clean position because we are going to calculate everything
-        position.clean()
-
         // calculate children
         this.calculateChildren(axis, view, contentRect)
     }
@@ -21,6 +15,9 @@ export default class UICalculatorView {
         // for each child
         let maxEnd = 0
         for (const child of parent.getUIChildren()) {
+            // clean position because we are going to calculate everything
+            child.positions[axis].clean()
+
             // eval dependencies that not depend from parent size
             UICalculatorDependencies.evalViewDependencies(axis, child, parent, contentRect)
 
