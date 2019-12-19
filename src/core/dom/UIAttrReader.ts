@@ -1,4 +1,4 @@
-import { UI_REF, UI_VIEW_ID, UI_SIZE } from "../../model/UIAttr"
+import { UI_REF, UI_VIEW_ID, UI_SIZE, UI_OVERFLOW } from "../../model/UIAttr"
 import UIAttrReaderUtils from "./UIAttrReaderUtils"
 import UIView from "../../model/UIView"
 import UIAttributeValue from "./UIAttributeValue"
@@ -38,6 +38,9 @@ export enum ATTR {
     CENTER_VERTICAL = "cv",
     CENTER_HORIZONTAL = "ch",
     CENTER = "c",
+    OVERFLOW = "o",
+    OVERFLOW_VERTICAL = "ov",
+    OVERFLOW_HORIZONTAL = "oh",
     SCROLL_VERTICAL = "sv",
     SCROLL_HORIZONTAL = "sh",
     VISIBILITY = "v",
@@ -251,11 +254,29 @@ export default class UIAttrReader {
                     viewAttrs.y.center = UI_VIEW_ID.PARENT
                 }
                 break
+            case ATTR.OVERFLOW:
+                viewAttrs.x.overflow = sValue
+                viewAttrs.y.overflow = sValue
+                break
+            case ATTR.OVERFLOW_VERTICAL:
+                viewAttrs.y.overflow = sValue
+                break
+            case ATTR.OVERFLOW_HORIZONTAL:
+                viewAttrs.x.overflow = sValue
+                break
             case ATTR.SCROLL_VERTICAL:
-                viewAttrs.y.scroll = bValue || false
+                if (bValue == null || bValue == true) {
+                    viewAttrs.y.overflow = UI_OVERFLOW.SCROLL
+                } else {
+                    viewAttrs.y.overflow = UI_OVERFLOW.HIDDEN
+                }
                 break
             case ATTR.SCROLL_HORIZONTAL:
-                viewAttrs.x.scroll = bValue || false
+                if (bValue == null || bValue == true) {
+                    viewAttrs.x.overflow = UI_OVERFLOW.SCROLL
+                } else {
+                    viewAttrs.x.overflow = UI_OVERFLOW.HIDDEN
+                }
                 break
             case ATTR.VISIBILITY:
                 viewAttrs.visibility = (sValue as UI_VISIBILITY) || UI_VISIBILITY.VISIBLE
@@ -349,12 +370,12 @@ export default class UIAttrReader {
             attrs.push(`${ATTR.CENTER_VERTICAL}:${viewAttrs.y.center}`)
         }
 
-        // scroll
-        if (viewAttrs.x.scroll) {
-            attrs.push(`${ATTR.SCROLL_HORIZONTAL}`)
+        // overflow
+        if (viewAttrs.x.overflow.length > 0 && viewAttrs.x.overflow != UI_OVERFLOW.HIDDEN) {
+            attrs.push(`${ATTR.OVERFLOW_HORIZONTAL}:${viewAttrs.x.overflow}`)
         }
-        if (viewAttrs.y.scroll) {
-            attrs.push(`${ATTR.SCROLL_VERTICAL}`)
+        if (viewAttrs.y.overflow.length > 0 && viewAttrs.y.overflow != UI_OVERFLOW.HIDDEN) {
+            attrs.push(`${ATTR.OVERFLOW_VERTICAL}:${viewAttrs.y.overflow}`)
         }
 
         // visibility

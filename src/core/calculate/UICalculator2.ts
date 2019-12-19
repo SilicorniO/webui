@@ -28,14 +28,6 @@ export default class UICalculator2 {
     }
 
     private static calculateView(axis: AXIS, view: UIView, scrollSize: number, parentSize: number) {
-        // check if it is already calculated
-        if (view.getState() >= UIViewState.CALCULATE) {
-            return
-        }
-
-        const attr = view.attrs[axis]
-        const position = view.positions[axis]
-
         // calculate children
         UICalculatorView.calculate(axis, view, parentSize, scrollSize)
 

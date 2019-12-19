@@ -1,7 +1,7 @@
 import UIView from "../../model/UIView"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
 import { AXIS, UIAxis, AXIS_LIST } from "../../model/UIAxis"
-import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID } from "../../model/UIAttr"
+import UIAttr, { UI_SIZE, UI_REF, UI_REF_LIST, UI_VIEW_ID, UI_OVERFLOW } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
 import UIPosition from "../../model/UIPosition"
 import { UIViewState } from "../../model/UIViewState"
@@ -141,9 +141,12 @@ export default class UICalculator {
             //if there are children we eval them with width restrictions
             if (view.childrenOrder[axis].length > 0) {
                 //calculate the real width with padding
-                var viewWidth = view.attrs[axis].scroll
-                    ? 0
-                    : view.positions[axis].size - view.positions[axis].paddingStart - view.positions[axis].paddingEnd
+                var viewWidth =
+                    view.attrs[axis].overflow == UI_OVERFLOW.SCROLL
+                        ? 0
+                        : view.positions[axis].size -
+                          view.positions[axis].paddingStart -
+                          view.positions[axis].paddingEnd
                 this.calculateViews(
                     axis,
                     view.childrenOrder[axis],
@@ -265,7 +268,7 @@ export default class UICalculator {
      * @param view View parent
      **/
     private static evalScroll(axis: AXIS, view: UIView, size: number) {
-        if (view.attrs[axis].scroll) {
+        if (view.attrs[axis].overflow == UI_OVERFLOW.SCROLL) {
             var max = 0
             for (const child of view.getUIChildren()) {
                 if (child.positions[axis].end > max) {

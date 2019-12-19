@@ -1,5 +1,5 @@
 import { AXIS, UIAxis } from "../../model/UIAxis"
-import { UI_SIZE } from "../../model/UIAttr"
+import { UI_SIZE, UI_OVERFLOW } from "../../model/UIAttr"
 import { UI_VISIBILITY } from "../../model/UIVisibility"
 import UIPosition from "../../model/UIPosition"
 import UIDraw, { UIDrawAnimation } from "../../model/UIDraw"
@@ -26,7 +26,8 @@ export default class UIDrawGenerator {
         // apply all
         this.applyBackground(viewColors, draw)
         this.applyVisibility(attrs, draw)
-        this.applySizeScreen(attrs, positions, childrenSize, draw)
+        this.applySize(positions, draw)
+        this.applyOverflow(attrs, draw)
 
         // return the draw object
         return draw
@@ -40,7 +41,7 @@ export default class UIDrawGenerator {
     ) {
         // apply size
         if (attrs[AXIS.X].size == UI_SIZE.SCREEN) {
-            draw.width = positions[AXIS.X].size + "px"
+            draw.width = Math.max(0, positions[AXIS.X].end - positions[AXIS.X].start) + "px"
         } else if (attrs[AXIS.X].size == UI_SIZE.PERCENTAGE) {
             draw.width = attrs[AXIS.X].sizeValue + "%"
         } else {
@@ -51,7 +52,7 @@ export default class UIDrawGenerator {
             }
         }
         if (attrs[AXIS.Y].size == UI_SIZE.SCREEN) {
-            draw.height = positions[AXIS.Y].size + "px"
+            draw.height = Math.max(0, positions[AXIS.Y].end - positions[AXIS.Y].start) + "px"
         } else if (attrs[AXIS.Y].size == UI_SIZE.PERCENTAGE) {
             draw.height = attrs[AXIS.Y].sizeValue + "%"
         } else {
@@ -78,6 +79,7 @@ export default class UIDrawGenerator {
         const maxPosition = this.applyPosition(positions, draw)
         this.applyVisibility(attrs, draw, parentVisibility)
         this.applyAnimation(animations, draw)
+        this.applyOverflow(attrs, draw)
 
         // return the draw object
         return {
@@ -106,6 +108,14 @@ export default class UIDrawGenerator {
             draw.transition = "all " + firstAnimation.duration + "s ease 0s"
             draw.onTransitionEnd = firstAnimation.onEnd
         }
+    }
+
+    private static applySize(positions: UIAxis<UIPosition>, draw: UIDraw) {
+        //set location
+        const width = Math.max(0, positions[AXIS.X].end - positions[AXIS.X].start)
+        const height = Math.max(0, positions[AXIS.Y].end - positions[AXIS.Y].start)
+        draw.width = width + "px"
+        draw.height = height + "px"
     }
 
     private static applyPosition(positions: UIAxis<UIPosition>, draw: UIDraw): UIAxis<number> {
@@ -143,6 +153,44 @@ export default class UIDrawGenerator {
             } else {
                 draw.opacity = "1"
             }
+        }
+    }
+
+    /**
+     * Apply visibility for the views
+     * @param {UIView} view to change visibility
+     * @param {UIView} parentView to know visibility of the parent
+     * @param {UIConfiguration} configuration to know time of animations
+     * @param {boolean} forceGone flag to know if parent is not being displayed because is gone
+     **/
+    public static applyOverflow(attrs: UIViewAttrs, draw: UIDraw) {
+        const overflowX = attrs[AXIS.X].overflow
+        const overflowY = attrs[AXIS.Y].overflow
+
+        switch (overflowX) {
+            case UI_OVERFLOW.VISIBLE:
+                draw.overflowX = "visible"
+                break
+            case UI_OVERFLOW.SCROLL:
+                draw.overflowX = "scroll"
+                break
+            case UI_OVERFLOW.HIDDEN:
+            default:
+                draw.overflowX = "hidden"
+                break
+        }
+
+        switch (overflowY) {
+            case UI_OVERFLOW.VISIBLE:
+                draw.overflowY = "visible"
+                break
+            case UI_OVERFLOW.SCROLL:
+                draw.overflowY = "scroll"
+                break
+            case UI_OVERFLOW.HIDDEN:
+            default:
+                draw.overflowY = "hidden"
+                break
         }
     }
 

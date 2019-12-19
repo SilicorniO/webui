@@ -77,10 +77,17 @@ export default class UIViewEventsUtils {
                     { stateChange: UIViewStateChange.CENTER, axis: AXIS.X },
                     { stateChange: UIViewStateChange.CENTER, axis: AXIS.Y },
                 ]
+            case ATTR.OVERFLOW_HORIZONTAL:
             case ATTR.SCROLL_HORIZONTAL:
-                return [{ stateChange: UIViewStateChange.SCROLL, axis: AXIS.X }]
+                return [{ stateChange: UIViewStateChange.OVERFLOW, axis: AXIS.X }]
+            case ATTR.OVERFLOW_VERTICAL:
             case ATTR.SCROLL_VERTICAL:
-                return [{ stateChange: UIViewStateChange.SCROLL, axis: AXIS.Y }]
+                return [{ stateChange: UIViewStateChange.OVERFLOW, axis: AXIS.Y }]
+            case ATTR.OVERFLOW:
+                return [
+                    { stateChange: UIViewStateChange.OVERFLOW, axis: AXIS.X },
+                    { stateChange: UIViewStateChange.OVERFLOW, axis: AXIS.Y },
+                ]
             case ATTR.VISIBILITY:
                 if (previousAttributes.visibility == UI_VISIBILITY.GONE || value == UI_VISIBILITY.GONE) {
                     return [{ stateChange: UIViewStateChange.VISIBILITY_GONE }]

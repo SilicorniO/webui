@@ -1,5 +1,5 @@
 import UIViewAttrs from "../../../model/UIViewAttrs"
-import { UI_SIZE, UI_VIEW_ID } from "../../../model/UIAttr"
+import { UI_SIZE, UI_VIEW_ID, UI_OVERFLOW } from "../../../model/UIAttr"
 import UIAttrReader from "../../../core/dom/UIAttrReader"
 import { UI_VISIBILITY } from "../../../model/UIVisibility"
 
@@ -102,14 +102,14 @@ describe("UiAttrReader", () => {
     test("generateUiAttr - scroll", async () => {
         // generate attributes
         const viewAttrs = new UIViewAttrs()
-        viewAttrs.x.scroll = true
-        viewAttrs.y.scroll = true
+        viewAttrs.x.overflow = UI_OVERFLOW.SCROLL
+        viewAttrs.y.overflow = UI_OVERFLOW.SCROLL
 
         // convert to text
         const uiAttr = UIAttrReader.generateUiAttr(viewAttrs)
 
         // check text
-        expect(uiAttr).toBe("sh;sv")
+        expect(uiAttr).toBe("oh:s;ov:s")
     })
 
     test("generateUiAttr - visibility gone", async () => {

@@ -25,7 +25,7 @@ export enum UIViewStateChange {
     MARGIN_END,
     PADDING_START,
     PADDING_END,
-    SCROLL,
+    OVERFLOW,
     VISIBILITY,
     VISIBILITY_GONE,
     CHILD_NODE_ADDED,

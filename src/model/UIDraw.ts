@@ -12,6 +12,8 @@ export default class UIDraw {
     display: string = ""
     opacity: string = ""
     transition: string = ""
+    overflowX: string = ""
+    overflowY: string = ""
     backgroundColor: string = ""
 
     // listener for the end of transition

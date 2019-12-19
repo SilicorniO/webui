@@ -55,8 +55,8 @@ export default class UIViewStateManager {
                 case UIViewStateChange.PADDING_END:
                     oldestView = this.changeStatePadding(axis)
                     break
-                case UIViewStateChange.SCROLL:
-                    oldestView = this.changeStateScroll(axis)
+                case UIViewStateChange.OVERFLOW:
+                    oldestView = this.changeStateOverflow(axis)
                     break
                 default:
                     break
@@ -176,7 +176,7 @@ export default class UIViewStateManager {
         return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
     }
 
-    private changeStateScroll(axis: AXIS): UIView | null {
+    private changeStateOverflow(axis: AXIS): UIView | null {
         return this.setParentOrViewLowerState(UIViewState.PREPARE)
     }
 

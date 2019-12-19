@@ -29,12 +29,18 @@ export enum UI_SIZE {
     PERCENTAGE = "sp",
 }
 
+export enum UI_OVERFLOW {
+    HIDDEN = "h",
+    SCROLL = "s",
+    VISIBLE = "v",
+}
+
 export interface UIAttrCleanOptions {
     size?: boolean
     position?: boolean
     margin?: boolean
     padding?: boolean
-    scroll?: boolean
+    overflow?: boolean
     center?: boolean
 }
 
@@ -46,7 +52,7 @@ export default class UIAttr {
     size: UI_SIZE = UI_SIZE.SIZE_CONTENT
     sizeValue: number = 0
     percentPos: number = 0
-    scroll: boolean = false
+    overflow: string = UI_OVERFLOW.HIDDEN
     center: UIViewId = ""
     marginStart: string = ""
     marginEnd: string = ""
@@ -131,8 +137,8 @@ export default class UIAttr {
             this.sizeValue = 0
             this.percentPos = 0
         }
-        if (options == null || options.scroll != false) {
-            this.scroll = false
+        if (options == null || options.overflow != false) {
+            this.overflow = UI_OVERFLOW.HIDDEN
         }
         if (options == null || options.center != false) {
             this.center = ""
@@ -157,7 +163,7 @@ export default class UIAttr {
         attr.size = this.size
         attr.sizeValue = this.sizeValue
         attr.percentPos = this.percentPos
-        attr.scroll = this.scroll
+        attr.overflow = this.overflow
         attr.center = this.center
         attr.marginStart = this.marginStart
         attr.marginEnd = this.marginEnd

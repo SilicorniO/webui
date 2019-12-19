@@ -2,7 +2,7 @@ import { AXIS, AxisRect } from "../../model/UIAxis"
 import UIView from "../../model/UIView"
 import UICalculatorViewSize from "./UICalculatorViewSize"
 import UIPosition from "../../model/UIPosition"
-import UIAttr, { UI_SIZE } from "../../model/UIAttr"
+import UIAttr, { UI_SIZE, UI_OVERFLOW } from "../../model/UIAttr"
 
 export default class UICalculatorContentRect {
     public static calculateContentRect(axis: AXIS, view: UIView, scrollSize: number, parentSize: number): AxisRect {
@@ -49,7 +49,7 @@ export default class UICalculatorContentRect {
         }
 
         // check we have scroll
-        if (!attr.scroll) {
+        if (attr.overflow != UI_OVERFLOW.SCROLL) {
             return
         }
 

@@ -12,6 +12,12 @@ export default class UICalculatorView {
 
         // calculate children
         this.calculateChildren(axis, view, contentRect, scrollSize)
+
+        // if screen is size content and has not end changed we calculate with the children
+        if (!view.positions[axis].endChanged) {
+            view.positions[axis].end = this.getMaxEndOfChildren(axis, view)
+            view.positions[axis].endChanged = true
+        }
     }
 
     private static calculateChildren(axis: AXIS, parent: UIView, contentRect: AxisRect, scrollSize: number) {
@@ -93,10 +99,7 @@ export default class UICalculatorView {
 
         // calculate max end checking all children
         if (view.hasUIChildren()) {
-            let maxEnd = 0
-            for (const child of view.getUIChildren()) {
-                maxEnd = Math.max(maxEnd, child.positions[axis].end)
-            }
+            const maxEnd = this.getMaxEndOfChildren(axis, view)
             position.size = maxEnd - contentRect.start
         } else {
             // if we are not in first axis (x), the content could change, so we recalculate
@@ -109,6 +112,14 @@ export default class UICalculatorView {
 
         // add padding end because this view is bigger than content size
         position.size += position.paddingEnd
+    }
+
+    private static getMaxEndOfChildren(axis: AXIS, view: UIView): number {
+        let maxEnd = 0
+        for (const child of view.getUIChildren()) {
+            maxEnd = Math.max(maxEnd, child.positions[axis].end)
+        }
+        return maxEnd
     }
 
     private static evalViewPositions(axis: AXIS, view: UIView) {

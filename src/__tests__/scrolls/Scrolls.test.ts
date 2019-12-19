@@ -27,7 +27,7 @@ describe("Scrolls", () => {
         const lastElement = await PuppeteerUtils.evalUiElement(page, "lastElement")
 
         expect(lastElement.top).toBeGreaterThan(content.height)
-        expect(content.overflowY).toBe("auto")
+        expect(content.overflowY).toBe("scroll")
     })
 
     test("Scroll horizontal", async () => {
@@ -36,7 +36,7 @@ describe("Scrolls", () => {
         const lastElement = await PuppeteerUtils.evalUiElement(page, "lastElement")
 
         expect(lastElement.left).toBeGreaterThan(content.width)
-        expect(content.overflowX).toBe("auto")
+        expect(content.overflowX).toBe("scroll")
     })
 
     test("Scroll vertical and horizontal", async () => {
@@ -45,8 +45,8 @@ describe("Scrolls", () => {
         const lastElement = await PuppeteerUtils.evalUiElement(page, "lastElement")
 
         expect(lastElement.top).toBeGreaterThan(content.height)
-        expect(content.overflowY).toBe("auto")
+        expect(content.overflowY).toBe("scroll")
         expect(lastElement.left).toBeGreaterThan(content.width)
-        expect(content.overflowX).toBe("auto")
+        expect(content.overflowX).toBe("scroll")
     })
 })

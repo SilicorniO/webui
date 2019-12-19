@@ -27,6 +27,7 @@ export default class UIDrawer {
         this.drawTransition(element, draw)
         this.drawPosition(element, draw)
         this.drawSize(element, draw)
+        this.drawOverflow(element, draw)
         this.drawVisibility(element, draw, configurationAnimations)
     }
 
@@ -85,6 +86,11 @@ export default class UIDrawer {
     private static drawSize(element: HTMLElement, draw: UIDraw) {
         element.style.width = draw.width
         element.style.height = draw.height
+    }
+
+    private static drawOverflow(element: HTMLElement, draw: UIDraw) {
+        element.style.overflowX = draw.overflowX
+        element.style.overflowY = draw.overflowY
     }
 
     public static drawVisibility(

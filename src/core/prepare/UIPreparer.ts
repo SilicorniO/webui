@@ -66,7 +66,6 @@ export default class UIPreparer {
     public static loadSizeScreen(screen: UIView) {
         // get the element
         const ele = screen.element
-        ele.style.position = "absolute"
 
         // show view if it is not visible
         if (ele.style.display == "none") {
@@ -100,14 +99,20 @@ export default class UIPreparer {
         position: UIPosition,
         hasUIChildren: boolean,
     ) {
+        // clean positionn because they are going to be calculated again
+        position.clean()
+
         // if it is size content we calculate the size with the children
         if (attr.size == UI_SIZE.SIZE_CONTENT) {
-            if (!hasUIChildren) {
-                if (axis == AXIS.X) {
-                    position.size = DomSizeUtils.calculateWidthView(element)
-                } else if (axis == AXIS.Y) {
-                    position.size = DomSizeUtils.calculateHeightView(element)
-                }
+            if (hasUIChildren) {
+                return
+            }
+
+            // apply content size
+            if (axis == AXIS.X) {
+                position.size = DomSizeUtils.calculateWidthView(element)
+            } else if (axis == AXIS.Y) {
+                position.size = DomSizeUtils.calculateHeightView(element)
             }
         } else {
             let style = ""
@@ -120,10 +125,10 @@ export default class UIPreparer {
             let offset = 0
             if (axis == AXIS.X) {
                 element.style.width = style
-                offset = element.offsetWidth
+                offset = Math.ceil(element.getBoundingClientRect().width)
             } else if (axis == AXIS.Y) {
                 element.style.height = style
-                offset = element.offsetHeight
+                offset = Math.ceil(element.getBoundingClientRect().height)
             }
 
             if (offset != position.size) {
