@@ -29,11 +29,27 @@ describe("Size", () => {
         expect(element.width).toBe(SIZE)
     })
 
+    test("Width full content", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "width-full-content")
+
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.width).toBe(content.width)
+    })
+
     test("Height", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "height")
         const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(element.height).toBe(SIZE)
+    })
+
+    test("Height 1", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "height-1")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.height).toBe(1)
     })
 
     test("Content horizontal", async () => {
