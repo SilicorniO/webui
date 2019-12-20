@@ -1,39 +1,48 @@
 import { AXIS, AxisRect } from "../../model/UIAxis"
 import UIView from "../../model/UIView"
-import UICalculatorViewSize from "./UICalculatorViewSize"
 import UIPosition from "../../model/UIPosition"
 import UIAttr, { UI_SIZE, UI_OVERFLOW } from "../../model/UIAttr"
 
 export default class UICalculatorContentRect {
-    public static calculateContentRect(axis: AXIS, view: UIView, scrollSize: number, parentSize: number): AxisRect {
+    public static calculate(axis: AXIS, view: UIView, parentSize: number, scrollSize: number): AxisRect {
         const attr = view.attrs[axis]
         const position = view.positions[axis]
 
-        // calculate the size of the view
-        position.size = UICalculatorViewSize.calculate(axis, view, scrollSize, parentSize)
-
-        // apply padding
-        this.applyPaddingToSize(attr, position)
-
         // create content rect
         const contentRect = new AxisRect()
-        this.applyPaddingToContentRect(contentRect, position)
 
-        // apply scroll if necessary
+        // calculate size
+        contentRect.end = this.calculateSize(axis, view, parentSize)
+
+        // apply padding to content rect
+        this.applyPaddingToContentRect(contentRect, attr, position)
+
+        // apply scroll to content rect
         this.applyScrollToContentRect(contentRect, attr, position, scrollSize)
 
         // return content rect
         return contentRect
     }
 
-    private static applyPaddingToSize(attr: UIAttr, position: UIPosition) {
+    private static calculateSize(axis: AXIS, view: UIView, parentSize: number): number {
+        const attr = view.attrs[axis]
+
+        // check size is content
         if (attr.size == UI_SIZE.SIZE_CONTENT) {
-            position.size += position.paddingStart + position.paddingEnd
+            return 0
+        } else if (attr.size == UI_SIZE.PERCENTAGE) {
+            return (parentSize * attr.sizeValue) / 100
+        } else {
+            return attr.sizeValue
         }
     }
 
-    private static applyPaddingToContentRect(contentRect: AxisRect, position: UIPosition) {
-        contentRect.end = position.size - position.paddingEnd
+    private static applyPaddingToContentRect(contentRect: AxisRect, attr: UIAttr, position: UIPosition) {
+        if (attr.size == UI_SIZE.SIZE_CONTENT) {
+            contentRect.end += position.paddingStart
+        } else {
+            contentRect.end -= position.paddingEnd
+        }
         contentRect.start += position.paddingStart
     }
 
@@ -59,6 +68,10 @@ export default class UICalculatorContentRect {
         }
 
         // apply scroll to content rect
-        contentRect.end -= scrollSize
+        if (attr.size == UI_SIZE.SIZE_CONTENT) {
+            contentRect.end += scrollSize
+        } else {
+            contentRect.end -= scrollSize
+        }
     }
 }

@@ -1,14 +1,15 @@
-import { AXIS, AxisRect } from "../../model/UIAxis"
+import { AXIS, AxisRect, AXIS_LIST } from "../../model/UIAxis"
 import UIView from "../../model/UIView"
 import { UI_SIZE } from "../../model/UIAttr"
 import UICalculatorDependencies from "./UICalculatorDependencies"
-import UICalculatorContentRect from "./UICalculatorContentRect"
 import DomSizeUtils from "../../utils/domsize/DomSizeUtils"
+import UICalculatorContentRect from "./UICalculatorContentRect"
+import { UIViewState } from "../../model/UIViewState"
 
 export default class UICalculatorView {
     public static calculate(axis: AXIS, view: UIView, size: number, scrollSize: number) {
         // calculate content rect
-        const contentRect = UICalculatorContentRect.calculateContentRect(axis, view, scrollSize, size)
+        const contentRect = UICalculatorContentRect.calculate(axis, view, size, scrollSize)
 
         // calculate children
         this.calculateChildren(axis, view, contentRect, scrollSize)
@@ -20,16 +21,25 @@ export default class UICalculatorView {
         }
     }
 
-    private static calculateChildren(axis: AXIS, parent: UIView, contentRect: AxisRect, scrollSize: number) {
-        // calculate content size
-        const contentSize = contentRect.end - contentRect.start
+    private static calculateChildren(
+        axis: AXIS,
+        parent: UIView,
+        contentRect: AxisRect,
+        scrollSize: number,
+        secondPass: boolean = false,
+    ) {
+        // check has children
+        if (!parent.hasUIChildren()) {
+            return
+        }
+
+        const attr = parent.attrs[axis]
 
         // for each child
         for (const child of parent.getUIChildren()) {
             // if has children we calculate children
             if (child.hasUIChildren()) {
-                const childSize = this.getChildSize(axis, child, contentSize)
-                this.calculate(axis, child, childSize, scrollSize)
+                this.calculate(axis, child, contentRect.size(), scrollSize)
             }
 
             // clean position because we are going to calculate everything
@@ -43,24 +53,20 @@ export default class UICalculatorView {
 
             // eval positions
             this.evalViewPositions(axis, child)
-        }
-    }
 
-    private static getChildSize(axis: AXIS, view: UIView, parentSize: number): number {
-        const attr = view.attrs[axis]
-
-        // check size is content
-        if (attr.size == UI_SIZE.SIZE_CONTENT) {
-            // calculate content size of view
-            if (view.hasUIChildren()) {
-                return parentSize
-            } else {
-                return attr.sizeValue
+            // if it is the last axis we mark it as calculated
+            if (axis == AXIS_LIST[AXIS_LIST.length - 1]) {
+                child.setState(UIViewState.CALCULATE)
             }
-        } else if (attr.size == UI_SIZE.PERCENTAGE) {
-            return (parentSize * attr.sizeValue) / 100
-        } else {
-            return attr.sizeValue
+        }
+
+        // TODO calculate again if a child has parent dependencies, but now with real size
+        if (attr.size == UI_SIZE.SIZE_CONTENT && contentRect.size() == 0 && !secondPass) {
+            // apply size of calculated children to content rect
+            contentRect.end = this.getMaxEndOfChildren(axis, parent)
+
+            // calculate children again
+            this.calculateChildren(axis, parent, contentRect, scrollSize, true)
         }
     }
 

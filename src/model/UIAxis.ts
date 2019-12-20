@@ -19,6 +19,10 @@ export class AxisRect {
     start: number = 0
     end: number = 0
 
+    public size(): number {
+        return this.end - this.start
+    }
+
     public clean() {
         this.start = 0
         this.end = 0
