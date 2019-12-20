@@ -2,6 +2,7 @@ import { AXIS, AxisRect } from "../../model/UIAxis"
 import UIView from "../../model/UIView"
 import UIPosition from "../../model/UIPosition"
 import UIAttr, { UI_SIZE, UI_OVERFLOW } from "../../model/UIAttr"
+import UICalculatorDependencies from "./UICalculatorDependencies"
 
 export default class UICalculatorContentRect {
     public static calculate(axis: AXIS, view: UIView, parentSize: number, scrollSize: number): AxisRect {
@@ -29,11 +30,31 @@ export default class UICalculatorContentRect {
 
         // check size is content
         if (attr.size == UI_SIZE.SIZE_CONTENT) {
-            return 0
+            return this.calculateSizeContent(axis, view, parentSize)
         } else if (attr.size == UI_SIZE.PERCENTAGE) {
             return (parentSize * attr.sizeValue) / 100
         } else {
             return attr.sizeValue
+        }
+    }
+
+    private static calculateSizeContent(axis: AXIS, view: UIView, parentSize: number): number {
+        const parent = view.parent
+        if (parent != null) {
+            // create content rect with the size
+            const contentRect = new AxisRect()
+            contentRect.end = parentSize
+
+            // try to get the size with dependencies with the parent
+            const position = UICalculatorDependencies.evalViewDependencies(axis, view, parent, contentRect, false)
+            if (position.startChanged && position.endChanged) {
+                return Math.max(0, position.end - position.start)
+            } else {
+                return 0
+            }
+        } else {
+            // else we return 0 to not calculate this child for the content
+            return 0
         }
     }
 

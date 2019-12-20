@@ -52,6 +52,19 @@ describe("Size", () => {
         expect(element.height).toBe(1)
     })
 
+    test("Height with dependences", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "height-with-dependences")
+
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(content.width).toBe(200)
+        expect(content.height).toBe(screen.height)
+        expect(element.width).toBe(content.width)
+        expect(element.height).toBe(content.height)
+    })
+
     test("Content horizontal", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "content-horizontal")
         const screen = await PuppeteerUtils.evalUiElement(page, "screen")

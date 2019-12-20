@@ -26,4 +26,26 @@ export default class UIPosition {
         this.end = 0
         this.size = 0
     }
+
+    public clone(): UIPosition {
+        const position = new UIPosition()
+
+        position.size = this.size
+
+        position.start = this.start
+        position.end = this.end
+        position.center = this.center
+
+        position.startChanged = this.startChanged
+        position.endChanged = this.endChanged
+        position.centerChanged = this.centerChanged
+
+        position.scrollApplied = this.scrollApplied
+        position.marginStart = this.marginStart
+        position.marginEnd = this.marginEnd
+        position.paddingStart = this.paddingStart
+        position.paddingEnd = this.paddingEnd
+
+        return position
+    }
 }

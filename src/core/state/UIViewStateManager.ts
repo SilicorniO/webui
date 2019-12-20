@@ -113,30 +113,38 @@ export default class UIViewStateManager {
 
     // ----- PRIVATE ------
 
-    private setViewLowerState(state: UIViewState): UIView | null {
-        return UIViewStateUtils.setLowerState(this.view, state)
+    private static setViewLowerState(view: UIView, state: UIViewState): UIView | null {
+        // apply state to view
+        UIViewStateUtils.setLowerState(view, state)
+
+        const viewParent = view.parent
+        if (viewParent != null) {
+            // if (UIViewStateUtils.hasParentDependencyOfView(view) || UIViewStateUtils.hasBrothersDependencOfView(view)) {
+            return this.setParentOrViewLowerState(viewParent, state)
+            // } else {
+            //     return view
+            // }
+        } else {
+            return view
+        }
     }
 
-    private setParentOrViewLowerState(state: UIViewState): UIView | null {
-        const viewParent = this.view.parent
+    private static setParentOrViewLowerState(view: UIView, state: UIViewState): UIView | null {
+        // apply state to view
+        UIViewStateUtils.setLowerState(view, state)
+
+        const viewParent = view.parent
         if (viewParent != null) {
-            UIViewStateUtils.setLowerState(viewParent, state)
-            UIViewStateUtils.setLowerState(this.view, state)
-            const mainView = UIViewStateUtils.setLowerStateToParents(viewParent, state)
-            UIViewStateUtils.setLowerStateToChildren(mainView, UIViewState.ORGANIZE)
-            return mainView
+            return UIViewStateManager.setViewLowerState(viewParent, state)
         } else {
-            UIViewStateUtils.setLowerState(this.view, state)
-            const mainView = UIViewStateUtils.setLowerStateToParents(this.view, state)
-            UIViewStateUtils.setLowerStateToChildren(mainView, UIViewState.ORGANIZE)
-            return this.view
+            return view
         }
     }
 
     // ------ CHANGE STATE -----
 
     private changeStateAll(): UIView | null {
-        const view = this.setParentOrViewLowerState(UIViewState.NONE)
+        const view = UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.NONE)
         UIViewStateUtils.setLowerStateToChildren(view || this.view, UIViewState.NONE)
         return view
     }
@@ -144,62 +152,62 @@ export default class UIViewStateManager {
     private changeStateSize(axis: AXIS): UIView | null {
         // if it is an screen we have to resize the screen
         if (this.view.parent == null) {
-            return this.setViewLowerState(UIViewState.DOM)
+            return UIViewStateManager.setViewLowerState(this.view, UIViewState.DOM)
         } else {
-            return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+            return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.ORGANIZE)
         }
     }
 
     private changeStateSizePos(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.ORGANIZE)
     }
 
     private changeStateStart(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.PREPARE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.PREPARE)
     }
 
     private changeStateEnd(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.PREPARE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.PREPARE)
     }
 
     private changeStateCenter(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.ORGANIZE)
     }
 
     private changeStateMarginStart(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.ORGANIZE)
     }
 
     private changeStateMarginEnd(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.ORGANIZE)
     }
 
     private changeStatePadding(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.ORGANIZE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.ORGANIZE)
     }
 
     private changeStateOverflow(axis: AXIS): UIView | null {
-        return this.setParentOrViewLowerState(UIViewState.PREPARE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.PREPARE)
     }
 
     private changeStateVisibility(): UIView | null {
         // visibility of view has changed between invisible and visible
-        return this.setViewLowerState(UIViewState.CALCULATE)
+        return UIViewStateManager.setViewLowerState(this.view, UIViewState.CALCULATE)
     }
 
     private changeStateVisibilityGone(): UIView | null {
         // visibility of view has changed between gone and visible or invisible
-        return this.setParentOrViewLowerState(UIViewState.DOM)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.DOM)
     }
 
     private changeStateChildNodeAdded(): UIView | null {
         // change state of this view to DOM
-        return this.setParentOrViewLowerState(UIViewState.NONE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.NONE)
     }
 
     private changeStateChildNodeRemoved(): UIView | null {
         // change state of this view to DOM
-        return this.setParentOrViewLowerState(UIViewState.NONE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.NONE)
     }
 
     private changeStateParentResized(): UIView | null {
@@ -215,16 +223,16 @@ export default class UIViewStateManager {
         }
 
         // calculate again with new space
-        return this.setViewLowerState(UIViewState.CALCULATE)
+        return UIViewStateManager.setViewLowerState(this.view, UIViewState.CALCULATE)
     }
 
     private changeStateAttributeModified(): UIView | null {
         // change state of this view to DOM
-        return this.setParentOrViewLowerState(UIViewState.NONE)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.NONE)
     }
 
     private changeStateElementLoaded(): UIView | null {
         // change state of this view to DOM
-        return this.setParentOrViewLowerState(UIViewState.DOM)
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.DOM)
     }
 }

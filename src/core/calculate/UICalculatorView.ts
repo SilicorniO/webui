@@ -42,11 +42,8 @@ export default class UICalculatorView {
                 this.calculate(axis, child, contentRect.size(), scrollSize)
             }
 
-            // clean position because we are going to calculate everything
-            child.positions[axis].clean()
-
             // eval dependencies that not depend from parent size
-            UICalculatorDependencies.evalViewDependencies(axis, child, parent, contentRect)
+            child.positions[axis] = UICalculatorDependencies.evalViewDependencies(axis, child, parent, contentRect)
 
             // eval size of child
             this.evalViewSize(axis, child, contentRect)

@@ -1,6 +1,7 @@
 import UIView from "../../model/UIView"
 import { UIViewState } from "../../model/UIViewState"
-import { AXIS_LIST } from "../../model/UIAxis"
+import { AXIS_LIST, AXIS } from "../../model/UIAxis"
+import { UI_SIZE } from "../../model/UIAttr"
 
 export default class UIViewStateUtils {
     public static setLowerState(view: UIView, state: UIViewState): UIView | null {
@@ -58,5 +59,42 @@ export default class UIViewStateUtils {
             viewParent.setState(state)
         }
         return UIViewStateUtils.setLowerStateToParents(viewParent, state)
+    }
+
+    public static hasParentDependencyOfView(view: UIView): boolean {
+        // get parent, if no parent we stop
+        const viewParent = view.parent
+        if (viewParent == null) {
+            return false
+        }
+
+        // if parent is size content then it can have dependency
+        return (
+            viewParent.attrs[AXIS.X].size === UI_SIZE.SIZE_CONTENT ||
+            viewParent.attrs[AXIS.Y].size === UI_SIZE.SIZE_CONTENT
+        )
+    }
+
+    public static hasBrothersDependencOfView(view: UIView): boolean {
+        // get parent, if no parent we stop
+        const viewParent = view.parent
+        if (viewParent == null) {
+            return false
+        }
+
+        // check a child has depedencies with specific view
+        for (const viewBrother of viewParent.getUIChildren()) {
+            // discard self
+            if (viewBrother.id != view.id) {
+                for (const axis of AXIS_LIST) {
+                    if (viewBrother.dependencies[axis].includes(view.id)) {
+                        return true
+                    }
+                }
+            }
+        }
+
+        // return if connected brothers
+        return false
     }
 }

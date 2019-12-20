@@ -2,6 +2,7 @@ import { AXIS, AxisRect } from "../../model/UIAxis"
 import UIView from "../../model/UIView"
 import { UI_REF_LIST, UI_REF, UI_VIEW_ID } from "../../model/UIAttr"
 import Log from "../../utils/log/Log"
+import UIPosition from "../../model/UIPosition"
 
 export default class UICalculatorDependencies {
     /**
@@ -13,28 +14,38 @@ export default class UICalculatorDependencies {
      * @param arrayViews
      * @param indexes
      */
-    public static evalViewDependencies(axis: AXIS, view: UIView, parentView: UIView, contentRect: AxisRect) {
+    public static evalViewDependencies(
+        axis: AXIS,
+        view: UIView,
+        parentView: UIView,
+        contentRect: AxisRect,
+    ): UIPosition {
+        // create the position to return, we add margin because we can use it
+        const position = view.positions[axis].clone()
+        position.clean()
+
         var numDependencies = 0
         var attrs = view.getAttrs(axis)
         for (const refId of UI_REF_LIST) {
             var dependency = this.translateViewDependency(view, attrs.getRef(refId), parentView)
             if (dependency.length > 0) {
-                this.evalViewDependence(
-                    axis,
-                    view,
-                    parentView,
-                    contentRect,
-                    refId,
-                    parentView.dependenciesMap[dependency],
-                )
-                numDependencies += 1
+                const viewDependency = parentView.dependenciesMap[dependency]
+                if (viewDependency != null) {
+                    this.evalViewDependence(axis, position, parentView, contentRect, refId, viewDependency)
+                    numDependencies += 1
+                } else {
+                    Log.logE(`The view ${view.id} has a wrong reference: ${refId}`)
+                }
             }
         }
 
-        //set left parent if there is not dependencies
+        // set left parent if there is not dependencies
         if (numDependencies == 0 && !view.attrs[axis].center) {
-            this.evalDependenceStartStart(axis, view, parentView, contentRect, parentView)
+            this.evalDependenceStartStart(position, contentRect, true, parentView.positions[axis])
         }
+
+        // return position
+        return position
     }
 
     /**
@@ -46,114 +57,107 @@ export default class UICalculatorDependencies {
      **/
     private static evalViewDependence(
         axis: AXIS,
-        view: UIView,
+        position: UIPosition,
         parentView: UIView,
         contentRect: AxisRect,
         referenceId: UI_REF,
-        viewDependency: UIView | null,
+        viewDependency: UIView,
     ) {
-        if (viewDependency == null) {
-            Log.logE(`The view ${view.id} has a wrong reference: ${referenceId}`)
-            return
-        }
+        // values to check
+        const viewDependencyPosition = viewDependency.positions[axis]
+        const parentDependence = viewDependency == parentView
 
         switch (referenceId) {
             case UI_REF.START_START:
-                this.evalDependenceStartStart(axis, view, parentView, contentRect, viewDependency)
+                this.evalDependenceStartStart(position, contentRect, parentDependence, viewDependencyPosition)
                 break
             case UI_REF.START_END:
-                this.evalDependenceStartEnd(axis, view, parentView, contentRect, viewDependency)
+                this.evalDependenceStartEnd(position, contentRect, parentDependence, viewDependencyPosition)
                 break
             case UI_REF.END_END:
-                this.evalDependenceEndEnd(axis, view, parentView, contentRect, viewDependency)
+                this.evalDependenceEndEnd(position, contentRect, parentDependence, viewDependencyPosition)
                 break
             case UI_REF.END_START:
-                this.evalDependenceEndStart(axis, view, parentView, contentRect, viewDependency)
+                this.evalDependenceEndStart(position, contentRect, parentDependence, viewDependencyPosition)
                 break
             case UI_REF.CENTER:
-                this.evalDependenceCenter(axis, view, parentView, contentRect, viewDependency)
+                this.evalDependenceCenter(position, contentRect, parentDependence, viewDependencyPosition)
                 break
         }
     }
 
     private static evalDependenceStartStart(
-        axis: AXIS,
-        view: UIView,
-        parentView: UIView,
+        position: UIPosition,
         contentRect: AxisRect,
-        viewDependency: UIView,
+        parentDependence: boolean,
+        viewDependencyPosition: UIPosition,
     ) {
-        if (parentView == viewDependency) {
-            view.positions[axis].start = contentRect.start
+        if (parentDependence) {
+            position.start = contentRect.start
         } else {
-            view.positions[axis].start = viewDependency.positions[axis].start
+            position.start = viewDependencyPosition.start
         }
-        view.positions[axis].start += view.positions[axis].marginStart
-        view.positions[axis].startChanged = true
+        position.start += position.marginStart
+        position.startChanged = true
     }
 
     private static evalDependenceStartEnd(
-        axis: AXIS,
-        view: UIView,
-        parentView: UIView,
+        position: UIPosition,
         contentRect: AxisRect,
-        viewDependency: UIView,
+        parentDependence: boolean,
+        viewDependencyPosition: UIPosition,
     ) {
-        if (parentView == viewDependency) {
-            view.positions[axis].start = contentRect.end
+        if (parentDependence) {
+            position.start = contentRect.end
         } else {
-            view.positions[axis].start = viewDependency.positions[axis].end
+            position.start = viewDependencyPosition.end
         }
-        view.positions[axis].start += view.positions[axis].marginStart
-        view.positions[axis].startChanged = true
+        position.start += position.marginStart
+        position.startChanged = true
     }
 
     private static evalDependenceEndEnd(
-        axis: AXIS,
-        view: UIView,
-        parentView: UIView,
+        position: UIPosition,
         contentRect: AxisRect,
-        viewDependency: UIView,
+        parentDependence: boolean,
+        viewDependencyPosition: UIPosition,
     ) {
-        if (parentView == viewDependency) {
-            view.positions[axis].end = contentRect.end
+        if (parentDependence) {
+            position.end = contentRect.end
         } else {
-            view.positions[axis].end = viewDependency.positions[axis].end
+            position.end = viewDependencyPosition.end
         }
-        view.positions[axis].end -= view.positions[axis].marginEnd
-        view.positions[axis].endChanged = true
+        position.end -= position.marginEnd
+        position.endChanged = true
     }
 
     private static evalDependenceEndStart(
-        axis: AXIS,
-        view: UIView,
-        parentView: UIView,
+        position: UIPosition,
         contentRect: AxisRect,
-        viewDependency: UIView,
+        parentDependence: boolean,
+        viewDependencyPosition: UIPosition,
     ) {
-        if (parentView == viewDependency) {
-            view.positions[axis].end = contentRect.start
+        if (parentDependence) {
+            position.end = contentRect.start
         } else {
-            view.positions[axis].end = viewDependency.positions[axis].start
+            position.end = viewDependencyPosition.start
         }
-        view.positions[axis].end -= view.positions[axis].marginEnd
-        view.positions[axis].endChanged = true
+        position.end -= position.marginEnd
+        position.endChanged = true
     }
 
     private static evalDependenceCenter(
-        axis: AXIS,
-        view: UIView,
-        parentView: UIView,
+        position: UIPosition,
         contentRect: AxisRect,
-        viewDependency: UIView,
+        parentDependence: boolean,
+        viewDependencyPosition: UIPosition,
     ) {
-        if (parentView == viewDependency) {
-            view.positions[axis].center = (contentRect.start + contentRect.end) / 2
-            view.positions[axis].centerChanged = true
+        if (parentDependence) {
+            position.center = (contentRect.start + contentRect.end) / 2
+            position.centerChanged = true
         } else {
-            view.positions[axis].center =
-                (viewDependency.positions[axis].start + viewDependency.positions[axis].end) / 2
-            view.positions[axis].centerChanged = true
+            position.center = (viewDependencyPosition.start + position.end) / 2
+            position.centerChanged = true
         }
     }
 
