@@ -46,7 +46,7 @@ export default class UICalculatorContentRect {
             contentRect.end = parentSize
 
             // try to get the size with dependencies with the parent
-            const position = UICalculatorDependencies.evalViewDependencies(axis, view, parent, contentRect, false)
+            const position = UICalculatorDependencies.evalViewDependencies(axis, view, parent, contentRect)
             if (position.startChanged && position.endChanged) {
                 return Math.max(0, position.end - position.start)
             } else {

@@ -50,6 +50,21 @@ describe("List", () => {
         expect(item3.width).toBeLessThan(screen.width)
     })
 
+    test("List vertical center horizontal all", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "list-vertical-center-horizontal-all")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const item1 = await PuppeteerUtils.evalUiElement(page, "item1")
+        const item2 = await PuppeteerUtils.evalUiElement(page, "item2")
+        const item3 = await PuppeteerUtils.evalUiElement(page, "item3")
+
+        expect(item1.left).toBe((screen.width - item1.width) / 2)
+        expect(item1.width).toBeLessThan(screen.width)
+        expect(item2.left).toBe(0)
+        expect(item2.width).toBe(screen.width)
+        expect(item3.left).toBe((screen.width - item3.width) / 2)
+        expect(item3.width).toBeLessThan(screen.width)
+    })
+
     test("List vertical bottom", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "list-vertical-bottom")
         const item1 = await PuppeteerUtils.evalUiElement(page, "item1")
@@ -80,6 +95,21 @@ describe("List", () => {
         const item3 = await PuppeteerUtils.evalUiElement(page, "item3")
 
         expect(item1.top).toBe(0)
+        expect(item1.height).toBeLessThan(screen.height)
+        expect(item2.top).toBe(0)
+        expect(item2.height).toBe(screen.height)
+        expect(item3.top).toBe((screen.height - item3.height) / 2)
+        expect(item3.height).toBeLessThan(screen.height)
+    })
+
+    test("List horizontal center vertical all", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "list-horizontal-center-vertical-all")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const item1 = await PuppeteerUtils.evalUiElement(page, "item1")
+        const item2 = await PuppeteerUtils.evalUiElement(page, "item2")
+        const item3 = await PuppeteerUtils.evalUiElement(page, "item3")
+
+        expect(item1.top).toBe((screen.height - item1.height) / 2)
         expect(item1.height).toBeLessThan(screen.height)
         expect(item2.top).toBe(0)
         expect(item2.height).toBe(screen.height)

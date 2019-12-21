@@ -60,7 +60,7 @@ export default class UICalculatorView {
         // TODO calculate again if a child has parent dependencies, but now with real size
         if (attr.size == UI_SIZE.SIZE_CONTENT && contentRect.size() == 0 && !secondPass) {
             // apply size of calculated children to content rect
-            contentRect.end = this.getMaxEndOfChildren(axis, parent)
+            contentRect.end = this.getMaxEndOfChildren(axis, parent, true)
 
             // calculate children again
             this.calculateChildren(axis, parent, contentRect, scrollSize, true)
@@ -117,10 +117,15 @@ export default class UICalculatorView {
         position.size += position.paddingEnd
     }
 
-    private static getMaxEndOfChildren(axis: AXIS, view: UIView): number {
+    private static getMaxEndOfChildren(axis: AXIS, view: UIView, forceInsideParent: boolean = false): number {
         let maxEnd = 0
         for (const child of view.getUIChildren()) {
-            maxEnd = Math.max(maxEnd, child.positions[axis].end)
+            const position = child.positions[axis]
+            if (forceInsideParent && position.start < 0) {
+                maxEnd = Math.max(maxEnd, position.end - position.start)
+            } else {
+                maxEnd = Math.max(maxEnd, position.end)
+            }
         }
         return maxEnd
     }
