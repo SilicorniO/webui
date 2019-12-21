@@ -103,7 +103,7 @@ export default class UICalculatorView {
         // calculate max end checking all children
         if (view.hasUIChildren()) {
             const maxEnd = this.getMaxEndOfChildren(axis, view)
-            position.size = maxEnd - contentRect.start
+            position.size = maxEnd
         } else {
             // if we are not in first axis (x), the content could change, so we recalculate
             if (axis == AXIS.Y) {
