@@ -89,8 +89,10 @@ export default class UICalculatorView {
             position.size = (parentSizeLessMargins * attr.sizeValue) / 100
 
             // if we have a position we apply it now
-            position.start = contentRect.start + position.size * attr.percentPos + position.marginStart
-            position.startChanged = true
+            if (attr.percentPos > 0) {
+                position.start = contentRect.start + position.size * attr.percentPos + position.marginStart
+                position.startChanged = true
+            }
         } else {
             position.size = attr.sizeValue
         }

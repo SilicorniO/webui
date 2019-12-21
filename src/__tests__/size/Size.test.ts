@@ -93,6 +93,18 @@ describe("Size", () => {
         expect(element2.width).toBe(screen.width / 2)
     })
 
+    test("Percent horizontal with reference", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "percent-horizontal-with-reference")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+
+        expect(element1.left).toBe(0)
+        expect(element1.width).toBe(screen.width / 2)
+        expect(element2.left).toBe(screen.width / 2)
+        expect(element2.width).toBe(screen.width / 2)
+    })
+
     test("Percent vertical", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "percent-vertical")
         const screen = await PuppeteerUtils.evalUiElement(page, "screen")
