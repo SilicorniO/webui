@@ -76,6 +76,9 @@ export default class UIViewStateManager {
                 case UIViewStateChange.CHILD_NODE_REMOVED:
                     oldestView = this.changeStateChildNodeRemoved()
                     break
+                case UIViewStateChange.CHILD_NODE_MODIFIED:
+                    oldestView = this.changeStateChildNodeModified()
+                    break
                 case UIViewStateChange.PARENT_RESIZED:
                     oldestView = this.changeStateParentResized()
                     break
@@ -208,6 +211,11 @@ export default class UIViewStateManager {
     private changeStateChildNodeRemoved(): UIView | null {
         // change state of this view to DOM
         return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.NONE)
+    }
+
+    private changeStateChildNodeModified(): UIView | null {
+        // change state of this view to DOM
+        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.DOM)
     }
 
     private changeStateParentResized(): UIView | null {

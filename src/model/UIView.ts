@@ -30,6 +30,7 @@ export enum UIViewStateChange {
     VISIBILITY_GONE,
     CHILD_NODE_ADDED,
     CHILD_NODE_REMOVED,
+    CHILD_NODE_MODIFIED,
     PARENT_RESIZED,
     ATTRIBUTE_MODIFIED,
     ELEMENT_LOADED,
@@ -142,26 +143,6 @@ export default class UIView {
 
     public getState(): UIViewState {
         return this.stateManager.getState()
-    }
-
-    // ----- EVENTS ----
-
-    public evalEvents() {
-        this.eventsManager.evalEvents()
-
-        // eval events of all children
-        for (const child of this.getUIChildren()) {
-            child.evalEvents()
-        }
-    }
-
-    public disableEvents() {
-        this.eventsManager.disableEvents()
-
-        // eval events of all children
-        for (const child of this.getUIChildren()) {
-            child.disableEvents()
-        }
     }
 
     // ----- REFRESH -----

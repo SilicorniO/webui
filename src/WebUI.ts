@@ -61,11 +61,17 @@ class WebUI implements WebUIListener {
             this.scrollSize = HtmlUtils.getScrollWidth()
         }
 
-        // listen the body to discover screens later
-        this.eventsManager.init(bodyElement, this.configuration)
+        //call to listener with start event
+        this.configuration.sendStartEvent()
 
         // discover screens from body
         this.discoverAndDraw(bodyElement)
+
+        // listen the body to discover screens later
+        this.eventsManager.init(bodyElement, this.configuration)
+
+        //call to listener with end event
+        this.configuration.sendEndEvent()
     }
 
     private discoverAndDraw(element: HTMLElement) {
@@ -92,9 +98,6 @@ class WebUI implements WebUIListener {
         var timerCalculate = 0
         var timerDraw = 0
         var timerAll = 0
-
-        //call to listener with start event
-        this.configuration.sendStartEvent()
 
         //start genral counter
         CounterUtils.startCounter("all")
@@ -137,12 +140,6 @@ class WebUI implements WebUIListener {
                 ` Calculate(${timerCalculate})` +
                 ` Draw(${timerDraw})`,
         )
-
-        // apply events
-        view.evalEvents()
-
-        //call to listener with end event
-        this.configuration.sendEndEvent()
     }
 
     // ----- REDRAW -----
