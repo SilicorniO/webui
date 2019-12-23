@@ -19,8 +19,9 @@ export default class UIDomPreparer {
         // check if it has UI attribute
         if (element.hasAttribute(config.attribute)) {
             // if parentUi we don't create yet the UIView because it is not a screen
-            if (!parentUi) {
-                // generate screen
+            // and we have to check this element was not initialized yet
+            if (!parentUi && UIHTMLElement.get(element) == null) {
+                // generate screen if
                 const screen = new UIView(element, config, webUIListener)
 
                 // screen was discovered

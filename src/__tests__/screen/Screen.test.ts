@@ -23,6 +23,15 @@ describe("Screen", () => {
         done()
     })
 
+    test("Screen size", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "screen-size")
+
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+
+        expect(screen.width).toBe(50)
+        expect(screen.height).toBe(50)
+    })
+
     test("Subscreen", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "subscreen")
         const screen = await PuppeteerUtils.evalUiElement(page, "screen")

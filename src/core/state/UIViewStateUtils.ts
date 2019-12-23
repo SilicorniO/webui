@@ -4,16 +4,16 @@ import { AXIS_LIST, AXIS } from "../../model/UIAxis"
 import { UI_SIZE } from "../../model/UIAttr"
 
 export default class UIViewStateUtils {
-    public static setLowerState(view: UIView, state: UIViewState): UIView | null {
+    public static setLowerState(view: UIView, state: UIViewState): boolean {
         // check this is lower state
         if (state >= view.getState()) {
-            return null
+            return false
         }
 
         // set state
         view.setState(state)
 
-        return view
+        return true
     }
 
     public static setLowerStateToChildren(view: UIView, state: UIViewState) {

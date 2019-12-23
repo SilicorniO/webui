@@ -76,7 +76,6 @@ export default class WebUIEventsManager {
         if (uiElement != null) {
             Log.log(`Event 'addedNode' being processed for view ${uiElement.id}`)
             uiElement.ui.changeState(UIViewStateChange.CHILD_NODE_ADDED)
-            return
         }
 
         // search for screens from parent element

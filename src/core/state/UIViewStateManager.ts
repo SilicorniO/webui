@@ -118,7 +118,9 @@ export default class UIViewStateManager {
 
     private static setViewLowerState(view: UIView, state: UIViewState): UIView | null {
         // apply state to view
-        UIViewStateUtils.setLowerState(view, state)
+        if (!UIViewStateUtils.setLowerState(view, state)) {
+            return null
+        }
 
         const viewParent = view.parent
         if (viewParent != null) {
@@ -134,7 +136,9 @@ export default class UIViewStateManager {
 
     private static setParentOrViewLowerState(view: UIView, state: UIViewState): UIView | null {
         // apply state to view
-        UIViewStateUtils.setLowerState(view, state)
+        if (!UIViewStateUtils.setLowerState(view, state)) {
+            return null
+        }
 
         const viewParent = view.parent
         if (viewParent != null) {

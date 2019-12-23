@@ -82,6 +82,15 @@ describe("Dom", () => {
         expect(text.left).toBe(0)
     })
 
+    test("Add element UI nested no parent", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "add-element-ui-nested-no-parent")
+
+        // add one element
+        const element2 = await PuppeteerUtils.evalUiElement(page, "element2")
+        expect(element2.width).toBe(50)
+        expect(element2.height).toBe(50)
+    })
+
     test("Add change element content", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "add-change-element-content")
 
