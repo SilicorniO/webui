@@ -3,7 +3,7 @@
 Easier way to set the position of the views/tags in a website.
 Built with basic Javascript, it should be working in most of browsers.
 
-![WebUI example](https://raw.githubusercontent.com/SilicorniO/webui/master/resources/webui-presentation.gif)
+![WebUI example](https://github.com/SilicorniO/webui/blob/master/resources/webui_presentation.gif)
 
 ## Features
 
