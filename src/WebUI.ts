@@ -22,7 +22,7 @@ export interface WebUIListener {
 /**
  * @constructor
  */
-class WebUI implements WebUIListener {
+export default class WebUI implements WebUIListener {
     //size of scrollbars to use as padding when views have scrollbars visible
     private scrollSize: number = 0
 
@@ -195,5 +195,3 @@ class WebUI implements WebUIListener {
         Log.log(`[WebUI] End redraw(${CounterUtils.endCounter("redraw")})`)
     }
 }
-
-export default new WebUI()
