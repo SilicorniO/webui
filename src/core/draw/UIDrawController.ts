@@ -34,7 +34,7 @@ export default class UIDrawController {
             const screenDraw = UIDrawGenerator.generateScreenDraw(
                 view.attrs,
                 view.positions,
-                childrenMaxPosition,
+                view.userStyles,
                 configuration.viewColors,
             )
 
@@ -71,6 +71,7 @@ export default class UIDrawController {
             view.positions,
             view.animations,
             screenVisibility,
+            view.userStyles,
             configuration.viewColors,
         )
 

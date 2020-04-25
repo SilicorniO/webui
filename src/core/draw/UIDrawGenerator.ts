@@ -4,6 +4,7 @@ import { UI_VISIBILITY } from "../../model/UIVisibility"
 import UIPosition from "../../model/UIPosition"
 import UIDraw, { UIDrawAnimation } from "../../model/UIDraw"
 import UIViewAttrs from "../../model/UIViewAttrs"
+import { UIViewUserStyles } from "../../model/UIView"
 
 export interface DrawGeneratorChildResult {
     maxPosition: UIAxis<number>
@@ -17,7 +18,7 @@ export default class UIDrawGenerator {
     public static generateScreenDraw(
         attrs: UIViewAttrs,
         positions: UIAxis<UIPosition>,
-        childrenSize: UIAxis<number>,
+        userStyles: UIViewUserStyles,
         viewColors: boolean,
     ): UIDraw {
         // generate the draw object to return
@@ -25,7 +26,7 @@ export default class UIDrawGenerator {
 
         // apply all
         this.applyBackground(viewColors, draw)
-        this.applyVisibility(attrs, draw)
+        this.applyVisibility(attrs, draw, userStyles)
         this.applySize(positions, draw)
         this.applyOverflow(attrs, draw)
 
@@ -69,6 +70,7 @@ export default class UIDrawGenerator {
         positions: UIAxis<UIPosition>,
         animations: UIDrawAnimation[],
         parentVisibility: UI_VISIBILITY,
+        userStyles: UIViewUserStyles,
         viewColors: boolean,
     ): DrawGeneratorChildResult {
         // generate the draw object to return
@@ -77,7 +79,7 @@ export default class UIDrawGenerator {
         // apply all
         this.applyBackground(viewColors, draw)
         const maxPosition = this.applyPosition(positions, draw)
-        this.applyVisibility(attrs, draw, parentVisibility)
+        this.applyVisibility(attrs, draw, userStyles, parentVisibility)
         this.applyAnimation(animations, draw)
         this.applyOverflow(attrs, draw)
 
@@ -142,7 +144,12 @@ export default class UIDrawGenerator {
      * @param {UIConfiguration} configuration to know time of animations
      * @param {boolean} forceGone flag to know if parent is not being displayed because is gone
      **/
-    public static applyVisibility(attrs: UIViewAttrs, draw: UIDraw, parentVisibility?: UI_VISIBILITY) {
+    public static applyVisibility(
+        attrs: UIViewAttrs,
+        draw: UIDraw,
+        userStyles: UIViewUserStyles,
+        parentVisibility?: UI_VISIBILITY
+    ) {
         if (attrs.visibility == "g" || parentVisibility == UI_VISIBILITY.GONE) {
             draw.display = "none"
             draw.opacity = "0"
@@ -151,7 +158,7 @@ export default class UIDrawGenerator {
             if (attrs.visibility == UI_VISIBILITY.INVISIBLE || parentVisibility == UI_VISIBILITY.INVISIBLE) {
                 draw.opacity = "0"
             } else {
-                draw.opacity = "1"
+                draw.opacity = userStyles.opacity || "1"
             }
         }
     }

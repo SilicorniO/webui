@@ -111,4 +111,18 @@ describe("Visibility", () => {
 
         expect(element.transition.length).toBeGreaterThan(0)
     })
+
+    test("Opacity class", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "opacity-class")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+
+        expect(element1.opacity).toBe("0.2")
+    })
+
+    test("Opacity style", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "opacity-style")
+        const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
+
+        expect(element1.opacity).toBe("0.2")
+    })
 })

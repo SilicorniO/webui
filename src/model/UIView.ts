@@ -12,6 +12,7 @@ import UIViewEventsManager from "../core/events/UIViewEventsManager"
 import { UIAttributeValueArray } from "../core/dom/UIAttributeValue"
 import UIViewStateManager from "../core/state/UIViewStateManager"
 import { UIViewState } from "./UIViewState"
+import StyleUtils from "../utils/style/StyleUtils"
 
 export enum UIViewStateChange {
     NONE,
@@ -36,6 +37,10 @@ export enum UIViewStateChange {
     ELEMENT_LOADED,
 }
 
+export class UIViewUserStyles {
+    opacity: string = ""
+}
+
 export default class UIView {
     public static readonly UI_TAG: string = "ui"
 
@@ -47,6 +52,9 @@ export default class UIView {
 
     // dom element
     element: UIHTMLElement
+
+    // saved properties
+    userStyles: UIViewUserStyles = new UIViewUserStyles()
 
     // connections with parent and screen
     parent?: UIView
@@ -120,7 +128,8 @@ export default class UIView {
         this.eventsManager = new UIViewEventsManager(this, configuration)
         this.stateManager = new UIViewStateManager(this, webUIListener)
 
-        // initialize opacity to 0 to show it when it has the position
+        // initialize opacity to 0 to show it when it has the position, first saving user opacity
+        this.userStyles.opacity = StyleUtils.getOpacity(element)
         element.style.opacity = "0"
 
         //if it is an image we prepare to refresh when image is loaded

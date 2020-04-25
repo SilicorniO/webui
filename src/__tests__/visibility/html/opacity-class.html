@@ -1,0 +1,28 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+    <style>
+        .opac {
+            opacity: 0.2;
+        }
+    </style>
+</head>
+<body style="margin:0">
+    
+    <div ui="fw;fh" id="screen">
+        <div id="element1" class="opac" ui="v:v">Element1</div>
+    </div>
+
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs',
+        timeRedraw: 0
+    });
+    
+    </script>
+    
+</body>
+</html>
