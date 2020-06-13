@@ -72,10 +72,10 @@ export default class WebUIEventsManager {
         }
 
         // check its parent is a UIView
-        const uiElement = UIHTMLElement.get(element)
-        if (uiElement != null) {
-            Log.log(`Event 'addedNode' being processed for view ${uiElement.id}`)
-            uiElement.ui.changeState(UIViewStateChange.CHILD_NODE_ADDED)
+        const previousUIElement = HtmlUtils.getPreviousElementWithAttribute(this.configuration.attribute, element)
+        if (previousUIElement != null) {
+            Log.log(`Event 'addedNode' being processed for view ${previousUIElement.id}`)
+            UIHTMLElement.get(previousUIElement)?.ui.changeState(UIViewStateChange.CHILD_NODE_ADDED)
         }
 
         // search for screens from parent element

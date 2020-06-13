@@ -1,0 +1,37 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../../../../build/webui-lib.js"></script>
+</head>
+<body style="margin:0">
+    
+    <div id="screen" ui="">
+        <div id="container">
+            <span>Text</span>
+        </div>
+    </div>
+    <div id="buttons">
+        <a id="changeContent" href="#" onClick="addContent()">Add content</a>
+    </div>
+    
+    <script>
+    WebUI.start({
+        viewColors: true,
+        showLogs: true,
+        viewLogs: 'logs',
+        timeRedraw: 0
+    });
+    
+    var elementContent = document.getElementById('elementContent');
+
+    function addContent(){
+        var container = document.getElementById("container");
+        var element = document.createElement("span");
+        element.innerHTML = "Text"
+        container.appendChild(element);
+    }
+
+    </script>
+    
+</body>
+</html>
