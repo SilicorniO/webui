@@ -6,12 +6,10 @@
 <body style="margin:0">
     
     <div id="screen" ui="">
-        <div id="container">
-            <span>Text</span>
-        </div>
+        <div id="container"><span>Text</span><span>Text</span><span>Text</span><span>Text</span><span>Text</span></div>
     </div>
     <div id="buttons">
-        <a id="addContent" href="#" onClick="addContent()">Add content</a>
+        <a id="removeContent" href="#" onClick="removeContent()">Remove content</a>
     </div>
     
     <script>
@@ -24,11 +22,9 @@
     
     var elementContent = document.getElementById('elementContent');
 
-    function addContent(){
+    function removeContent(){
         var container = document.getElementById("container");
-        var element = document.createElement("span");
-        element.innerHTML = "Text"
-        container.appendChild(element);
+        container.removeChild(container.lastChild)
     }
 
     </script>

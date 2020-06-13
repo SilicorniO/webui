@@ -166,6 +166,32 @@ describe("Dom", () => {
         expect(element.width).toBeGreaterThan(elementWidth)
     })
 
+    test("Change element content add", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-content-add")
+
+        // check position
+        let container = await PuppeteerUtils.evalUiElement(page, "container")
+        const containerWidth = container.width
+
+        // add one element
+        await page.click("#addContent")
+        container = await PuppeteerUtils.evalUiElement(page, "container")
+        expect(container.width).toBeGreaterThan(containerWidth)
+    })
+
+    test("Change element content remove", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "change-element-content-remove")
+
+        // check position
+        let container = await PuppeteerUtils.evalUiElement(page, "container")
+        const containerWidth = container.width
+
+        // add one element
+        await page.click("#removeContent")
+        container = await PuppeteerUtils.evalUiElement(page, "container")
+        expect(container.width).toBeLessThan(containerWidth)
+    })
+
     test("Change element content sub", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "change-element-content-sub")
 
