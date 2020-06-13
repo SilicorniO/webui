@@ -20,7 +20,6 @@ export default class WebUIEventsManager {
 
         // create observer
         const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
-            Log.log(`Mutation received: ${JSON.stringify(mutationsList, null, 2)}`)
             for (const mutation of mutationsList) {
                 if (mutation.type == "childList") {
                     this.evalModifiedDom(mutation)
@@ -128,7 +127,7 @@ export default class WebUIEventsManager {
         }
 
         // change state of previous element because size might have changed
-        Log.log(`Event 'modifiedaNode' being processed for view ${uiElement.id}`)
+        Log.log(`Event 'modifiedNode' being processed for view ${uiElement.id}`)
         uiElement.ui.changeState(UIViewStateChange.CHILD_NODE_ADDED)
     }
 
