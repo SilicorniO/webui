@@ -1,6 +1,6 @@
 {
   "name": "js-webui",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "build/webui-dist.js",
   "description": "Easier way to set the position of the views/tags in a website.  Built with basic Javascript, it should be working in most of browsers.",
   "private": false,

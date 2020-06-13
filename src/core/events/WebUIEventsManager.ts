@@ -20,6 +20,7 @@ export default class WebUIEventsManager {
 
         // create observer
         const observerAddRemoveNodes = new MutationObserver((mutationsList: MutationRecord[]) => {
+            Log.log(`Mutation received: ${JSON.stringify(mutationsList, null, 2)}`)
             for (const mutation of mutationsList) {
                 if (mutation.type == "childList") {
                     this.evalModifiedDom(mutation)
@@ -41,6 +42,8 @@ export default class WebUIEventsManager {
     }
 
     private evalModifiedDom(mutation: MutationRecord) {
+        Log.log(`evalModifiedDom`)
+
         // check it is an HTMLElement
         const element = mutation.target
         if (!(element instanceof HTMLElement)) {
@@ -65,6 +68,8 @@ export default class WebUIEventsManager {
     }
 
     private evalAddedNode(node: Node, element: HTMLElement) {
+        Log.log(`evalAddedNode`)
+
         // if node is not an HTMLElement it is a modification
         if (!(node instanceof HTMLElement)) {
             this.evalModifiedNode(element)
@@ -83,11 +88,12 @@ export default class WebUIEventsManager {
     }
 
     private evalRemovedNode(element: HTMLElement) {
-        Log.log("Event 'removedNode' being processed from body. Element: " + element.id)
+        Log.log(`evalRemovedNode`)
 
         // check its parent is a UIView
         const uiElement = UIHTMLElement.get(element)
         if (uiElement != null) {
+            Log.log(`Event 'removedNode' with UI being processed for view ${uiElement.id}`)
             uiElement.ui.changeState(UIViewStateChange.CHILD_NODE_REMOVED)
             return
         }
@@ -99,19 +105,14 @@ export default class WebUIEventsManager {
             return
         }
 
-        // convert to ui element
-        const previousUiElement = UIHTMLElement.get(previousUIElement)
-        if (previousUiElement == null) {
-            Log.logE("UNEXPECTED: element has the UI attribute but it is not initialized")
-            return
-        }
-
         // change state of previous element because size might have changed
-        Log.log(`Event 'removedNode' being processed for view ${previousUiElement.id}`)
-        previousUiElement.ui.changeState(UIViewStateChange.CHILD_NODE_REMOVED)
+        Log.log(`Event 'removedNode' being processed for view ${previousUIElement.id}`)
+        UIHTMLElement.get(previousUIElement)?.ui.changeState(UIViewStateChange.CHILD_NODE_REMOVED)
     }
 
     private evalModifiedNode(element: HTMLElement) {
+        Log.log(`evalModifiedNode`)
+
         // search for previous UI view, if exists we change the state to dom
         const previousUiElement = HtmlUtils.getPreviousElementWithAttribute(this.configuration.attribute, element)
         if (previousUiElement == null) {
