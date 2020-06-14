@@ -64,7 +64,6 @@ export default class UIView {
     eventsManager: UIViewEventsManager
 
     // calculated children
-    childrenInOrder: boolean = false
     childrenOrder: UIAxisArray<UIView> = {
         [AXIS.X]: [],
         [AXIS.Y]: [],

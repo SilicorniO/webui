@@ -112,6 +112,15 @@ describe("Position", () => {
         expect(element.left).toBe(content.left + content.width)
     })
 
+    test("At right with id", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "at-right-with-id")
+        const screen = await PuppeteerUtils.evalUiElement(page, "screen")
+        const menu = await PuppeteerUtils.evalUiElement(page, "menu")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+
+        expect(content.width).toBe(screen.width - menu.width)
+    })
+
     test("At top", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "at-top")
         const element = await PuppeteerUtils.evalUiElement(page, "element")

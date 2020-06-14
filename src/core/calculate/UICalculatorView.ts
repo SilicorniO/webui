@@ -36,7 +36,7 @@ export default class UICalculatorView {
         const attr = parent.attrs[axis]
 
         // for each child
-        for (const child of parent.getUIChildren()) {
+        for (const child of parent.childrenOrder[axis]) {
             // if has children we calculate children
             if (child.hasUIChildren()) {
                 this.calculate(axis, child, contentRect.size(), scrollSize)
