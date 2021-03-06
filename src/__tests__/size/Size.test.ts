@@ -38,6 +38,15 @@ describe("Size", () => {
         expect(element.width).toBe(content.width)
     })
 
+    test("Width full with padding", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "width-full-with-padding")
+
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.width).toBe(content.width - 100)
+    })
+
     test("Height", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "height")
         const element = await PuppeteerUtils.evalUiElement(page, "element")
