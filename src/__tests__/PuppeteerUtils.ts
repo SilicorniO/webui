@@ -25,7 +25,7 @@ export default class PuppeteerUtils {
     }
 
     public static async evalUiElement(page: any, elementId: string): Promise<UiDataElement> {
-        await page.waitFor("#" + elementId)
+        await page.waitForTimeout("#" + elementId)
         return await page.evaluate((eId: string) => {
             // get element
             const element = document.getElementById(eId)
@@ -51,7 +51,7 @@ export default class PuppeteerUtils {
     }
 
     public static async evalElement(page: any, elementId: string): Promise<DataElement> {
-        await page.waitFor("#" + elementId)
+        await page.waitForTimeout("#" + elementId)
         return await page.evaluate((eId: string) => {
             // get element
             const element = document.getElementById(eId)
