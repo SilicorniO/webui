@@ -48,9 +48,9 @@ export default class DomSizeUtils {
 
     // generate list of indexes
     public static generateIndexes(elements: UIView[]): { [key: string]: number } {
-        var indexes: { [key: string]: number } = {}
+        const indexes: { [key: string]: number } = {}
 
-        for (var i = 0; i < elements.length; i++) {
+        for (let i = 0; i < elements.length; i++) {
             if (elements[i].id) {
                 indexes[elements[i].id] = i
             }

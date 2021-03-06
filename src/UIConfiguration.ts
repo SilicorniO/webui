@@ -68,7 +68,7 @@ export default class UIConfiguration {
         }
 
         if (uiConf.animations != null) {
-            var animations = uiConf.animations
+            const animations = uiConf.animations
             if (animations.defaultTime != null) {
                 this.animations.defaultTime = animations.defaultTime
             }
@@ -90,8 +90,8 @@ export default class UIConfiguration {
         this.dimens = {}
         if (uiConf.dimens) {
             // copy all values
-            var dimenKeys = Object.keys(uiConf.dimens)
-            for (var i = 0; i < dimenKeys.length; i++) {
+            const dimenKeys = Object.keys(uiConf.dimens)
+            for (let i = 0; i < dimenKeys.length; i++) {
                 this.dimens[dimenKeys[i]] = uiConf.dimens[dimenKeys[i]]
             }
         }
@@ -106,19 +106,19 @@ export default class UIConfiguration {
 
     public refreshScreenSize() {
         //initialize array of attributes
-        var aAttributes: string[] = []
-        var dimens = this.dimens
+        const aAttributes: string[] = []
+        const dimens = this.dimens
 
-        var widthScreen = window.innerWidth
-        var heightScreen = window.innerHeight
+        const widthScreen = window.innerWidth
+        const heightScreen = window.innerHeight
 
         Log.log("screen-width: " + widthScreen)
         Log.log("screen-height: " + heightScreen)
 
         if (this.screenModes) {
-            for (var i = 0; i < this.screenModes.length; i++) {
+            for (let i = 0; i < this.screenModes.length; i++) {
                 //get the screenMode
-                var screenMode = this.screenModes[i]
+                const screenMode = this.screenModes[i]
 
                 //check each screenMode
                 if (
@@ -144,8 +144,8 @@ export default class UIConfiguration {
 
                     //add dimens of this screen mode overriding existing
                     if (screenMode.dimens) {
-                        var dimenKeys = Object.keys(screenMode["dimens"])
-                        for (var n = 0; n < dimenKeys.length; n++) {
+                        const dimenKeys = Object.keys(screenMode["dimens"])
+                        for (let n = 0; n < dimenKeys.length; n++) {
                             dimens[dimenKeys[n]] = screenMode["dimens"][dimenKeys[n]]
                         }
                     }
@@ -182,7 +182,7 @@ export default class UIConfiguration {
         }
     }
 
-    public sendEndEvent = function() {
+    public sendEndEvent = function () {
         if (this.events) {
             this.events({
                 name: UIConfiguration.EVENT_END,

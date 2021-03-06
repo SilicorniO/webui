@@ -12,7 +12,9 @@
     "dist": "webpack --config webpack.prod.js",
     "lint": "eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
     "test": "npx jest --runInBand",
-    "test:coverage": "npx jest --coverage --runInBand"
+    "test:coverage": "npx jest --coverage --runInBand",
+    "lint:fix": "eslint --fix src --ext 'src/**/*.{js,ts,tsx}'",
+    "prettier:fix": "prettier --write 'src/**/*.{js,ts,tsx}'"
   },
   "repository": {
     "type": "git",

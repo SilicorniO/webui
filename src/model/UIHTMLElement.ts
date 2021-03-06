@@ -32,7 +32,7 @@ export default class UIHTMLElement extends HTMLElement {
                 }
             }
         } else {
-            ;(elements as NodeListOf<ChildNode>).forEach(node => {
+            ;(elements as NodeListOf<ChildNode>).forEach((node) => {
                 const uiElement = UIHTMLElement.get(node)
                 if (uiElement != null) {
                     uiElements.push(uiElement)

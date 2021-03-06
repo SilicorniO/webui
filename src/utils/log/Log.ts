@@ -40,7 +40,7 @@ export default class Log {
         }
 
         //prepare log
-        var log = text
+        let log = text
         switch (type) {
             case LogType.DEBUG:
                 log = "DEBUG: " + log

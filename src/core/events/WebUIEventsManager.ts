@@ -41,7 +41,7 @@ export default class WebUIEventsManager {
     }
 
     private evalModifiedDom(mutation: MutationRecord) {
-        Log.log(`evalModifiedDom`)
+        Log.log("evalModifiedDom")
 
         // check it is an HTMLElement
         const element = mutation.target
@@ -53,13 +53,13 @@ export default class WebUIEventsManager {
         const processedNodes: Node[] = []
 
         // added nodes
-        mutation.addedNodes.forEach(addedNode => {
+        mutation.addedNodes.forEach((addedNode) => {
             this.evalAddedNode(addedNode, element)
             processedNodes.push(addedNode)
         })
 
         // removed nodes
-        mutation.removedNodes.forEach(removedNode => {
+        mutation.removedNodes.forEach((removedNode) => {
             if (!processedNodes.includes(removedNode)) {
                 this.evalRemovedNode(element)
             }
@@ -67,7 +67,7 @@ export default class WebUIEventsManager {
     }
 
     private evalAddedNode(node: Node, element: HTMLElement) {
-        Log.log(`evalAddedNode`)
+        Log.log("evalAddedNode")
 
         // if node is not an HTMLElement it is a modification
         if (!(node instanceof HTMLElement)) {
@@ -87,7 +87,7 @@ export default class WebUIEventsManager {
     }
 
     private evalRemovedNode(element: HTMLElement) {
-        Log.log(`evalRemovedNode`)
+        Log.log("evalRemovedNode")
 
         // check its parent is a UIView
         const uiElement = UIHTMLElement.get(element)
@@ -110,7 +110,7 @@ export default class WebUIEventsManager {
     }
 
     private evalModifiedNode(element: HTMLElement) {
-        Log.log(`evalModifiedNode`)
+        Log.log("evalModifiedNode")
 
         // search for previous UI view, if exists we change the state to dom
         const previousUiElement = HtmlUtils.getPreviousElementWithAttribute(this.configuration.attribute, element)

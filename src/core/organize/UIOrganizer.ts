@@ -143,7 +143,7 @@ export default class UIOrganizer {
         }
 
         //sort views after setting order num
-        views.sort(function(a, b) {
+        views.sort(function (a, b) {
             return a.orderNum - b.orderNum
         })
 

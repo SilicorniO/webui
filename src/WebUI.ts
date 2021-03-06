@@ -54,7 +54,7 @@ export default class WebUI implements WebUIListener {
         Log.uiViewLogs = this.configuration.logsView
 
         //get the body element
-        var bodyElement = document.getElementsByTagName("BODY")[0] as HTMLElement
+        const bodyElement = document.getElementsByTagName("BODY")[0] as HTMLElement
 
         //calculate the size of scrollbars
         if (this.scrollSize == 0) {
@@ -80,7 +80,7 @@ export default class WebUI implements WebUIListener {
         CounterUtils.startCounter("drawScreens")
 
         // discover screens
-        UIDomPreparer.discoverScreens(element, this.configuration, this, screen => {
+        UIDomPreparer.discoverScreens(element, this.configuration, this, (screen) => {
             // draw the screen
             this.drawUIView(screen)
         })
@@ -92,12 +92,12 @@ export default class WebUI implements WebUIListener {
         Log.log(`[${view.id}] Start processing screen`)
 
         //timers variables
-        var timerDom = 0
-        var timerPrepare = 0
-        var timerOrganize = 0
-        var timerCalculate = 0
-        var timerDraw = 0
-        var timerAll = 0
+        let timerDom = 0
+        let timerPrepare = 0
+        let timerOrganize = 0
+        let timerCalculate = 0
+        let timerDraw = 0
+        let timerAll = 0
 
         //start genral counter
         CounterUtils.startCounter("all")

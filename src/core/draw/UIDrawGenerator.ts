@@ -148,7 +148,7 @@ export default class UIDrawGenerator {
         attrs: UIViewAttrs,
         draw: UIDraw,
         userStyles: UIViewUserStyles,
-        parentVisibility?: UI_VISIBILITY
+        parentVisibility?: UI_VISIBILITY,
     ) {
         if (attrs.visibility == "g" || parentVisibility == UI_VISIBILITY.GONE) {
             draw.display = "none"

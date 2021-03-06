@@ -33,7 +33,7 @@ export default class UIDomPreparer {
         }
 
         // no UI, search in children
-        element.childNodes.forEach(child => {
+        element.childNodes.forEach((child) => {
             if (child instanceof HTMLElement) {
                 UIDomPreparer.discoverScreens(child, config, webUIListener, listener, hasParentUi)
             }
@@ -57,7 +57,7 @@ export default class UIDomPreparer {
                 view.attrs = UIAttrReader.readAttrs(view.element, configuration)
 
                 // generate views of all children
-                element.childNodes.forEach(child => {
+                element.childNodes.forEach((child) => {
                     if (child instanceof HTMLElement) {
                         UIDomPreparer.prepareDom(child, configuration, webUIListener, view, screen)
                     }
@@ -81,7 +81,7 @@ export default class UIDomPreparer {
         view.attrs = UIAttrReader.readAttrs(view.element, configuration)
 
         // generate views of all children
-        element.childNodes.forEach(child => {
+        element.childNodes.forEach((child) => {
             if (child instanceof HTMLElement) {
                 UIDomPreparer.prepareDom(child, configuration, webUIListener, view, screen)
             }
@@ -96,7 +96,7 @@ export default class UIDomPreparer {
         delete (element as any).ui
 
         // delete the UI from children
-        element.childNodes.forEach(childNode => {
+        element.childNodes.forEach((childNode) => {
             UIDomPreparer.clearUIDom(childNode)
         })
     }

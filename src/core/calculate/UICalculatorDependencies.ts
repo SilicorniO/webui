@@ -24,10 +24,10 @@ export default class UICalculatorDependencies {
         const position = view.positions[axis].clone()
         position.clean()
 
-        var numDependencies = 0
-        var attrs = view.getAttrs(axis)
+        let numDependencies = 0
+        const attrs = view.getAttrs(axis)
         for (const refId of UI_REF_LIST) {
-            var dependency = this.translateViewDependency(view, attrs.getRef(refId), parentView)
+            const dependency = this.translateViewDependency(view, attrs.getRef(refId), parentView)
             if (dependency.length > 0) {
                 const viewDependency = parentView.dependenciesMap[dependency]
                 if (viewDependency != null) {
@@ -167,7 +167,7 @@ export default class UICalculatorDependencies {
             return parentView.id
         } else if (viewDependency == UI_VIEW_ID.LAST) {
             // get previous view and check is null to set as parent
-            var previousView = view.getPreviousView()
+            const previousView = view.getPreviousView()
             if (previousView != null) {
                 return previousView.id
             } else {

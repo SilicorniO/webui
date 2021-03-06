@@ -181,7 +181,7 @@ export default class UIView {
         animationEnd?: () => void,
     ) {
         // get a copy of the attributes
-        let previousAttributes = this.attrs.clone()
+        const previousAttributes = this.attrs.clone()
 
         // apply attribute
         this.applyAttribute(attribute, value)
