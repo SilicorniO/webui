@@ -59,7 +59,7 @@ export default class UICalculatorContentRect {
     }
 
     private static applyPaddingToContentRect(contentRect: AxisRect, attr: UIAttr, position: UIPosition) {
-        if (attr.size == UI_SIZE.SIZE_CONTENT) {
+        if (attr.size == UI_SIZE.SIZE_CONTENT && contentRect.end == 0) {
             contentRect.end += position.paddingStart
         } else {
             contentRect.end -= position.paddingEnd
