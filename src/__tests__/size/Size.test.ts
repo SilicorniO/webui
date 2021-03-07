@@ -55,7 +55,7 @@ describe("Size", () => {
         const element = await PuppeteerUtils.evalUiElement(page, "element")
 
         expect(subscreen.width).toBe(content.width)
-        expect(subscreen.left + subscreen.width).toBe(element.left + element.width)
+        expect(subscreen.width).toBe(element.left + element.width)
     })
 
     test("Height", async () => {
