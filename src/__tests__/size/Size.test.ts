@@ -47,6 +47,17 @@ describe("Size", () => {
         expect(element.width).toBe(content.width - 100)
     })
 
+    test("Width full with right son", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "width-full-with-right-son")
+
+        const subscreen = await PuppeteerUtils.evalUiElement(page, "subscreen")
+        const content = await PuppeteerUtils.evalUiElement(page, "content")
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(subscreen.width).toBe(content.width)
+        expect(subscreen.left + subscreen.width).toBe(element.left + element.width)
+    })
+
     test("Height", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "height")
         const element = await PuppeteerUtils.evalUiElement(page, "element")
