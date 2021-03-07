@@ -32,7 +32,7 @@ You can find the latest minified version in the builds folder. If you need to de
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="webui-3.0.0.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
     </head>
     <body></body>
 </html>
@@ -44,7 +44,7 @@ You can find the latest minified version in the builds folder. If you need to de
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="webui-3.0.0.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
     </head>
     <body>
         <script>
@@ -62,7 +62,7 @@ The webui framework search for ui attributes in HTML elements. The first element
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="webui-1.0.0.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
     </head>
     <body>
         <div ui="fw;fh">
@@ -84,7 +84,7 @@ Add "ui" attribute to the element you want to convert to UI-Screen. By default a
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="webui-1.0.0.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
     </head>
     <body>
         <div style="width:100%;height:50px;background-color:gray">
@@ -178,6 +178,9 @@ You can define the position of your webui-view with short commands inside the "u
 -   **[sv] Scroll vertical:** () Just add this parameter to show vertical scrollbars in the view if it is necessary.
 -   **[sh] Scroll horizontal:** () Just add this parameter to show vertical scrollbars in the view if it is necessary.
 -   **[v] Visibility:** ("v") to show the view, this is the default value. ("i") to set the view as invisible but having size. ("g") to hide view from eyes and calculations.
+-   **[o] Overflow:** ("o") to show overflow or not. Views by default are hiding overflow ("h"). You can do it visible with ("v") or you can define scroll with ("s").
+-   **[oh] Overflow horizontal:** ("o") to show overflow or not. Views by default are hiding overflow ("h"). You can do it visible with ("v") or you can define scroll with ("s").
+-   **[ov] Overflow vertical:** ("o") to show overflow or not. Views by default are hiding overflow ("h"). You can do it visible with ("v") or you can define scroll with ("s").
 
 ### 3. Identifiers of the views
 
