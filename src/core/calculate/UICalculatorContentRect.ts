@@ -32,7 +32,7 @@ export default class UICalculatorContentRect {
         if (attr.size == UI_SIZE.SIZE_CONTENT) {
             return this.calculateSizeContent(axis, view, parentSize)
         } else if (attr.size == UI_SIZE.PERCENTAGE) {
-            return (parentSize * attr.sizeValue) / 100
+            return ((parentSize * attr.sizeValue) / 100) - view.positions[axis].marginStart - view.positions[axis].marginEnd
         } else {
             return attr.sizeValue
         }
