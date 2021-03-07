@@ -32,7 +32,7 @@ You can find the latest minified version in the builds folder. If you need to de
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.7.min.js"></script>
     </head>
     <body></body>
 </html>
@@ -44,7 +44,7 @@ You can find the latest minified version in the builds folder. If you need to de
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.7.min.js"></script>
     </head>
     <body>
         <script>
@@ -62,7 +62,7 @@ The webui framework search for ui attributes in HTML elements. The first element
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.7.min.js"></script>
     </head>
     <body>
         <div ui="fw;fh">
@@ -84,7 +84,7 @@ Add "ui" attribute to the element you want to convert to UI-Screen. By default a
 <html>
     <head>
         <!-- WEBUI SCRIPT REFERNCE -->
-        <script type="text/javascript" src="js-webui-1.0.6.min.js"></script>
+        <script type="text/javascript" src="js-webui-1.0.7.min.js"></script>
     </head>
     <body>
         <div style="width:100%;height:50px;background-color:gray">
