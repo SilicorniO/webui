@@ -204,7 +204,9 @@ export default class UIViewStateManager {
 
     private changeStateVisibilityGone(): UIView | null {
         // visibility of view has changed between gone and visible or invisible
-        return UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.DOM)
+        const view = UIViewStateManager.setParentOrViewLowerState(this.view, UIViewState.DOM)
+        UIViewStateUtils.setLowerStateToChildren(view || this.view, UIViewState.DOM)
+        return view
     }
 
     private changeStateChildNodeAdded(): UIView | null {

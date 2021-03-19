@@ -68,6 +68,14 @@ describe("Visibility", () => {
         expect(element2.left).toBe(element1.left + element1.width)
     })
 
+    test("Gone to visible", async () => {
+        await PuppeteerUtils.loadPage(page, __dirname, "gone-to-visible")
+        await page.waitForSelector("#element", { visible: true })
+        const element = await PuppeteerUtils.evalUiElement(page, "element")
+
+        expect(element.width).not.toBe(0)
+    })
+
     test("Gone", async () => {
         await PuppeteerUtils.loadPage(page, __dirname, "gone")
         const element1 = await PuppeteerUtils.evalUiElement(page, "element1")
